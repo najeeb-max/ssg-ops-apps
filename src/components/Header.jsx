@@ -9,14 +9,13 @@ export default function Header() {
 
   return (
     <header className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b-4 border-red-600">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="flex flex-col">
-            <span className="text-2xl font-black text-red-600">SSG</span>
-            <span className="text-xs font-bold text-white tracking-widest">OPS APPS</span>
-          </div>
-          <div className="hidden sm:block h-8 w-px bg-red-600/50"></div>
-          <span className="hidden sm:block text-sm font-semibold text-gray-300 italic">Streamline • Simplify • Grow</span>
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
+          <img 
+            src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
+            alt="SSG OPS APPS Logo"
+            className="h-16 w-auto"
+          />
         </Link>
         
         <button

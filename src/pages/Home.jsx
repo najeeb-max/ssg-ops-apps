@@ -156,16 +156,15 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex items-end gap-3 mb-4">
-              <h1 className="text-5xl md:text-6xl font-black text-red-600">
-                SSG OPS APPS
-              </h1>
-              <span className="text-sm font-semibold text-gray-600 mb-2 tracking-widest">PORTAL</span>
-            </div>
-            <p className="text-lg text-gray-600 mb-2 font-semibold">
+            <img 
+              src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
+              alt="SSG OPS APPS"
+              className="h-32 mb-6"
+            />
+            <p className="text-lg text-gray-600 mb-4 font-semibold italic">
               Streamline • Simplify • Grow
             </p>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 mb-8 max-w-2xl">
               Access all your internal tools and integrations in one seamless workspace
             </p>
 
@@ -232,7 +231,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="text-red-600 font-bold mb-4 text-lg">SSG OPS APPS</h3>
+              <img 
+                src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
+                alt="SSG OPS APPS"
+                className="h-20 mb-4"
+              />
               <p className="text-sm">Unified workspace for all your business tools and integrations.</p>
             </div>
             <div>
