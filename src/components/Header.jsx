@@ -29,15 +29,32 @@ export default function Header() {
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b-2 border-red-600 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex-1 hover:opacity-80 transition-opacity">
-          <div className="flex items-center gap-4">
+          <motion.div 
+            className="flex items-center gap-4"
+            animate={{ opacity: [1, 0.85, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <div>
-              <p className="text-sm font-semibold text-slate-900">{dateTime}</p>
+              <motion.p 
+                className="text-sm font-semibold text-slate-900"
+                key={tick}
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {dateTime}
+              </motion.p>
               <div className="flex items-center gap-2 mt-1">
-                <Cloud className="w-4 h-4 text-gray-600" />
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Cloud className="w-4 h-4 text-gray-600" />
+                </motion.div>
                 <span className="text-xs text-gray-600">{weather.condition} • {weather.temp}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </Link>
         
         <button
