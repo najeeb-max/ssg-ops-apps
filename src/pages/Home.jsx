@@ -181,40 +181,20 @@ export default function Home() {
             {filteredApps.map((app) => (
               <AppCard key={app.id} {...app} />
             ))}
-          </motion.div>
+          </div>
 
           {filteredApps.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-gray-600 text-lg">No applications found matching your search</p>
+            <div className="text-center py-12">
+              <p className="text-gray-600">No applications found matching your search</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t-2 border-red-600 py-16 px-6 mt-8">
+      <footer className="bg-white border-t border-gray-300 py-6 px-6 mt-auto">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-            <div>
-              <img 
-                src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
-                alt="SSG OPS APPS"
-                className="h-40 mb-6"
-              />
-              <p className="text-gray-700 text-sm leading-relaxed">Enterprise operations platform designed for modern teams.</p>
-            </div>
-            <div>
-              <h3 className="text-red-600 font-bold mb-4 uppercase tracking-widest text-sm">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li><a href="#" className="hover:text-red-600 transition">Documentation</a></li>
-                <li><a href="#" className="hover:text-red-600 transition">Contact IT</a></li>
-                <li><a href="#" className="hover:text-red-600 transition">Help Center</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-300 pt-8">
-            <p className="text-center text-gray-700 text-sm">&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
-          </div>
+          <p className="text-center text-gray-600 text-xs">&copy; 2026 SSG OPS. All rights reserved.</p>
         </div>
       </footer>
     </div>
