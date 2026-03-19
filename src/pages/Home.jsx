@@ -137,71 +137,42 @@ export default function Home() {
   }, [searchQuery, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-hidden flex flex-col">
       <Header />
 
-      {/* Hero Section with Large Logo */}
-      <section className="pt-28 px-6 pb-16 bg-white min-h-screen flex flex-col items-center justify-center">
-        <div className="max-w-6xl w-full">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col items-center justify-center mb-12"
-          >
-            <img 
-              src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
-              alt="SSG OPS APPS"
-              className="h-56 w-auto mb-8 drop-shadow-2xl"
-            />
-            <p className="text-xl text-gray-600 font-light tracking-widest mb-8">
-              Streamline • Simplify • Grow
-            </p>
-            <p className="text-gray-700 text-center max-w-2xl mb-12 text-lg">
-              Your unified workspace for enterprise operations. Access all critical business tools and integrations seamlessly integrated with Google Workspace.
-            </p>
-          </motion.div>
-
+      {/* Main Content */}
+      <div className="flex-1 pt-24 px-6 pb-8">
+        <div className="max-w-7xl mx-auto">
           {/* Search Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative max-w-2xl mx-auto mb-8"
-          >
-            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
+          <div className="relative max-w-2xl mx-auto mb-6">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
             <input
               type="text"
               placeholder="Search applications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-5 py-4 bg-white border-2 border-red-200 rounded-xl focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-slate-900 placeholder-gray-500 text-lg"
+              className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-slate-900 placeholder-gray-500"
             />
-          </motion.div>
+          </div>
 
           {/* Category Filter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex gap-2 justify-center flex-wrap mb-16"
-          >
+          <div className="flex gap-2 justify-center flex-wrap mb-8">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full font-semibold text-sm transition-all ${
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                   activeCategory === category
-                    ? 'bg-red-600 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-700 border border-gray-300 hover:border-red-500 hover:text-gray-900'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
                 {category}
               </button>
             ))}
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* Apps Grid */}
       <section className="px-6 py-16 bg-white">
