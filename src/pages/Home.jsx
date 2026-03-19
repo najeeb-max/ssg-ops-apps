@@ -74,33 +74,7 @@ const COMPANY_APPS = [
     link: '/directory',
     category: 'People'
   },
-  {
-    id: 8,
-    name: 'Analytics Dashboard',
-    description: 'Track key metrics and performance indicators across all apps',
-    icon: BarChart3,
-    color: 'bg-red-600',
-    link: '/analytics',
-    category: 'Analytics'
-  },
-  {
-    id: 9,
-    name: 'Task Manager',
-    description: 'Organize tasks, track progress, and collaborate with your team',
-    icon: CheckSquare,
-    color: 'bg-red-700',
-    link: '/tasks',
-    category: 'Productivity'
-  },
-  {
-    id: 10,
-    name: 'Expense Tracking',
-    description: 'Log, approve, and manage company expenses and reimbursements',
-    icon: DollarSign,
-    color: 'bg-red-600',
-    link: '/expenses',
-    category: 'Finance'
-  },
+
   {
     id: 11,
     name: 'Automation Hub',
