@@ -149,7 +149,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Section with Large Logo */}
-      <section className="pt-28 px-6 pb-16 bg-gradient-to-b from-white via-gray-50 to-gray-100 min-h-screen flex flex-col items-center justify-center">
+      <section className="pt-28 px-6 pb-16 bg-white min-h-screen flex flex-col items-center justify-center">
         <div className="max-w-6xl w-full">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -241,7 +241,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-b from-gray-50 to-gray-100 border-t-2 border-red-600 py-16 px-6 mt-8">
+      <footer className="bg-white border-t-2 border-red-600 py-16 px-6 mt-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
