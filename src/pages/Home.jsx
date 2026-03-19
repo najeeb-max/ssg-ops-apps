@@ -145,11 +145,11 @@ export default function Home() {
   }, [searchQuery, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-hidden">
       <Header />
 
       {/* Hero Section with Large Logo */}
-      <section className="pt-28 px-6 pb-16 bg-gradient-to-b from-black via-black to-gray-950 min-h-screen flex flex-col items-center justify-center">
+      <section className="pt-28 px-6 pb-16 bg-gradient-to-b from-white via-gray-50 to-gray-100 min-h-screen flex flex-col items-center justify-center">
         <div className="max-w-6xl w-full">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -162,10 +162,10 @@ export default function Home() {
               alt="SSG OPS APPS"
               className="h-56 w-auto mb-8 drop-shadow-2xl"
             />
-            <p className="text-xl text-gray-400 font-light tracking-widest mb-8">
+            <p className="text-xl text-gray-600 font-light tracking-widest mb-8">
               Streamline • Simplify • Grow
             </p>
-            <p className="text-gray-500 text-center max-w-2xl mb-12 text-lg">
+            <p className="text-gray-700 text-center max-w-2xl mb-12 text-lg">
               Your unified workspace for enterprise operations. Access all critical business tools and integrations seamlessly integrated with Google Workspace.
             </p>
           </motion.div>
@@ -183,7 +183,7 @@ export default function Home() {
               placeholder="Search applications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-5 py-4 bg-gray-900 border-2 border-red-600/50 rounded-xl focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/30 transition-all text-white placeholder-gray-600 text-lg"
+              className="w-full pl-14 pr-5 py-4 bg-white border-2 border-red-200 rounded-xl focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-slate-900 placeholder-gray-500 text-lg"
             />
           </motion.div>
 
@@ -200,8 +200,8 @@ export default function Home() {
                 onClick={() => setActiveCategory(category)}
                 className={`px-6 py-2 rounded-full font-semibold text-sm transition-all ${
                   activeCategory === category
-                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/50'
-                    : 'bg-gray-900 text-gray-400 border border-gray-800 hover:border-red-600/50 hover:text-gray-300'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-gray-200 text-gray-700 border border-gray-300 hover:border-red-500 hover:text-gray-900'
                 }`}
               >
                 {category}
@@ -212,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* Apps Grid */}
-      <section className="px-6 py-16 bg-black">
+      <section className="px-6 py-16 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -234,14 +234,14 @@ export default function Home() {
 
           {filteredApps.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No applications found matching your search</p>
+              <p className="text-gray-600 text-lg">No applications found matching your search</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-t from-red-600/10 to-black border-t border-red-600/30 py-16 px-6 mt-8">
+      <footer className="bg-gradient-to-b from-gray-50 to-gray-100 border-t-2 border-red-600 py-16 px-6 mt-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
@@ -250,27 +250,27 @@ export default function Home() {
                 alt="SSG OPS APPS"
                 className="h-24 mb-6"
               />
-              <p className="text-gray-500 text-sm leading-relaxed">Enterprise operations platform designed for modern teams.</p>
+              <p className="text-gray-700 text-sm leading-relaxed">Enterprise operations platform designed for modern teams.</p>
             </div>
             <div>
               <h3 className="text-red-600 font-bold mb-4 uppercase tracking-widest text-sm">Product</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-red-500 transition">Features</a></li>
-                <li><a href="#" className="hover:text-red-500 transition">Integrations</a></li>
-                <li><a href="#" className="hover:text-red-500 transition">Pricing</a></li>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li><a href="#" className="hover:text-red-600 transition">Features</a></li>
+                <li><a href="#" className="hover:text-red-600 transition">Integrations</a></li>
+                <li><a href="#" className="hover:text-red-600 transition">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-red-600 font-bold mb-4 uppercase tracking-widest text-sm">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-red-500 transition">Documentation</a></li>
-                <li><a href="#" className="hover:text-red-500 transition">Contact IT</a></li>
-                <li><a href="#" className="hover:text-red-500 transition">Help Center</a></li>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li><a href="#" className="hover:text-red-600 transition">Documentation</a></li>
+                <li><a href="#" className="hover:text-red-600 transition">Contact IT</a></li>
+                <li><a href="#" className="hover:text-red-600 transition">Help Center</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-900 pt-8">
-            <p className="text-center text-gray-600 text-sm">&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
+          <div className="border-t border-gray-300 pt-8">
+            <p className="text-center text-gray-700 text-sm">&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
           </div>
         </div>
       </footer>
