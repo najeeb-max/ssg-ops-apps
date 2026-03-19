@@ -248,7 +248,7 @@ export default function Home() {
               <img 
                 src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
                 alt="SSG OPS APPS"
-                className="h-24 mb-6"
+                className="h-40 mb-6"
               />
               <p className="text-gray-700 text-sm leading-relaxed">Enterprise operations platform designed for modern teams.</p>
             </div>
