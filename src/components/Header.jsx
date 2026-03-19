@@ -1,20 +1,23 @@
 import { Link } from 'react-router-dom';
-import { LogOut, Cloud, CloudRain, Sun, Wind } from 'lucide-react';
+import { LogOut, Cloud } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 export default function Header() {
   const [dateTime, setDateTime] = useState('');
   const [weather, setWeather] = useState({ temp: '72°F', condition: 'Partly Cloudy' });
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
-      const options = { weekday: 'long', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const options = { weekday: 'long', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
       setDateTime(now.toLocaleDateString('en-US', options));
+      setTick(prev => prev + 1);
     };
     updateDateTime();
-    const interval = setInterval(updateDateTime, 60000);
+    const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
