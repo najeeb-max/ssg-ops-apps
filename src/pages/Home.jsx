@@ -9,9 +9,7 @@ import {
   Sheet,
   BookOpen,
   Presentation,
-  Users,
-  Zap,
-  Settings
+  Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -72,24 +70,7 @@ const COMPANY_APPS = [
     category: 'People'
   },
 
-  {
-    id: 11,
-    name: 'Automation Hub',
-    description: 'Build and manage workflow automations across Google Workspace',
-    icon: Zap,
-    color: 'bg-red-700',
-    link: '/automation',
-    category: 'Productivity'
-  },
-  {
-    id: 12,
-    name: 'Settings & Admin',
-    description: 'Manage app settings, permissions, and organizational preferences',
-    icon: Settings,
-    color: 'bg-red-600',
-    link: '/admin',
-    category: 'Administration'
-  }
+
 ];
 
 export default function Home() {
