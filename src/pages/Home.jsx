@@ -178,15 +178,8 @@ export default function Home() {
       <section className="flex-1 px-6 pb-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredApps.map((app, idx) => (
-              <motion.div
-                key={app.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.05 * idx }}
-              >
-                <AppCard {...app} />
-              </motion.div>
+            {filteredApps.map((app) => (
+              <AppCard key={app.id} {...app} />
             ))}
           </motion.div>
 
