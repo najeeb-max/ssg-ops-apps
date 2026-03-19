@@ -10,9 +10,6 @@ import {
   BookOpen,
   Presentation,
   Users,
-  BarChart3,
-  CheckSquare,
-  DollarSign,
   Zap,
   Settings
 } from 'lucide-react';
