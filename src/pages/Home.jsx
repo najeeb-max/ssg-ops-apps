@@ -37,15 +37,7 @@ const COMPANY_APPS = [
     link: '/documents',
     category: 'Collaboration'
   },
-  {
-    id: 3,
-    name: 'Email Manager',
-    description: 'Centralized email management and communications powered by Gmail',
-    icon: Mail,
-    color: 'bg-red-600',
-    link: '/email',
-    category: 'Communication'
-  },
+
   {
     id: 4,
     name: 'Spreadsheets',
