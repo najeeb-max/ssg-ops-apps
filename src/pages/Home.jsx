@@ -175,14 +175,9 @@ export default function Home() {
       </div>
 
       {/* Apps Grid */}
-      <section className="px-6 py-16 bg-white">
+      <section className="flex-1 px-6 pb-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredApps.map((app, idx) => (
               <motion.div
                 key={app.id}
