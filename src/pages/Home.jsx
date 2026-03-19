@@ -123,7 +123,7 @@ const COMPANY_APPS = [
     name: 'Settings & Admin',
     description: 'Manage app settings, permissions, and organizational preferences',
     icon: Settings,
-    color: 'bg-slate-700',
+    color: 'bg-red-600',
     link: '/admin',
     category: 'Administration'
   }
@@ -145,110 +145,132 @@ export default function Home() {
   }, [searchQuery, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
+    <div className="min-h-screen bg-black text-white overflow-hidden">
       <Header />
 
-      {/* Hero Section */}
-      <section className="py-16 px-6 bg-gradient-to-br from-white to-gray-50 border-b-4 border-red-600">
-        <div className="max-w-7xl mx-auto">
+      {/* Hero Section with Large Logo */}
+      <section className="pt-28 px-6 pb-16 bg-gradient-to-b from-black via-black to-gray-950 min-h-screen flex flex-col items-center justify-center">
+        <div className="max-w-6xl w-full">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7 }}
+            className="flex flex-col items-center justify-center mb-12"
           >
             <img 
               src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
               alt="SSG OPS APPS"
-              className="h-32 mb-6"
+              className="h-56 w-auto mb-8 drop-shadow-2xl"
             />
-            <p className="text-lg text-gray-600 mb-4 font-semibold italic">
+            <p className="text-xl text-gray-400 font-light tracking-widest mb-8">
               Streamline • Simplify • Grow
             </p>
-            <p className="text-gray-600 mb-8 max-w-2xl">
-              Access all your internal tools and integrations in one seamless workspace
+            <p className="text-gray-500 text-center max-w-2xl mb-12 text-lg">
+              Your unified workspace for enterprise operations. Access all critical business tools and integrations seamlessly integrated with Google Workspace.
             </p>
-
-            {/* Search Bar */}
-            <div className="relative max-w-2xl">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search apps..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
-              />
-            </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Category Filter */}
-      <section className="py-6 px-6 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="relative max-w-2xl mx-auto mb-8"
+          >
+            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search applications..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-14 pr-5 py-4 bg-gray-900 border-2 border-red-600/50 rounded-xl focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/30 transition-all text-white placeholder-gray-600 text-lg"
+            />
+          </motion.div>
+
+          {/* Category Filter */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex gap-2 justify-center flex-wrap mb-16"
+          >
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap font-semibold transition-all ${
+                className={`px-6 py-2 rounded-full font-semibold text-sm transition-all ${
                   activeCategory === category
-                    ? 'bg-red-600 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/50'
+                    : 'bg-gray-900 text-gray-400 border border-gray-800 hover:border-red-600/50 hover:text-gray-300'
                 }`}
               >
                 {category}
               </button>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Apps Grid */}
-      <section className="py-12 px-6">
+      <section className="px-6 py-16 bg-black">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {filteredApps.map((app) => (
-              <AppCard key={app.id} {...app} />
+            {filteredApps.map((app, idx) => (
+              <motion.div
+                key={app.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.05 * idx }}
+              >
+                <AppCard {...app} />
+              </motion.div>
             ))}
           </motion.div>
 
           {filteredApps.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">No apps found matching your search</p>
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">No applications found matching your search</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-gray-400 py-12 px-6 mt-16 border-t-4 border-red-600">
+      <footer className="bg-gradient-to-t from-red-600/10 to-black border-t border-red-600/30 py-16 px-6 mt-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
               <img 
                 src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/99d91e4be_74038218-a49d-416f-a638-f696a9d9ea15.png" 
                 alt="SSG OPS APPS"
-                className="h-20 mb-4"
+                className="h-24 mb-6"
               />
-              <p className="text-sm">Unified workspace for all your business tools and integrations.</p>
+              <p className="text-gray-500 text-sm leading-relaxed">Enterprise operations platform designed for modern teams.</p>
             </div>
             <div>
-              <h3 className="text-white font-bold mb-4">Google Workspace</h3>
-              <p className="text-sm">Seamlessly connected with Calendar, Drive, Gmail, Sheets & more for maximum productivity.</p>
+              <h3 className="text-red-600 font-bold mb-4 uppercase tracking-widest text-sm">Product</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-red-500 transition">Features</a></li>
+                <li><a href="#" className="hover:text-red-500 transition">Integrations</a></li>
+                <li><a href="#" className="hover:text-red-500 transition">Pricing</a></li>
+              </ul>
             </div>
             <div>
-              <h3 className="text-white font-bold mb-4">Support</h3>
-              <p className="text-sm">Need help? Contact the IT department or use the in-app support chat.</p>
+              <h3 className="text-red-600 font-bold mb-4 uppercase tracking-widest text-sm">Support</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-red-500 transition">Documentation</a></li>
+                <li><a href="#" className="hover:text-red-500 transition">Contact IT</a></li>
+                <li><a href="#" className="hover:text-red-500 transition">Help Center</a></li>
+              </ul>
             </div>
           </div>
-          <div className="border-t border-slate-800 pt-6 text-center text-sm">
-            <p>&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
+          <div className="border-t border-gray-900 pt-8">
+            <p className="text-center text-gray-600 text-sm">&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
           </div>
         </div>
       </footer>
