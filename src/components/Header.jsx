@@ -1,17 +1,40 @@
 import { Link } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LogOut, Cloud, CloudRain, Sun, Wind } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
+  const [dateTime, setDateTime] = useState('');
+  const [weather, setWeather] = useState({ temp: '72°F', condition: 'Partly Cloudy' });
+
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const options = { weekday: 'long', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      setDateTime(now.toLocaleDateString('en-US', options));
+    };
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLogout = async () => {
     await base44.auth.logout('/');
   };
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b-2 border-red-600 shadow-sm">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-        <Link to="/" className="hover:opacity-80 transition-opacity">
-          <span className="text-sm font-bold text-red-600 tracking-widest">SSG OPS</span>
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <Link to="/" className="flex-1 hover:opacity-80 transition-opacity">
+          <div className="flex items-center gap-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{dateTime}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <Cloud className="w-4 h-4 text-gray-600" />
+                <span className="text-xs text-gray-600">{weather.condition} • {weather.temp}</span>
+              </div>
+            </div>
+          </div>
         </Link>
         
         <button
