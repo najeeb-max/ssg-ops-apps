@@ -24,7 +24,7 @@ const COMPANY_APPS = [
     name: 'Calendar & Events',
     description: 'Manage team schedules, meetings, and events with Google Calendar integration',
     icon: Calendar,
-    color: 'bg-blue-500',
+    color: 'bg-red-600',
     link: '/calendar',
     category: 'Communication'
   },
@@ -33,7 +33,7 @@ const COMPANY_APPS = [
     name: 'Document Hub',
     description: 'Create, edit, and collaborate on documents with seamless Google Docs sync',
     icon: Files,
-    color: 'bg-orange-500',
+    color: 'bg-red-700',
     link: '/documents',
     category: 'Collaboration'
   },
@@ -42,7 +42,7 @@ const COMPANY_APPS = [
     name: 'Email Manager',
     description: 'Centralized email management and communications powered by Gmail',
     icon: Mail,
-    color: 'bg-red-500',
+    color: 'bg-red-600',
     link: '/email',
     category: 'Communication'
   },
@@ -51,7 +51,7 @@ const COMPANY_APPS = [
     name: 'Spreadsheets',
     description: 'Analyze data and create reports with integrated Google Sheets',
     icon: Sheet,
-    color: 'bg-green-500',
+    color: 'bg-red-500',
     link: '/sheets',
     category: 'Analytics'
   },
@@ -60,7 +60,7 @@ const COMPANY_APPS = [
     name: 'Training Portal',
     description: 'Access courses and track learning progress via Google Classroom',
     icon: BookOpen,
-    color: 'bg-purple-500',
+    color: 'bg-red-700',
     link: '/learning',
     category: 'Learning'
   },
@@ -69,7 +69,7 @@ const COMPANY_APPS = [
     name: 'Presentations',
     description: 'Create and deliver presentations using Google Slides',
     icon: Presentation,
-    color: 'bg-yellow-500',
+    color: 'bg-red-600',
     link: '/presentations',
     category: 'Collaboration'
   },
@@ -78,7 +78,7 @@ const COMPANY_APPS = [
     name: 'Team Directory',
     description: 'View team members, contact information, and organizational structure',
     icon: Users,
-    color: 'bg-indigo-500',
+    color: 'bg-red-800',
     link: '/directory',
     category: 'People'
   },
@@ -87,7 +87,7 @@ const COMPANY_APPS = [
     name: 'Analytics Dashboard',
     description: 'Track key metrics and performance indicators across all apps',
     icon: BarChart3,
-    color: 'bg-cyan-500',
+    color: 'bg-red-600',
     link: '/analytics',
     category: 'Analytics'
   },
@@ -96,7 +96,7 @@ const COMPANY_APPS = [
     name: 'Task Manager',
     description: 'Organize tasks, track progress, and collaborate with your team',
     icon: CheckSquare,
-    color: 'bg-emerald-500',
+    color: 'bg-red-700',
     link: '/tasks',
     category: 'Productivity'
   },
@@ -105,7 +105,7 @@ const COMPANY_APPS = [
     name: 'Expense Tracking',
     description: 'Log, approve, and manage company expenses and reimbursements',
     icon: DollarSign,
-    color: 'bg-teal-500',
+    color: 'bg-red-600',
     link: '/expenses',
     category: 'Finance'
   },
@@ -114,7 +114,7 @@ const COMPANY_APPS = [
     name: 'Automation Hub',
     description: 'Build and manage workflow automations across Google Workspace',
     icon: Zap,
-    color: 'bg-pink-500',
+    color: 'bg-red-700',
     link: '/automation',
     category: 'Productivity'
   },
@@ -123,7 +123,7 @@ const COMPANY_APPS = [
     name: 'Settings & Admin',
     description: 'Manage app settings, permissions, and organizational preferences',
     icon: Settings,
-    color: 'bg-slate-600',
+    color: 'bg-slate-700',
     link: '/admin',
     category: 'Administration'
   }
@@ -145,33 +145,39 @@ export default function Home() {
   }, [searchQuery, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
       <Header />
 
       {/* Hero Section */}
-      <section className="py-12 px-6 bg-white border-b border-slate-200">
+      <section className="py-16 px-6 bg-gradient-to-br from-white to-gray-50 border-b-4 border-red-600">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Company App Portal
-            </h1>
-            <p className="text-lg text-slate-600 mb-8">
+            <div className="flex items-end gap-3 mb-4">
+              <h1 className="text-5xl md:text-6xl font-black text-red-600">
+                SSG OPS APPS
+              </h1>
+              <span className="text-sm font-semibold text-gray-600 mb-2 tracking-widest">PORTAL</span>
+            </div>
+            <p className="text-lg text-gray-600 mb-2 font-semibold">
+              Streamline • Simplify • Grow
+            </p>
+            <p className="text-gray-600 mb-8">
               Access all your internal tools and integrations in one seamless workspace
             </p>
 
             {/* Search Bar */}
             <div className="relative max-w-2xl">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search apps..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
               />
             </div>
           </motion.div>
@@ -179,17 +185,17 @@ export default function Home() {
       </section>
 
       {/* Category Filter */}
-      <section className="py-6 px-6 bg-white border-b border-slate-200">
+      <section className="py-6 px-6 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto">
           <div className="flex gap-2 overflow-x-auto pb-2">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-lg whitespace-nowrap font-semibold transition-all ${
                   activeCategory === category
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {category}
@@ -215,31 +221,31 @@ export default function Home() {
 
           {filteredApps.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-slate-600 text-lg">No apps found matching your search</p>
+              <p className="text-gray-600 text-lg">No apps found matching your search</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 py-8 px-6 mt-12">
+      <footer className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-gray-400 py-12 px-6 mt-16 border-t-4 border-red-600">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="text-white font-semibold mb-4">Company Apps</h3>
+              <h3 className="text-red-600 font-bold mb-4 text-lg">SSG OPS APPS</h3>
               <p className="text-sm">Unified workspace for all your business tools and integrations.</p>
             </div>
             <div>
-              <h3 className="text-white font-semibold mb-4">Integration</h3>
-              <p className="text-sm">Seamlessly connected with Google Workspace for maximum productivity.</p>
+              <h3 className="text-white font-bold mb-4">Google Workspace</h3>
+              <p className="text-sm">Seamlessly connected with Calendar, Drive, Gmail, Sheets & more for maximum productivity.</p>
             </div>
             <div>
-              <h3 className="text-white font-semibold mb-4">Support</h3>
+              <h3 className="text-white font-bold mb-4">Support</h3>
               <p className="text-sm">Need help? Contact the IT department or use the in-app support chat.</p>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 text-center text-sm">
-            <p>&copy; 2026 Your Company. All rights reserved.</p>
+            <p>&copy; 2026 SSG OPS. All rights reserved. | Streamline • Simplify • Grow</p>
           </div>
         </div>
       </footer>
