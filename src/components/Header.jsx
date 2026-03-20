@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SSGLogo from './SSGLogo';
 import { LogOut, Cloud } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';

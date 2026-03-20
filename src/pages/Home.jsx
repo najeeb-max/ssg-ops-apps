@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import SSGLogo from '../components/SSGLogo';
 import Header from '../components/Header';
 import AppCard from '../components/AppCard';
 import QatarNewsTile from '../components/QatarNewsTile';
