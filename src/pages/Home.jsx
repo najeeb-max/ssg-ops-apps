@@ -34,12 +34,12 @@ const COMPANY_APPS = [
 
   {
     id: 4,
-    name: 'Spreadsheets',
-    description: 'Analyze data and create reports with integrated Google Sheets',
-    icon: FileSpreadsheet,
+    name: 'Qatar News',
+    description: 'Stay updated with the latest news and headlines from Qatar',
+    icon: Newspaper,
     color: 'bg-red-500',
-    link: '/sheets',
-    category: 'Analytics'
+    link: '/qatar-news',
+    category: 'News'
   },
   {
     id: 5,
