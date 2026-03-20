@@ -86,13 +86,8 @@ export default function Home() {
       <Header />
 
       {/* Hero Banner */}
-      <div className="pt-20 bg-gradient-to-br from-red-950 via-red-900 to-slate-900 relative overflow-hidden flex items-center justify-center" style={{ minHeight: '160px' }}>
-        <img
-          src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png"
-          alt="SSG OPS"
-          className="h-28 w-auto object-contain"
-          style={{ mixBlendMode: 'screen', opacity: 0.85 }}
-        />
+      <div className="pt-20 bg-gradient-to-br from-red-950 via-red-900 to-slate-900 flex items-center justify-center" style={{ minHeight: '160px' }}>
+        <SSGLogo className="h-28 w-auto" />
       </div>
 
       {/* Main Content */}

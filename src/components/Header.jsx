@@ -30,11 +30,7 @@ export default function Header() {
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b-2 border-red-600 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="hover:opacity-90 transition-opacity">
-          <img
-            src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png"
-            alt="SSG OPS APPS"
-            className="h-12 w-auto"
-          />
+          <SSGLogo className="h-12 w-auto" />
         </Link>
 
         <div className="flex-1 flex justify-center">
