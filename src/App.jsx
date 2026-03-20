@@ -39,6 +39,7 @@ const AuthenticatedApp = () => {
       {/* Add your page Route elements here */}
       <Route path="/" element={<Home />} />
       <Route path="/qatar-news" element={<QatarNews />} />
+      <Route path="/app-viewer" element={<AppViewer />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
