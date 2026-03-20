@@ -84,8 +84,24 @@ export default function Home() {
     <div className="min-h-screen bg-white overflow-hidden flex flex-col">
       <Header />
 
+      {/* Hero Banner */}
+      <div className="pt-20 bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: `url("https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png")`, backgroundSize: '600px', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+        />
+        <div className="relative max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
+          <img
+            src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png"
+            alt="SSG OPS APPS"
+            className="h-28 w-auto mb-4 drop-shadow-2xl"
+          />
+          <h1 className="text-white text-2xl font-bold tracking-wide mb-1">Internal Operations Portal</h1>
+          <p className="text-red-300 text-sm tracking-widest uppercase font-medium">Streamline • Simplify • Grow</p>
+        </div>
+      </div>
+
       {/* Main Content */}
-      <div className="flex-1 pt-24 px-6 pb-8">
+      <div className="flex-1 pt-6 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Search Bar */}
           <div className="relative max-w-2xl mx-auto mb-6">
