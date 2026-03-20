@@ -60,15 +60,6 @@ const COMPANY_APPS = [
     category: 'Collaboration'
   },
   {
-    id: 8,
-    name: 'PCS',
-    description: 'Overview of SSG procurement price comparisons for Existing System Orders',
-    icon: ShoppingCart,
-    color: 'bg-red-600',
-    link: '/pcs',
-    category: 'Collaboration'
-  },
-  {
     id: 7,
     name: 'Team Directory',
     description: 'View team members, contact information, and organizational structure',
