@@ -15,6 +15,15 @@ import {
 
 const COMPANY_APPS = [
   {
+    id: 8,
+    name: 'PCS',
+    description: 'Overview of SSG procurement price comparisons for Existing System Orders',
+    icon: ShoppingCart,
+    color: 'bg-red-600',
+    link: '/pcs',
+    category: 'Collaboration'
+  },
+  {
     id: 1,
     name: 'Calendar & Events',
     description: 'Manage team schedules, meetings, and events with Google Calendar integration',
