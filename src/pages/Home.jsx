@@ -1,16 +1,15 @@
 import { useState, useMemo } from 'react';
 import Header from '../components/Header';
 import AppCard from '../components/AppCard';
+import QatarNewsTile from '../components/QatarNewsTile';
 import { Search } from 'lucide-react';
 import {
   Calendar,
   Files,
-  Newspaper,
   BookOpen,
   Monitor,
   Users
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const COMPANY_APPS = [
   {
@@ -30,16 +29,6 @@ const COMPANY_APPS = [
     color: 'bg-red-700',
     link: '/documents',
     category: 'Collaboration'
-  },
-
-  {
-    id: 4,
-    name: 'Qatar News',
-    description: 'Stay updated with the latest news and headlines from Qatar',
-    icon: Newspaper,
-    color: 'bg-red-500',
-    link: '/qatar-news',
-    category: 'News'
   },
   {
     id: 5,
@@ -68,15 +57,13 @@ const COMPANY_APPS = [
     link: '/directory',
     category: 'People'
   },
-
-
 ];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
-  const categories = ['All', ...new Set(COMPANY_APPS.map(app => app.category))];
+  const allCategories = ['All', 'Communication', 'Collaboration', 'Learning', 'People', 'News'];
 
   const filteredApps = useMemo(() => {
     return COMPANY_APPS.filter(app => {
@@ -86,6 +73,12 @@ export default function Home() {
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory]);
+
+  const showNewsTile = activeCategory === 'All' || activeCategory === 'News';
+  const newsTileMatchesSearch =
+    'qatar news'.includes(searchQuery.toLowerCase()) ||
+    'headlines'.includes(searchQuery.toLowerCase()) ||
+    searchQuery === '';
 
   return (
     <div className="min-h-screen bg-white overflow-hidden flex flex-col">
@@ -108,7 +101,7 @@ export default function Home() {
 
           {/* Category Filter */}
           <div className="flex gap-2 justify-center flex-wrap mb-8">
-            {categories.map((category) => (
+            {allCategories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
@@ -132,9 +125,12 @@ export default function Home() {
             {filteredApps.map((app) => (
               <AppCard key={app.id} {...app} />
             ))}
+            {showNewsTile && newsTileMatchesSearch && (
+              <QatarNewsTile />
+            )}
           </div>
 
-          {filteredApps.length === 0 && (
+          {filteredApps.length === 0 && !(showNewsTile && newsTileMatchesSearch) && (
             <div className="text-center py-12">
               <p className="text-gray-600">No applications found matching your search</p>
             </div>
