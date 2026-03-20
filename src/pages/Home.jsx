@@ -9,7 +9,8 @@ import {
   Files,
   BookOpen,
   Monitor,
-  Users
+  Users,
+  ShoppingCart
 } from 'lucide-react';
 
 const COMPANY_APPS = [
