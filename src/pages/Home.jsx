@@ -86,10 +86,10 @@ export default function Home() {
 
       {/* Hero Banner */}
       <div className="pt-20 bg-gradient-to-br from-red-950 via-red-900 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-35"
-          style={{ backgroundImage: `url("https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png")`, backgroundSize: '320px', backgroundPosition: 'center center', backgroundRepeat: 'no-repeat' }}
+        <div className="absolute inset-0"
+          style={{ backgroundImage: `url("https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png")`, backgroundSize: '280px', backgroundPosition: 'center center', backgroundRepeat: 'no-repeat', mixBlendMode: 'multiply', opacity: 0.6 }}
         />
-        <div className="relative py-32" />
+        <div className="relative py-20" />
       </div>
 
       {/* Main Content */}
