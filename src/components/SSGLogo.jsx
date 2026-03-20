@@ -1,12 +1,12 @@
 export default function SSGLogo({ className = "" }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 876 449" className={className} role="img" aria-label="SSG Ops Apps logo">
-      <path d="M 801 375 L 791 385 L 777 387 L 776 389 L 767 392 L 748 394 L 105 395 L 88 393 L 80 387 L 60 386 L 59 393 L 61 399 L 71 407 L 100 413 L 730 413 L 779 409 L 792 401 L 798 394 L 801 383 Z" fill="#e3e0e0" fillRule="evenodd"/>
-      <path d="M 793 356 L 775 357 L 773 359 L 766 359 L 765 361 L 753 361 L 748 358 L 737 360 L 728 360 L 727 358 L 693 358 L 679 362 L 530 360 L 524 362 L 523 364 L 515 363 L 513 361 L 505 361 L 504 359 L 496 359 L 495 361 L 468 362 L 433 358 L 422 359 L 416 361 L 415 363 L 391 364 L 382 377 L 392 377 L 398 381 L 398 385 L 411 385 L 417 376 L 778 376 L 784 374 L 788 370 L 791 363 L 790 360 Z" fill="#e3e0e0" fillRule="evenodd"/>
-      <path d="M 797 347 L 807 346 L 808 342 L 798 342 Z" fill="#e3e0e0" fillRule="evenodd"/>
-      <path d="M 540 277 L 809 279 L 816 284 L 824 283 L 826 280 L 822 273 L 811 269 L 581 270 L 576 273 L 559 277 Z" fill="#e3e0e0" fillRule="evenodd"/>
-      <path d="M 474 197 L 470 195 L 426 211 L 427 218 L 432 220 L 472 201 Z" fill="#e3e0e0" fillRule="evenodd"/>
-      <path d="M 533 0 L 533 2 L 557 2 L 557 0 Z" fill="#e3e0e0" fillRule="evenodd"/>
+      <path d="M 801 375 L 791 385 L 777 387 L 776 389 L 767 392 L 748 394 L 105 395 L 88 393 L 80 387 L 60 386 L 59 393 L 61 399 L 71 407 L 100 413 L 730 413 L 779 409 L 792 401 L 798 394 L 801 383 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 793 356 L 775 357 L 773 359 L 766 359 L 765 361 L 753 361 L 748 358 L 737 360 L 728 360 L 727 358 L 693 358 L 679 362 L 530 360 L 524 362 L 523 364 L 515 363 L 513 361 L 505 361 L 504 359 L 496 359 L 495 361 L 468 362 L 433 358 L 422 359 L 416 361 L 415 363 L 391 364 L 382 377 L 392 377 L 398 381 L 398 385 L 411 385 L 417 376 L 778 376 L 784 374 L 788 370 L 791 363 L 790 360 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 797 347 L 807 346 L 808 342 L 798 342 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 540 277 L 809 279 L 816 284 L 824 283 L 826 280 L 822 273 L 811 269 L 581 270 L 576 273 L 559 277 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 474 197 L 470 195 L 426 211 L 427 218 L 432 220 L 472 201 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 533 0 L 533 2 L 557 2 L 557 0 Z" fill="transparent" fillRule="evenodd"/>
       <path d="M 794 379 L 789 380 L 784 376 L 778 378 L 716 378 L 715 380 L 710 380 L 709 378 L 417 378 L 413 385 L 780 385 L 782 383 L 787 384 Z" fill="#af0101" fillRule="evenodd"/>
       <path d="M 804 353 L 797 353 L 795 363 L 801 363 Z" fill="#af0101" fillRule="evenodd"/>
       <path d="M 233 325 L 245 326 L 266 324 L 271 322 L 273 312 L 270 310 L 238 310 L 235 314 Z" fill="#af0101" fillRule="evenodd"/>
@@ -61,10 +61,10 @@ export default function SSGLogo({ className = "" }) {
       <path d="M 238 105 L 238 116 L 240 122 L 248 131 L 252 133 L 260 134 L 265 137 L 292 136 L 293 138 L 323 138 L 328 139 L 330 143 L 341 142 L 365 148 L 364 134 L 359 126 L 352 121 L 336 117 L 283 117 L 274 111 L 274 104 L 277 100 L 284 97 L 357 97 L 375 76 L 269 77 L 251 85 L 243 93 Z" fill="#e30304" fillRule="evenodd"/>
       <path d="M 658 27 L 664 29 L 665 34 L 670 36 L 672 39 L 666 44 L 679 43 L 684 38 L 689 37 L 697 40 L 704 32 L 675 28 L 664 29 Z" fill="#e30304" fillRule="evenodd"/>
       <path d="M 640 31 L 631 23 L 617 15 L 603 10 L 570 4 L 532 3 L 485 8 L 437 18 L 382 34 L 349 50 L 400 33 L 433 25 L 472 19 L 507 16 L 554 18 L 590 26 L 608 36 L 618 47 L 620 53 L 645 42 Z" fill="#e30304" fillRule="evenodd"/>
-      <path d="M 83 389 L 92 393 L 105 394 L 173 393 L 208 395 L 253 393 L 599 394 L 748 393 L 767 391 L 776 388 L 776 386 L 84 386 Z" fill="#b29a9a" fillRule="evenodd"/>
-      <path d="M 823 284 L 816 285 L 816 290 L 800 337 L 801 341 L 809 340 L 825 285 Z" fill="#b29a9a" fillRule="evenodd"/>
-      <path d="M 427 219 L 425 217 L 425 213 L 386 224 L 381 227 L 381 231 L 383 235 L 387 236 L 427 221 Z" fill="#b29a9a" fillRule="evenodd"/>
-      <path d="M 712 95 L 708 117 L 712 117 L 713 114 Z" fill="#b29a9a" fillRule="evenodd"/>
+      <path d="M 83 389 L 92 393 L 105 394 L 173 393 L 208 395 L 253 393 L 599 394 L 748 393 L 767 391 L 776 388 L 776 386 L 84 386 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 823 284 L 816 285 L 816 290 L 800 337 L 801 341 L 809 340 L 825 285 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 427 219 L 425 217 L 425 213 L 386 224 L 381 227 L 381 231 L 383 235 L 387 236 L 427 221 Z" fill="transparent" fillRule="evenodd"/>
+      <path d="M 712 95 L 708 117 L 712 117 L 713 114 Z" fill="transparent" fillRule="evenodd"/>
     </svg>
   );
 }
