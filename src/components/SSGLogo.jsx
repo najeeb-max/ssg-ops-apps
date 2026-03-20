@@ -17,39 +17,39 @@ export default function SSGLogo({ className = "" }) {
       <path d="M 501 148 L 500 144 L 497 142 L 472 144 L 466 152 L 457 156 L 376 156 L 364 179 L 466 180 L 478 177 L 490 170 L 497 162 L 500 156 Z" fill="#af0101" fillRule="evenodd"/>
       <path d="M 643 136 L 640 134 L 632 143 L 623 145 L 619 150 L 612 151 L 608 155 L 557 154 L 542 145 L 538 139 L 527 141 L 524 140 L 521 143 L 515 143 L 513 145 L 510 159 L 513 164 L 524 173 L 541 179 L 638 179 L 642 151 L 641 138 Z" fill="#af0101" fillRule="evenodd"/>
       <path d="M 696 41 L 692 39 L 684 39 L 678 45 L 660 45 L 631 58 L 629 61 L 619 64 L 616 68 L 646 68 L 668 56 L 669 53 L 674 53 L 675 51 L 670 51 L 669 48 L 677 46 L 679 48 L 679 52 L 677 54 L 676 68 Z" fill="#af0101" fillRule="evenodd"/>
-      <path d="M 776 443 L 838 444 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 49 443 L 112 444 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 615 437 L 615 443 L 620 444 L 622 442 L 621 437 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 397 436 L 395 437 L 394 442 L 399 444 L 401 443 L 402 439 L 401 437 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 725 431 L 730 448 L 734 447 L 737 439 L 740 440 L 742 447 L 746 448 L 751 431 L 749 432 L 745 443 L 743 442 L 739 431 L 736 432 L 732 442 L 730 441 L 727 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 696 436 L 696 443 L 700 448 L 711 448 L 715 444 L 715 436 L 710 431 L 702 431 Z M 703 433 L 709 433 L 713 437 L 713 442 L 708 447 L 703 447 L 699 443 L 698 439 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 672 431 L 672 448 L 674 448 L 675 443 L 678 443 L 683 448 L 686 448 L 683 444 L 686 440 L 686 434 L 682 431 Z M 674 434 L 681 433 L 684 438 L 680 441 L 675 441 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 643 436 L 643 443 L 647 448 L 660 447 L 660 440 L 657 441 L 657 445 L 655 447 L 650 447 L 645 441 L 646 437 L 650 433 L 659 434 L 659 432 L 648 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 577 431 L 583 442 L 583 448 L 586 448 L 586 442 L 592 431 L 585 439 L 580 432 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 567 431 L 555 431 L 555 448 L 557 448 L 558 442 L 567 441 L 566 439 L 558 439 L 557 434 L 567 433 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 541 431 L 541 448 L 543 448 L 543 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 518 431 L 518 448 L 530 448 L 521 446 L 521 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 506 432 L 493 432 L 493 448 L 496 448 L 497 444 L 507 442 L 508 434 Z M 496 434 L 504 434 L 505 439 L 503 441 L 497 441 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 461 432 L 461 448 L 464 448 L 465 439 L 472 446 L 477 438 L 479 439 L 479 448 L 482 447 L 481 431 L 478 432 L 472 442 L 469 440 L 464 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 447 431 L 447 448 L 449 448 L 450 437 L 449 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 425 431 L 422 435 L 423 439 L 432 442 L 433 446 L 423 446 L 423 448 L 435 448 L 436 442 L 425 436 L 427 433 L 435 432 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 360 431 L 359 448 L 373 448 L 362 446 L 363 441 L 371 441 L 371 439 L 363 439 L 362 434 L 373 432 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 331 431 L 331 448 L 333 448 L 334 437 L 344 448 L 347 448 L 347 431 L 345 431 L 345 438 L 343 441 L 334 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 316 431 L 316 448 L 319 448 L 319 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 294 431 L 294 448 L 306 448 L 297 446 L 297 432 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 262 431 L 262 448 L 264 448 L 265 438 L 271 446 L 273 446 L 278 439 L 280 448 L 282 448 L 282 431 L 279 431 L 273 441 L 270 440 L 265 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 241 431 L 233 448 L 238 445 L 247 445 L 249 448 L 252 448 L 244 431 Z M 242 436 L 245 439 L 244 443 L 239 441 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 210 431 L 210 448 L 223 448 L 214 447 L 212 445 L 213 441 L 222 441 L 222 439 L 214 439 L 212 434 L 223 433 L 223 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 184 431 L 184 448 L 186 448 L 188 443 L 192 443 L 195 448 L 198 448 L 196 445 L 199 439 L 198 433 L 193 431 Z M 187 440 L 188 433 L 194 433 L 197 436 L 194 441 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 159 431 L 159 433 L 165 434 L 165 448 L 167 448 L 167 435 L 169 433 L 174 433 L 174 431 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 138 431 L 136 433 L 136 438 L 140 441 L 146 442 L 147 445 L 145 447 L 136 447 L 148 448 L 150 445 L 149 441 L 139 436 L 140 433 L 148 432 L 143 430 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 826 346 L 874 346 L 875 341 L 828 341 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 769 297 L 718 297 L 704 303 L 698 314 L 698 322 L 701 327 L 714 332 L 745 332 L 749 335 L 749 341 L 744 345 L 691 345 L 689 356 L 744 356 L 755 351 L 760 346 L 763 337 L 762 329 L 759 325 L 749 321 L 717 321 L 712 318 L 711 314 L 717 308 L 766 308 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 609 356 L 622 356 L 625 343 L 628 338 L 664 338 L 674 335 L 683 327 L 687 317 L 686 305 L 681 300 L 670 297 L 625 298 Z M 629 327 L 635 307 L 669 307 L 675 312 L 672 323 L 665 328 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 527 356 L 540 356 L 545 338 L 582 338 L 595 333 L 601 326 L 604 319 L 605 311 L 602 303 L 597 299 L 588 297 L 543 298 Z M 547 327 L 553 307 L 587 307 L 592 311 L 592 318 L 585 327 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 495 297 L 480 298 L 433 356 L 447 356 L 456 344 L 462 343 L 496 343 L 502 356 L 514 356 L 514 352 Z M 486 310 L 494 333 L 467 334 L 466 332 L 480 314 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 380 229 L 377 227 L 337 237 L 301 242 L 274 244 L 226 242 L 241 247 L 262 251 L 302 252 L 354 244 L 382 237 Z" fill="#2a2a2a" fillRule="evenodd"/>
-      <path d="M 711 120 L 709 118 L 706 119 L 700 131 L 689 145 L 663 169 L 642 184 L 613 201 L 569 222 L 511 243 L 476 252 L 429 260 L 384 262 L 414 264 L 511 264 L 561 246 L 614 219 L 641 202 L 666 183 L 688 161 L 698 148 L 707 132 Z" fill="#2a2a2a" fillRule="evenodd"/>
+      <path d="M 776 443 L 838 444 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 49 443 L 112 444 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 615 437 L 615 443 L 620 444 L 622 442 L 621 437 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 397 436 L 395 437 L 394 442 L 399 444 L 401 443 L 402 439 L 401 437 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 725 431 L 730 448 L 734 447 L 737 439 L 740 440 L 742 447 L 746 448 L 751 431 L 749 432 L 745 443 L 743 442 L 739 431 L 736 432 L 732 442 L 730 441 L 727 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 696 436 L 696 443 L 700 448 L 711 448 L 715 444 L 715 436 L 710 431 L 702 431 Z M 703 433 L 709 433 L 713 437 L 713 442 L 708 447 L 703 447 L 699 443 L 698 439 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 672 431 L 672 448 L 674 448 L 675 443 L 678 443 L 683 448 L 686 448 L 683 444 L 686 440 L 686 434 L 682 431 Z M 674 434 L 681 433 L 684 438 L 680 441 L 675 441 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 643 436 L 643 443 L 647 448 L 660 447 L 660 440 L 657 441 L 657 445 L 655 447 L 650 447 L 645 441 L 646 437 L 650 433 L 659 434 L 659 432 L 648 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 577 431 L 583 442 L 583 448 L 586 448 L 586 442 L 592 431 L 585 439 L 580 432 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 567 431 L 555 431 L 555 448 L 557 448 L 558 442 L 567 441 L 566 439 L 558 439 L 557 434 L 567 433 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 541 431 L 541 448 L 543 448 L 543 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 518 431 L 518 448 L 530 448 L 521 446 L 521 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 506 432 L 493 432 L 493 448 L 496 448 L 497 444 L 507 442 L 508 434 Z M 496 434 L 504 434 L 505 439 L 503 441 L 497 441 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 461 432 L 461 448 L 464 448 L 465 439 L 472 446 L 477 438 L 479 439 L 479 448 L 482 447 L 481 431 L 478 432 L 472 442 L 469 440 L 464 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 447 431 L 447 448 L 449 448 L 450 437 L 449 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 425 431 L 422 435 L 423 439 L 432 442 L 433 446 L 423 446 L 423 448 L 435 448 L 436 442 L 425 436 L 427 433 L 435 432 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 360 431 L 359 448 L 373 448 L 362 446 L 363 441 L 371 441 L 371 439 L 363 439 L 362 434 L 373 432 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 331 431 L 331 448 L 333 448 L 334 437 L 344 448 L 347 448 L 347 431 L 345 431 L 345 438 L 343 441 L 334 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 316 431 L 316 448 L 319 448 L 319 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 294 431 L 294 448 L 306 448 L 297 446 L 297 432 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 262 431 L 262 448 L 264 448 L 265 438 L 271 446 L 273 446 L 278 439 L 280 448 L 282 448 L 282 431 L 279 431 L 273 441 L 270 440 L 265 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 241 431 L 233 448 L 238 445 L 247 445 L 249 448 L 252 448 L 244 431 Z M 242 436 L 245 439 L 244 443 L 239 441 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 210 431 L 210 448 L 223 448 L 214 447 L 212 445 L 213 441 L 222 441 L 222 439 L 214 439 L 212 434 L 223 433 L 223 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 184 431 L 184 448 L 186 448 L 188 443 L 192 443 L 195 448 L 198 448 L 196 445 L 199 439 L 198 433 L 193 431 Z M 187 440 L 188 433 L 194 433 L 197 436 L 194 441 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 159 431 L 159 433 L 165 434 L 165 448 L 167 448 L 167 435 L 169 433 L 174 433 L 174 431 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 138 431 L 136 433 L 136 438 L 140 441 L 146 442 L 147 445 L 145 447 L 136 447 L 148 448 L 150 445 L 149 441 L 139 436 L 140 433 L 148 432 L 143 430 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 826 346 L 874 346 L 875 341 L 828 341 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 769 297 L 718 297 L 704 303 L 698 314 L 698 322 L 701 327 L 714 332 L 745 332 L 749 335 L 749 341 L 744 345 L 691 345 L 689 356 L 744 356 L 755 351 L 760 346 L 763 337 L 762 329 L 759 325 L 749 321 L 717 321 L 712 318 L 711 314 L 717 308 L 766 308 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 609 356 L 622 356 L 625 343 L 628 338 L 664 338 L 674 335 L 683 327 L 687 317 L 686 305 L 681 300 L 670 297 L 625 298 Z M 629 327 L 635 307 L 669 307 L 675 312 L 672 323 L 665 328 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 527 356 L 540 356 L 545 338 L 582 338 L 595 333 L 601 326 L 604 319 L 605 311 L 602 303 L 597 299 L 588 297 L 543 298 Z M 547 327 L 553 307 L 587 307 L 592 311 L 592 318 L 585 327 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 495 297 L 480 298 L 433 356 L 447 356 L 456 344 L 462 343 L 496 343 L 502 356 L 514 356 L 514 352 Z M 486 310 L 494 333 L 467 334 L 466 332 L 480 314 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 380 229 L 377 227 L 337 237 L 301 242 L 274 244 L 226 242 L 241 247 L 262 251 L 302 252 L 354 244 L 382 237 Z" fill="#ffffff" fillRule="evenodd"/>
+      <path d="M 711 120 L 709 118 L 706 119 L 700 131 L 689 145 L 663 169 L 642 184 L 613 201 L 569 222 L 511 243 L 476 252 L 429 260 L 384 262 L 414 264 L 511 264 L 561 246 L 614 219 L 641 202 L 666 183 L 688 161 L 698 148 L 707 132 Z" fill="#ffffff" fillRule="evenodd"/>
       <path d="M 796 353 L 792 362 L 793 366 L 786 375 L 789 379 L 794 378 L 800 368 L 794 364 Z" fill="#e30304" fillRule="evenodd"/>
       <path d="M 3 346 L 52 346 L 54 340 L 6 340 Z" fill="#e30304" fillRule="evenodd"/>
       <path d="M 78 310 L 90 310 L 106 314 L 110 307 L 120 298 L 135 292 L 185 293 L 194 298 L 199 303 L 199 307 L 201 309 L 211 310 L 213 312 L 215 312 L 215 305 L 217 304 L 221 293 L 283 294 L 293 302 L 296 312 L 300 312 L 301 314 L 303 314 L 305 306 L 313 297 L 324 293 L 386 293 L 387 295 L 384 306 L 381 310 L 392 304 L 403 304 L 404 306 L 418 305 L 420 308 L 431 294 L 444 271 L 100 271 L 95 273 L 89 279 Z" fill="#e30304" fillRule="evenodd"/>
