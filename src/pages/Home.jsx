@@ -86,8 +86,8 @@ export default function Home() {
       <Header />
 
       {/* Hero Banner */}
-      <div className="pt-20 bg-gradient-to-br from-red-950 via-red-900 to-slate-900 flex items-center justify-center" style={{ minHeight: '160px' }}>
-        <SSGLogo className="h-28 w-auto" />
+      <div className="pt-20 bg-gradient-to-br from-red-950 via-red-900 to-slate-900 flex items-center justify-center" style={{ minHeight: '220px' }}>
+        <SSGLogo className="w-full max-w-lg h-auto px-8" />
       </div>
 
       {/* Main Content */}
