@@ -36,7 +36,7 @@ const COMPANY_APPS = [
     id: 4,
     name: 'Spreadsheets',
     description: 'Analyze data and create reports with integrated Google Sheets',
-    icon: Sheet,
+    icon: FileSpreadsheet,
     color: 'bg-red-500',
     link: '/sheets',
     category: 'Analytics'
@@ -54,7 +54,7 @@ const COMPANY_APPS = [
     id: 6,
     name: 'Presentations',
     description: 'Create and deliver presentations using Google Slides',
-    icon: Presentation,
+    icon: Monitor,
     color: 'bg-red-600',
     link: '/presentations',
     category: 'Collaboration'
