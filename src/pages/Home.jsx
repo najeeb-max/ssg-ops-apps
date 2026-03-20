@@ -84,20 +84,31 @@ export default function Home() {
     <div className="min-h-screen bg-white overflow-hidden flex flex-col">
       <Header />
 
-      {/* Hero Banner */}
-      <div className="pt-20 bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: `url("https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png")`, backgroundSize: '600px', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
-        />
-        <div className="relative max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
-          <img
-            src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png"
-            alt="SSG OPS APPS"
-            className="h-28 w-auto mb-4 drop-shadow-2xl"
-          />
-          <h1 className="text-white text-2xl font-bold tracking-wide mb-1">Internal Operations Portal</h1>
-          <p className="text-red-300 text-sm tracking-widest uppercase font-medium">Streamline • Simplify • Grow</p>
-        </div>
+      {/* Banner Color Previews */}
+      <div className="pt-20">
+        {[
+          { label: 'Option 1 — Deep Navy Blue', gradient: 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900', sub: 'text-blue-300' },
+          { label: 'Option 2 — Charcoal / Dark Gray', gradient: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900', sub: 'text-gray-400' },
+          { label: 'Option 3 — Maroon / Deep Red', gradient: 'bg-gradient-to-br from-red-950 via-red-900 to-slate-900', sub: 'text-red-300' },
+          { label: 'Option 4 — Dark Teal', gradient: 'bg-gradient-to-br from-slate-900 via-teal-900 to-slate-800', sub: 'text-teal-300' },
+          { label: 'Option 5 — White / Minimal', gradient: 'bg-white border-b-4 border-red-600', sub: 'text-red-500', dark: false },
+        ].map((opt, i) => (
+          <div key={i} className={`${opt.gradient} relative overflow-hidden`}>
+            <div className="absolute inset-0 opacity-5"
+              style={{ backgroundImage: `url("https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png")`, backgroundSize: '400px', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+            />
+            <div className="relative max-w-7xl mx-auto px-6 py-8 flex flex-col items-center text-center">
+              <span className={`text-xs font-bold uppercase tracking-widest mb-3 px-3 py-1 rounded-full border ${opt.dark === false ? 'border-red-200 text-red-400' : 'border-white/20 text-white/50'}`}>{opt.label}</span>
+              <img
+                src="https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/4bd734812_74038218-a49d-416f-a638-f696a9d9ea15.png"
+                alt="SSG OPS APPS"
+                className="h-20 w-auto mb-3 drop-shadow-2xl"
+              />
+              <h1 className={`text-xl font-bold tracking-wide mb-1 ${opt.dark === false ? 'text-slate-900' : 'text-white'}`}>Internal Operations Portal</h1>
+              <p className={`text-xs tracking-widest uppercase font-medium ${opt.sub}`}>Streamline • Simplify • Grow</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Main Content */}
