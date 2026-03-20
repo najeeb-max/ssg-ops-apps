@@ -3,13 +3,16 @@ import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function AppCard({ name, description, icon: Icon, color, link }) {
+  const isExternal = link.startsWith('http');
+
   return (
     <motion.div
       whileHover={{ y: -8, boxShadow: '0 40px 80px rgba(239, 68, 68, 0.25)' }}
       transition={{ duration: 0.3 }}
       className="h-full"
     >
-      <Link to={link}>
+      {isExternal ? (
+        <a href={link} target="_blank" rel="noopener noreferrer">
         <div className="h-full bg-white border-2 border-gray-200 hover:border-red-600 rounded-2xl p-7 cursor-pointer group overflow-hidden relative shadow-sm hover:shadow-lg transition-all">
           <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative">
