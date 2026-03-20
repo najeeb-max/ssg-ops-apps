@@ -5,7 +5,7 @@ import { Search } from 'lucide-react';
 import {
   Calendar,
   Files,
-  FileSpreadsheet,
+  Newspaper,
   BookOpen,
   Monitor,
   Users
