@@ -5,10 +5,9 @@ import { Search } from 'lucide-react';
 import {
   Calendar,
   Files,
-  Mail,
-  Sheet,
+  FileSpreadsheet,
   BookOpen,
-  Presentation,
+  Monitor,
   Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
