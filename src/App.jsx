@@ -9,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import QatarNews from './pages/QatarNews';
 import AppViewer from './pages/AppViewer';
+import BulkInvite from './pages/BulkInvite';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,6 +41,7 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Home />} />
       <Route path="/qatar-news" element={<QatarNews />} />
       <Route path="/app-viewer" element={<AppViewer />} />
+      <Route path="/bulk-invite" element={<BulkInvite />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

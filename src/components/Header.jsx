@@ -1,14 +1,20 @@
 import { Link } from 'react-router-dom';
 import SSGLogo from './SSGLogo';
-import { LogOut, Cloud } from 'lucide-react';
+import { LogOut, Cloud, UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Header() {
   const [dateTime, setDateTime] = useState('');
   const [weather, setWeather] = useState({ temp: '72°F', condition: 'Partly Cloudy' });
   const [tick, setTick] = useState(0);
+
+  const { data: user } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => base44.auth.me(),
+  });
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -51,13 +57,24 @@ export default function Header() {
           </motion.div>
         </div>
         
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
-        >
-          <LogOut className="w-4 h-4" />
-          Logout
-        </button>
+        <div className="flex items-center gap-2">
+          {user?.role === 'admin' && (
+            <Link
+              to="/bulk-invite"
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
+            >
+              <UserPlus className="w-4 h-4" />
+              Invite Users
+            </Link>
+          )}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
       </div>
     </header>
   );
