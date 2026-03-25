@@ -1,4 +1,3 @@
-import React from "react";
 import { GitBranch } from "lucide-react";
 
 export default function PcsSplitOrderSummary({ lineItems, providers, quotes }) {

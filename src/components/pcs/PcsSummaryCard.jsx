@@ -1,4 +1,3 @@
-import React from "react";
 import { DollarSign, TrendingDown, Percent, Award } from "lucide-react";
 
 export default function PcsSummaryCard({ sheet, lineItems, providers, quotes }) {
