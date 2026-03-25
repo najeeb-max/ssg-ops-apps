@@ -10,6 +10,10 @@ import Home from './pages/Home';
 import QatarNews from './pages/QatarNews';
 import AppViewer from './pages/AppViewer';
 import BulkInvite from './pages/BulkInvite';
+import PcsDashboard from './pages/PcsDashboard';
+import PcsSheets from './pages/PcsSheets';
+import PcsCreateSheet from './pages/PcsCreateSheet';
+import PcsSheetDetail from './pages/PcsSheetDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -42,6 +46,10 @@ const AuthenticatedApp = () => {
       <Route path="/qatar-news" element={<QatarNews />} />
       <Route path="/app-viewer" element={<AppViewer />} />
       <Route path="/bulk-invite" element={<BulkInvite />} />
+      <Route path="/pcs" element={<PcsDashboard />} />
+      <Route path="/pcs-sheets" element={<PcsSheets />} />
+      <Route path="/pcs-create" element={<PcsCreateSheet />} />
+      <Route path="/pcs-detail" element={<PcsSheetDetail />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

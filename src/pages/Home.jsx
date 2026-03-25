@@ -20,7 +20,7 @@ const COMPANY_APPS = [
     description: 'Overview of SSG procurement price comparisons for Existing System Orders',
     icon: ShoppingCart,
     color: 'bg-red-600',
-    link: 'https://ssg-pcs-workflows-f5816009.base44.app',
+    link: '/pcs',
     category: 'Collaboration'
   },
   {
