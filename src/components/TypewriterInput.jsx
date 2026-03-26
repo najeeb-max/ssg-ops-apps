@@ -26,7 +26,7 @@ export default function TypewriterInput({ value, onChange, onFocus, onBlur, plac
   };
 
   return (
-    <div>
+    <div className="relative">
       {label && <label className="text-xs text-slate-600 mb-1 block font-medium">{label}</label>}
       <div className="relative">
         <Input
@@ -41,7 +41,8 @@ export default function TypewriterInput({ value, onChange, onFocus, onBlur, plac
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 pointer-events-none rounded-md px-3 flex items-center text-sm font-mono text-slate-700 overflow-hidden"
+            className="absolute inset-0 pointer-events-none rounded-md px-3 flex items-center text-sm font-mono text-slate-700 overflow-hidden top-0"
+            style={{ paddingTop: '0.5625rem' }}
           >
             {displayText}
             <motion.span
