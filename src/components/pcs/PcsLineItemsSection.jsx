@@ -30,11 +30,9 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
 
       {/* Controls + Drop zone — only for editors */}
       {canEdit && (
-        <div className="px-5 pt-3 pb-2 flex items-center gap-3 flex-wrap">
+        <div className="px-5 pt-3 pb-2 space-y-2">
           <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
-          <div className="flex-1 min-w-[220px]">
-            <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
-          </div>
+          <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
         </div>
       )}
 

@@ -107,8 +107,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
-          style={{ resize: "both", overflow: "hidden", width: "160px", height: "60px", minWidth: "120px", minHeight: "40px", maxWidth: "320px", maxHeight: "120px" }}
-          className={`flex items-center gap-2 border-2 border-dashed rounded-lg px-3 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
+          className={`flex items-center gap-3 border-2 border-dashed rounded-xl px-4 py-3 cursor-pointer transition-all w-full ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
         >
           <ImagePlus className={`w-3.5 h-3.5 flex-shrink-0 ${dragging ? "text-red-500" : "text-slate-400"}`} />
           <span className="text-xs text-slate-500 truncate">{dragging ? "Release to extract line items" : "Drop screenshot or click to upload"}</span>

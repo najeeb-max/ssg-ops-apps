@@ -1,16 +1,14 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, ChevronDown, ChevronUp, ScanLine, Loader2 } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export default function PcsQuickAddItem({ pcsId, lineItems }) {
   const [open, setOpen] = useState(false);
-  const [scanning, setScanning] = useState(false);
-  const scanInputRef = useRef();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     description: "",
@@ -39,28 +37,6 @@ export default function PcsQuickAddItem({ pcsId, lineItems }) {
     createMutation.mutate({ pcs_id: pcsId, item_number: form.item_number, description: form.description, unit: form.unit, quantity: qty, selling_price: price, total_selling_price: qty * price });
   };
 
-  const handleScanFill = async (file) => {
-    if (!file) return;
-    setScanning(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Extract the FIRST or most prominent line item from this image. Return a single item with: description (full product description), unit (e.g. MTR, PCS, PKT), quantity (number), selling_price (unit price as number, 0 if not visible).`,
-        file_urls: [file_url],
-        response_json_schema: { type: "object", properties: { description: { type: "string" }, unit: { type: "string" }, quantity: { type: "number" }, selling_price: { type: "number" } } },
-      });
-      if (result?.description) {
-        setForm((prev) => ({ ...prev, description: result.description || prev.description, unit: result.unit || prev.unit, quantity: result.quantity || prev.quantity, selling_price: result.selling_price || prev.selling_price }));
-        setOpen(true);
-        toast.success("Fields filled from screenshot");
-      }
-    } catch (err) {
-      toast.error("Could not read screenshot: " + err.message);
-    } finally {
-      setScanning(false);
-    }
-  };
-
   const total = form.quantity && form.selling_price ? (parseFloat(form.quantity) * parseFloat(form.selling_price)).toFixed(2) : "0.00";
 
   return (
@@ -72,11 +48,6 @@ export default function PcsQuickAddItem({ pcsId, lineItems }) {
             {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </Button>
         </CollapsibleTrigger>
-        <button onClick={(e) => { e.stopPropagation(); scanInputRef.current?.click(); }} disabled={scanning} className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60">
-          {scanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ScanLine className="w-3.5 h-3.5" />}
-          {scanning ? "Scanning..." : "From Screenshot"}
-        </button>
-        <input type="file" accept="image/*" ref={scanInputRef} className="hidden" onChange={(e) => handleScanFill(e.target.files?.[0])} />
       </div>
       <CollapsibleContent>
         <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 mb-4">
