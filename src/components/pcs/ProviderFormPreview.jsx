@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Type, Zap, Wind } from "lucide-react";
+import { Sparkles, Zap, Wind, Rocket } from "lucide-react";
 
 const SAMPLE = {
   name: "Supplier Co.",
@@ -15,54 +15,51 @@ const SAMPLE = {
   currency: "QAR",
 };
 
-// Style 1: Typewriter effect - text appears character by character
-function TypewriterPreview() {
-  const [chars, setChars] = useState("");
-  useEffect(() => {
-    const name = SAMPLE.name;
-    let i = 0;
-    const type = () => {
-      setChars(name.substring(0, i));
-      i++;
-      if (i <= name.length) {
-        setTimeout(type, 50);
-      } else {
-        setTimeout(() => { i = 0; type(); }, 2000);
-      }
-    };
-    type();
-  }, []);
-
-  return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-6 border border-blue-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Type className="w-4 h-4 text-blue-600" />
-        <h3 className="font-semibold text-blue-900">Typewriter Effect</h3>
-      </div>
-      <div className="space-y-3">
-        <div>
-          <label className="text-xs text-blue-700 mb-1 block font-medium">Company Name *</label>
-          <Input
-            value={chars}
-            readOnly
-            className="text-sm h-9 bg-white border-blue-300 cursor-text"
-            style={{ minHeight: "36px" }}
-          />
-        </div>
-        <p className="text-xs text-blue-600 italic">Text appears character by character...</p>
-      </div>
-    </div>
-  );
-}
-
-// Style 2: Fade-in staggered - each field fades in sequentially
-function StaggeredFadePreview() {
+// Style 1: Spring Bounce - smooth springy entrance
+function SpringBouncePreview() {
   const [reset, setReset] = useState(0);
   const fields = [
     { label: "Company Name *", value: SAMPLE.name },
     { label: "Contact Person", value: SAMPLE.contact_person },
     { label: "Delivery Period", value: SAMPLE.delivery_period },
   ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2800);
+    return () => clearTimeout(timer);
+  }, [reset]);
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-6 border border-blue-200">
+      <div className="flex items-center gap-2 mb-4">
+        <Rocket className="w-4 h-4 text-blue-600" />
+        <h3 className="font-semibold text-blue-900">Spring Bounce</h3>
+      </div>
+      <div className="space-y-2.5">
+        {fields.map((field, idx) => (
+          <motion.div
+            key={`${idx}-${reset}`}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 180, damping: 12, delay: idx * 0.12 }}
+          >
+            <label className="text-xs text-blue-700 mb-1 block font-medium">{field.label}</label>
+            <Input
+              value={field.value}
+              readOnly
+              className="text-sm h-9 bg-white border-blue-300"
+            />
+          </motion.div>
+        ))}
+        <p className="text-xs text-blue-600 italic">Bouncy spring entrance...</p>
+      </div>
+    </div>
+  );
+}
+
+// Style 2: Shimmer Gradient - gradient shimmer across field
+function ShimmerPreview() {
+  const [reset, setReset] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => setReset(prev => prev + 1), 2500);
@@ -73,121 +70,107 @@ function StaggeredFadePreview() {
     <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-6 border border-emerald-200">
       <div className="flex items-center gap-2 mb-4">
         <Wind className="w-4 h-4 text-emerald-600" />
-        <h3 className="font-semibold text-emerald-900">Staggered Fade-In</h3>
+        <h3 className="font-semibold text-emerald-900">Shimmer Gradient</h3>
       </div>
       <div className="space-y-3">
-        {fields.map((field, idx) => (
-          <motion.div
-            key={`${idx}-${reset}`}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.15, duration: 0.4 }}
-          >
-            <label className="text-xs text-emerald-700 mb-1 block font-medium">{field.label}</label>
-            <Input
-              value={field.value}
-              readOnly
-              className="text-sm h-9 bg-white border-emerald-300"
+        <div>
+          <label className="text-xs text-emerald-700 mb-1 block font-medium">Company Name *</label>
+          <div className="relative overflow-hidden rounded-md h-9 bg-white border border-emerald-300">
+            <motion.div
+              key={reset}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200 to-transparent"
+              animate={{ x: ["100%", "-100%"] }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
             />
-          </motion.div>
-        ))}
-        <p className="text-xs text-emerald-600 italic">Fields appear one after another...</p>
+            <div className="relative h-full px-3 flex items-center text-sm text-emerald-900 font-medium">
+              {SAMPLE.name}
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-emerald-600 italic">Gradient shimmers across the field...</p>
       </div>
     </div>
   );
 }
 
-// Style 3: Placeholder morph - placeholder transitions to value
-function PlaceholderMorphPreview() {
-  const [showValue, setShowValue] = useState(false);
+// Style 3: Elastic Wave - text expands with elastic effect
+function ElasticWavePreview() {
+  const [reset, setReset] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowValue(true), 300);
-    const reset = setTimeout(() => setShowValue(false), 2000);
-    return () => { clearTimeout(timer); clearTimeout(reset); };
-  }, [showValue]);
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2800);
+    return () => clearTimeout(timer);
+  }, [reset]);
+
+  const letters = SAMPLE.name.split("");
 
   return (
     <div className="bg-gradient-to-br from-violet-50 to-violet-100/50 rounded-xl p-6 border border-violet-200">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-4 h-4 text-violet-600" />
-        <h3 className="font-semibold text-violet-900">Placeholder Morph</h3>
+        <h3 className="font-semibold text-violet-900">Elastic Wave</h3>
       </div>
       <div className="space-y-3">
-        <motion.div
-          initial={{ scale: 0.98, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
+        <div>
           <label className="text-xs text-violet-700 mb-1 block font-medium">Company Name *</label>
-          <Input
-            placeholder={!showValue ? "Supplier Co." : ""}
-            value={showValue ? SAMPLE.name : ""}
-            readOnly
-            className="text-sm h-9 bg-white border-violet-300"
-            style={{
-              color: showValue ? "#1e1b4b" : "#a78bfa",
-              fontStyle: !showValue ? "italic" : "normal",
-            }}
-          />
-        </motion.div>
-        <p className="text-xs text-violet-600 italic">Placeholder text transitions to value...</p>
+          <div className="h-9 bg-white border border-violet-300 rounded-md px-3 flex items-center gap-0.5 text-sm font-medium text-violet-900">
+            {letters.map((char, idx) => (
+              <motion.span
+                key={`${idx}-${reset}`}
+                initial={{ scaleY: 0.5, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 8,
+                  delay: idx * 0.05,
+                }}
+                style={{ transformOrigin: "center" }}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </div>
+        </div>
+        <p className="text-xs text-violet-600 italic">Each letter bounces in with elastic motion...</p>
       </div>
     </div>
   );
 }
 
-// Style 4: Pulse fill - field pulses as it fills
-function PulseFillPreview() {
-  const [progress, setProgress] = useState(0);
+// Style 4: Glow Pulse - field glows while content appears
+function GlowPulsePreview() {
+  const [reset, setReset] = useState(0);
 
   useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      i += Math.random() * 30;
-      if (i >= 100) {
-        setProgress(100);
-        clearInterval(timer);
-        setTimeout(() => setProgress(0), 2000);
-      } else {
-        setProgress(i);
-      }
-    }, 80);
-    return () => clearInterval(timer);
-  }, [progress]);
-
-  const displayValue = SAMPLE.name.substring(0, Math.ceil((progress / 100) * SAMPLE.name.length));
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2600);
+    return () => clearTimeout(timer);
+  }, [reset]);
 
   return (
     <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-6 border border-amber-200">
       <div className="flex items-center gap-2 mb-4">
         <Zap className="w-4 h-4 text-amber-600" />
-        <h3 className="font-semibold text-amber-900">Pulse Fill</h3>
+        <h3 className="font-semibold text-amber-900">Glow Pulse</h3>
       </div>
       <div className="space-y-3">
         <div>
           <label className="text-xs text-amber-700 mb-1 block font-medium">Company Name *</label>
-          <div className="relative">
-            <Input
-              value={displayValue}
-              readOnly
-              className="text-sm h-9 bg-white border-amber-300"
-            />
-            <motion.div
-              className="absolute inset-0 bg-amber-200 rounded-md opacity-20 pointer-events-none"
-              animate={{ scale: progress === 100 ? 0 : 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        </div>
-        <div className="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-amber-400"
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.1 }}
-          />
+            key={reset}
+            initial={{ boxShadow: "0 0 0px rgba(217, 119, 6, 0)" }}
+            animate={{ boxShadow: ["0 0 0px rgba(217, 119, 6, 0)", "0 0 12px rgba(217, 119, 6, 0.6)", "0 0 0px rgba(217, 119, 6, 0)"] }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+            className="relative rounded-md"
+          >
+            <Input
+              value={SAMPLE.name}
+              readOnly
+              className="text-sm h-9 bg-white border-amber-300 relative z-10"
+            />
+          </motion.div>
         </div>
-        <p className="text-xs text-amber-600 italic">Field fills with progress indicator...</p>
+        <p className="text-xs text-amber-600 italic">Field glows with pulsing aura...</p>
       </div>
     </div>
   );
@@ -209,20 +192,20 @@ export default function ProviderFormPreview({ onSelect }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button onClick={() => handleSelect("typewriter")} className={`text-left transition-all ${selected === "typewriter" ? "ring-2 ring-blue-400" : ""}`}>
-          <TypewriterPreview />
+        <button onClick={() => handleSelect("spring")} className={`text-left transition-all ${selected === "spring" ? "ring-2 ring-blue-400" : ""}`}>
+          <SpringBouncePreview />
         </button>
 
-        <button onClick={() => handleSelect("staggered")} className={`text-left transition-all ${selected === "staggered" ? "ring-2 ring-emerald-400" : ""}`}>
-          <StaggeredFadePreview />
+        <button onClick={() => handleSelect("shimmer")} className={`text-left transition-all ${selected === "shimmer" ? "ring-2 ring-emerald-400" : ""}`}>
+          <ShimmerPreview />
         </button>
 
-        <button onClick={() => handleSelect("morph")} className={`text-left transition-all ${selected === "morph" ? "ring-2 ring-violet-400" : ""}`}>
-          <PlaceholderMorphPreview />
+        <button onClick={() => handleSelect("wave")} className={`text-left transition-all ${selected === "wave" ? "ring-2 ring-violet-400" : ""}`}>
+          <ElasticWavePreview />
         </button>
 
-        <button onClick={() => handleSelect("pulse")} className={`text-left transition-all ${selected === "pulse" ? "ring-2 ring-amber-400" : ""}`}>
-          <PulseFillPreview />
+        <button onClick={() => handleSelect("glow")} className={`text-left transition-all ${selected === "glow" ? "ring-2 ring-amber-400" : ""}`}>
+          <GlowPulsePreview />
         </button>
       </div>
 
