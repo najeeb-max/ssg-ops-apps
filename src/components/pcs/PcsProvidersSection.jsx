@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-export default function PcsProvidersSection({ pcsId, providers }) {
+export default function PcsProvidersSection({ pcsId, providers, canEdit = true }) {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -46,6 +46,7 @@ export default function PcsProvidersSection({ pcsId, providers }) {
           <Users className="w-4 h-4" />
           Suppliers <span className="text-slate-400 font-normal text-sm">({providers?.length || 0}/4)</span>
         </h2>
+        {canEdit && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm" disabled={!canAddMore} className="bg-red-600 hover:bg-red-700 text-white gap-1.5">
@@ -73,6 +74,7 @@ export default function PcsProvidersSection({ pcsId, providers }) {
             </div>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
       {(!providers || providers.length === 0) ? (
@@ -94,6 +96,7 @@ export default function PcsProvidersSection({ pcsId, providers }) {
                     {prov.payment_terms && <span>Payment: {prov.payment_terms}</span>}
                   </div>
                 </div>
+                {canEdit && (
                 <div className="flex items-center gap-1">
                   <Button variant="ghost" size="sm" onClick={() => awardMutation.mutate({ id: prov.id, isAwarded: !prov.is_awarded })} className="text-xs h-7 px-2">
                     {prov.is_awarded ? "Remove Award" : "Award This"}
@@ -102,6 +105,7 @@ export default function PcsProvidersSection({ pcsId, providers }) {
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 </div>
+                )}
               </div>
             </div>
           ))}

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import PcsQuickAddItem from "./PcsQuickAddItem";
 import PcsImageImportDropzone from "./PcsImageImportDropzone";
 
-export default function PcsLineItemsSection({ pcsId, lineItems }) {
+export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -28,13 +28,15 @@ export default function PcsLineItemsSection({ pcsId, lineItems }) {
         </h2>
       </div>
 
-      {/* Controls + Drop zone — all inline */}
-      <div className="px-5 pt-3 pb-2 flex items-center gap-3 flex-wrap">
-        <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
-        <div className="flex-1 min-w-[220px]">
-          <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
+      {/* Controls + Drop zone — only for editors */}
+      {canEdit && (
+        <div className="px-5 pt-3 pb-2 flex items-center gap-3 flex-wrap">
+          <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
+          <div className="flex-1 min-w-[220px]">
+            <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
+          </div>
         </div>
-      </div>
+      )}
 
       {(!lineItems || lineItems.length === 0) ? (
         <div className="text-center py-10 text-slate-400 text-sm px-5 pb-5">
@@ -66,9 +68,11 @@ export default function PcsLineItemsSection({ pcsId, lineItems }) {
                   <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">{item.selling_price?.toFixed(2)}</td>
                   <td className="py-2.5 px-4 text-right font-semibold text-slate-900 tabular-nums">{item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                   <td className="py-2.5 px-4">
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(item.id)}>
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                    {canEdit && (
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(item.id)}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

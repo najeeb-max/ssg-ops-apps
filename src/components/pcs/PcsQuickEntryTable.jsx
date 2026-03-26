@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
-export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes }) {
+export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes, canEdit = true }) {
   const queryClient = useQueryClient();
   const [editingCell, setEditingCell] = useState(null);
   const [cellValue, setCellValue] = useState("");
@@ -113,14 +113,14 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                   const isAwarded = item.awarded_provider_id === prov.id;
                   return (
                     <td key={prov.id} className={cn("py-1.5 px-2 text-center", isAwarded && "bg-emerald-50")}>
-                      {isEditing ? (
+                      {isEditing && canEdit ? (
                         <div className="flex flex-col gap-1 items-center">
                           <Input value={cellValue} onChange={(e) => setCellValue(e.target.value)} className="h-7 text-xs text-center w-24" autoFocus onKeyDown={(e) => { if (e.key === "Enter") handleSave(item, prov); if (e.key === "Escape") { setEditingCell(null); setCellValue(""); }}} />
                           <Button size="sm" className="h-6 text-xs px-2 bg-red-600 hover:bg-red-700" onClick={() => handleSave(item, prov)}><Save className="w-3 h-3" /></Button>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-0.5">
-                          <button onClick={() => handleCellClick(item, prov, quote)} className="cursor-pointer py-1 px-2 rounded hover:bg-blue-50 transition-colors w-full text-center">
+                          <button onClick={() => canEdit && handleCellClick(item, prov, quote)} className={cn("py-1 px-2 rounded w-full text-center transition-colors", canEdit ? "cursor-pointer hover:bg-blue-50" : "cursor-default")}>
                             {quote ? (
                               <div>
                                 <div className="font-medium text-slate-900 text-xs">{quote.unit_price?.toFixed(2)}</div>
@@ -129,7 +129,7 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                             ) : <span className="text-slate-300 text-xs">—</span>}
                             {isAwarded && <div className="text-emerald-600 text-xs font-bold mt-0.5">✓ AWARDED</div>}
                           </button>
-                          {quote && !isEditing && (
+                          {quote && !isEditing && canEdit && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-5 w-5"><MoreHorizontal className="w-3 h-3" /></Button>
@@ -150,21 +150,40 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                   );
                 })}
                 <td className="py-2 px-2 text-center text-xs">
-                  {item.awarded_provider_id ? (
-                    <span className="text-emerald-700 font-medium">{sortedProviders.find(p => p.id === item.awarded_provider_id)?.name || "—"}</span>
+                  {!canEdit ? (
+                    item.awarded_provider_id ? (
+                      <span className="text-emerald-700 font-medium flex items-center gap-1 justify-center">
+                        <Award className="w-3 h-3" />{sortedProviders.find(p => p.id === item.awarded_provider_id)?.name || "—"}
+                      </span>
+                    ) : <span className="text-slate-300">—</span>
                   ) : (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      {item.awarded_provider_id ? (
+                        <button className="flex items-center gap-1 text-emerald-700 font-medium hover:bg-emerald-50 rounded px-2 py-1 transition-colors cursor-pointer">
+                          <Award className="w-3 h-3" />
+                          {sortedProviders.find(p => p.id === item.awarded_provider_id)?.name || "—"}
+                        </button>
+                      ) : (
                         <Button variant="ghost" size="sm" className="text-xs h-6 px-2 text-slate-400">+ Assign</Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel className="text-xs">Award item #{item.item_number} to:</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        {sortedProviders.map(p => (
-                          <DropdownMenuItem key={p.id} onClick={() => awardItemMutation.mutate({ itemId: item.id, providerId: p.id })} className="text-emerald-700 font-medium text-xs">{p.name}</DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      )}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel className="text-xs">Item #{item.item_number}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {sortedProviders.map(p => (
+                        <DropdownMenuItem key={p.id} onClick={() => awardItemMutation.mutate({ itemId: item.id, providerId: p.id })} className={cn("text-xs", item.awarded_provider_id === p.id ? "text-emerald-700 font-semibold" : "text-slate-700")}>
+                          {item.awarded_provider_id === p.id ? "✓ " : ""}{p.name}
+                        </DropdownMenuItem>
+                      ))}
+                      {item.awarded_provider_id && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => awardItemMutation.mutate({ itemId: item.id, providerId: null })} className="text-red-500 text-xs">✕ Remove Assignment</DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   )}
                 </td>
               </tr>

@@ -1,0 +1,77 @@
+{
+  "name": "PriceComparisonSheet",
+  "type": "object",
+  "properties": {
+    "pcs_number": {
+      "type": "string",
+      "description": "Auto-generated PCS number e.g. PCS-00001"
+    },
+    "po_number": {
+      "type": "string",
+      "description": "Client PO Number"
+    },
+    "sq_number": {
+      "type": "string",
+      "description": "SSG Sales Order Number"
+    },
+    "rfq_number": {
+      "type": "string",
+      "description": "Client RFQ Number"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Client/Customer name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "PCS creation date"
+    },
+    "po_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Customer PO Date"
+    },
+    "quoted_lead_time_weeks": {
+      "type": "number",
+      "description": "Lead time in weeks"
+    },
+    "quoted_lead_time_days": {
+      "type": "number",
+      "description": "Lead time in days"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_progress",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "awarded"
+      ],
+      "default": "draft",
+      "description": "Workflow status"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of user currently responsible for this PCS (overrides creator)"
+    },
+    "submitted_by": {
+      "type": "string",
+      "description": "Email of user who submitted for approval"
+    },
+    "remarks": {
+      "type": "string",
+      "description": "General remarks"
+    },
+    "total_selling_value": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "client_name",
+    "po_number"
+  ]
+}

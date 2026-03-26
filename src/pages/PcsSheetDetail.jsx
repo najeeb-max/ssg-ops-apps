@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from "../components/Header";
@@ -13,13 +14,15 @@ import PcsApprovalSection from "../components/pcs/PcsApprovalSection";
 export default function PcsSheetDetail() {
   const urlParams = new URLSearchParams(window.location.search);
   const sheetId = urlParams.get("id");
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => setCurrentUser(null));
+  }, []);
 
   const { data: sheet, isLoading: loadingSheet } = useQuery({
     queryKey: ["pcs-sheet", sheetId],
-    queryFn: async () => {
-      const sheets = await base44.entities.PriceComparisonSheet.list();
-      return sheets.find(s => s.id === sheetId) || null;
-    },
+    queryFn: () => base44.entities.PriceComparisonSheet.filter({ id: sheetId }).then(r => r[0] || null),
     enabled: !!sheetId,
   });
 
@@ -71,25 +74,34 @@ export default function PcsSheetDetail() {
       <div className="pt-24 px-4 md:px-6 pb-8">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header Section */}
-          <PcsSheetHeader sheet={sheet} />
+          <PcsSheetHeader sheet={sheet} currentUser={currentUser} />
 
           {/* Summary Cards */}
           <PcsSummaryCard sheet={sheet} lineItems={lineItems} providers={providers} quotes={quotes} />
 
           {/* Line Items - Full Width */}
-          <PcsLineItemsSection pcsId={sheetId} lineItems={lineItems} />
+          <PcsLineItemsSection pcsId={sheetId} lineItems={lineItems} canEdit={
+            currentUser?.email === (sheet.assigned_to || sheet.created_by) ||
+            currentUser?.role === "admin" || currentUser?.role === "manager"
+          } />
 
           {/* Split Order Summary */}
           <PcsSplitOrderSummary lineItems={lineItems} providers={providers} quotes={quotes} />
 
           {/* Suppliers - Full Width */}
-          <PcsProvidersSection pcsId={sheetId} providers={providers} />
+          <PcsProvidersSection pcsId={sheetId} providers={providers} canEdit={
+            currentUser?.email === (sheet.assigned_to || sheet.created_by) ||
+            currentUser?.role === "admin" || currentUser?.role === "manager"
+          } />
 
           {/* Price Comparison Table - Full Width */}
-          <PcsQuickEntryTable pcsId={sheetId} lineItems={lineItems} providers={providers} quotes={quotes} />
+          <PcsQuickEntryTable pcsId={sheetId} lineItems={lineItems} providers={providers} quotes={quotes} canEdit={
+            currentUser?.email === (sheet.assigned_to || sheet.created_by) ||
+            currentUser?.role === "admin" || currentUser?.role === "manager"
+          } />
 
-          {/* Approval Section */}
-          <PcsApprovalSection pcsId={sheetId} pcsStatus={sheet.status} />
+          {/* Approval & Workflow Section */}
+          <PcsApprovalSection pcsId={sheetId} sheet={sheet} currentUser={currentUser} />
         </div>
       </div>
     </div>
