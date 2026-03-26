@@ -128,8 +128,8 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
                     <span className="bg-slate-100 text-slate-600 text-xs font-medium px-1.5 py-0.5 rounded">{item.unit}</span>
                   </td>
                   <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">{item.quantity?.toLocaleString()}</td>
-                  <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">{item.selling_price?.toFixed(2)}</td>
-                  <td className="py-2.5 px-4 text-right font-semibold text-slate-900 tabular-nums">{item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">QAR {item.selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-slate-900 tabular-nums">QAR {item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="py-2.5 px-4">
                     {canEdit && (
                       <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(item.id)}>
@@ -144,7 +144,7 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
               <tr className="bg-slate-50 border-t-2 border-slate-200">
                 <td colSpan={5} className="py-3 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wide">Total Selling Value</td>
                 <td className="py-3 px-4 text-right font-bold text-slate-900 tabular-nums text-sm">
-                  {lineItems.reduce((sum, i) => sum + (i.total_selling_price || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  QAR {lineItems.reduce((sum, i) => sum + (i.total_selling_price || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
                 <td></td>
               </tr>
