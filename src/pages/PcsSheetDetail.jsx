@@ -74,8 +74,8 @@ export default function PcsSheetDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="pt-24 px-4 md:px-6 pb-8">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <div className="pt-24 px-3 md:px-5 pb-8">
+        <div className="max-w-[1600px] mx-auto space-y-6">
           {/* Header Section */}
           <PcsSheetHeader sheet={sheet} currentUser={currentUser} />
 
