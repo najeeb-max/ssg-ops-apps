@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, CheckCircle2, X, Trash2, Sparkles } from "lucide-react";
+import { ImagePlus, Loader2, CheckCircle2, X, Trash2, Sparkles, Clipboard, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 export default function PcsImageImportDropzone({ pcsId, lineItems }) {
@@ -10,7 +10,17 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
   const [dragging, setDragging] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [pasteReady, setPasteReady] = useState(false);
   const inputRef = useRef();
+
+  // Flash the paste-ready indicator when window gets focus (user may have just taken a screenshot)
+  useEffect(() => {
+    const onFocus = () => { if (!preview && !extracting) setPasteReady(true); };
+    const onBlur = () => setPasteReady(false);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    return () => { window.removeEventListener("focus", onFocus); window.removeEventListener("blur", onBlur); };
+  }, [preview, extracting]);
 
   const bulkCreate = useMutation({
     mutationFn: async (items) => {
@@ -79,13 +89,33 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
     if (preview || extracting) return;
     const items = [...e.clipboardData.items];
     const imgItem = items.find((i) => i.type.startsWith("image/"));
-    if (imgItem) handleFiles([imgItem.getAsFile()]);
+    if (imgItem) { setPasteReady(false); handleFiles([imgItem.getAsFile()]); }
   }, [preview, extracting]);
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
     return () => document.removeEventListener("paste", handlePaste);
   }, [handlePaste]);
+
+  // Programmatic clipboard read (modern browsers)
+  const handleClipboardRead = async () => {
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const imgType = item.types.find((t) => t.startsWith("image/"));
+        if (imgType) {
+          const blob = await item.getType(imgType);
+          const file = new File([blob], "screenshot.png", { type: imgType });
+          handleFiles([file]);
+          return;
+        }
+      }
+      toast.error("No image in clipboard — take a screenshot first (PrtScr / Cmd+Shift+4)");
+    } catch {
+      // Fallback: just trigger file picker
+      inputRef.current?.click();
+    }
+  };
 
   const updateItem = (idx, field, value) => {
     setPreview((prev) => {
@@ -102,16 +132,57 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
   return (
     <div>
       {!preview && !extracting && (
-        <div
-          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
-          className={`flex items-center gap-3 border-2 border-dashed rounded-xl px-4 py-3 cursor-pointer transition-all w-full ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
-        >
-          <ImagePlus className={`w-3.5 h-3.5 flex-shrink-0 ${dragging ? "text-red-500" : "text-slate-400"}`} />
-          <span className="text-xs text-slate-500 truncate">{dragging ? "Release to extract line items" : "Drop screenshot or click to upload"}</span>
-          <span className="ml-auto flex-shrink-0 text-xs bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-medium">AI Extract</span>
+        <div className="space-y-2">
+          {/* Main drop zone */}
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => inputRef.current?.click()}
+            className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl px-4 py-5 cursor-pointer transition-all w-full ${
+              dragging
+                ? "border-red-400 bg-red-50 scale-[1.01]"
+                : pasteReady
+                ? "border-emerald-400 bg-emerald-50 shadow-sm"
+                : "border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
+            }`}
+          >
+            {dragging ? (
+              <>
+                <ImagePlus className="w-6 h-6 text-red-400" />
+                <span className="text-sm font-medium text-red-600">Release to extract items</span>
+              </>
+            ) : pasteReady ? (
+              <>
+                <Clipboard className="w-6 h-6 text-emerald-500" />
+                <span className="text-sm font-semibold text-emerald-700">Screenshot detected in clipboard!</span>
+                <span className="text-xs text-emerald-600">Press <kbd className="bg-white border border-emerald-300 rounded px-1.5 py-0.5 font-mono text-xs">Ctrl+V</kbd> to paste &amp; extract instantly</span>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <Camera className="w-5 h-5 text-slate-400" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-slate-600">Drop a screenshot or click to browse</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Or take a screenshot and press <kbd className="bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 font-mono text-xs">Ctrl+V</kbd> / <kbd className="bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 font-mono text-xs">Cmd+V</kbd> anywhere
+                    </p>
+                  </div>
+                  <span className="ml-auto flex-shrink-0 text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded font-semibold">AI Extract</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Quick paste button */}
+          <button
+            onClick={handleClipboardRead}
+            className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg px-3 py-2 transition-colors"
+          >
+            <Clipboard className="w-3.5 h-3.5" />
+            Paste Screenshot from Clipboard
+          </button>
+
           <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
         </div>
       )}
