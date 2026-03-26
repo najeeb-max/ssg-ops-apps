@@ -1,0 +1,58 @@
+{
+  "name": "Provider",
+  "type": "object",
+  "properties": {
+    "pcs_id": {
+      "type": "string",
+      "description": "Reference to PriceComparisonSheet"
+    },
+    "provider_number": {
+      "type": "number",
+      "description": "Provider sequence number (1-4)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Supplier/Provider company name"
+    },
+    "contact_person": {
+      "type": "string",
+      "description": "Contact person name"
+    },
+    "delivery_period": {
+      "type": "string",
+      "description": "Delivery period/lead time"
+    },
+    "payment_terms": {
+      "type": "string",
+      "description": "Payment terms"
+    },
+    "delivery_terms": {
+      "type": "string",
+      "description": "Delivery terms (FOB, CIF, etc.)"
+    },
+    "currency": {
+      "type": "string",
+      "default": "QAR",
+      "description": "Quote currency (e.g. QAR, USD, EUR)"
+    },
+    "exchange_rate": {
+      "type": "number",
+      "default": 1,
+      "description": "Exchange rate to QAR (e.g. 1 USD = 3.64 QAR)"
+    },
+    "freight_charges": {
+      "type": "number",
+      "default": 0,
+      "description": "Additional freight charges in provider's currency"
+    },
+    "is_awarded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this provider was awarded"
+    }
+  },
+  "required": [
+    "pcs_id",
+    "name"
+  ]
+}

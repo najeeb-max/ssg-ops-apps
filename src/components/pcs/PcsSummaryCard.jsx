@@ -3,11 +3,13 @@ import { DollarSign, TrendingDown, Percent, Award } from "lucide-react";
 export default function PcsSummaryCard({ sheet, lineItems, providers, quotes }) {
   const sellingTotal = (lineItems || []).reduce((sum, i) => sum + (i.total_selling_price || 0), 0);
 
-  const getProviderTotal = (providerId) =>
-    (quotes || []).filter(q => q.provider_id === providerId).reduce((sum, q) => sum + (q.total_price || 0), 0) || 0;
+  const getProviderTotalQAR = (provider) => {
+    const rate = provider?.exchange_rate || 1;
+    return (quotes || []).filter(q => q.provider_id === provider.id).reduce((sum, q) => sum + (q.total_price || 0) * rate, 0) || 0;
+  };
 
   const providerTotals = (providers || [])
-    .map(p => ({ id: p.id, name: p.name, total: getProviderTotal(p.id), freight: p.freight_charges || 0 }))
+    .map(p => ({ id: p.id, name: p.name, total: getProviderTotalQAR(p), freight: (p.freight_charges || 0) * (p.exchange_rate || 1) }))
     .filter(p => p.total > 0)
     .sort((a, b) => (a.total + a.freight) - (b.total + b.freight));
 

@@ -5,10 +5,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Header from "../components/Header";
 import PcsSheetHeader from "../components/pcs/PcsSheetHeader";
 import PcsLineItemsSection from "../components/pcs/PcsLineItemsSection";
-import PcsProvidersSection from "../components/pcs/PcsProvidersSection";
-import PcsQuickEntryTable from "../components/pcs/PcsQuickEntryTable";
+import PcsProvidersSection from "../components/pcs/PcsProvidersSection.jsx";
+import PcsQuickEntryTable from "../components/pcs/PcsQuickEntryTable.jsx";
 import PcsSummaryCard from "../components/pcs/PcsSummaryCard";
-import PcsSplitOrderSummary from "../components/pcs/PcsSplitOrderSummary";
+import PcsSplitOrderSummary from "../components/pcs/PcsSplitOrderSummary.jsx";
 import PcsApprovalSection from "../components/pcs/PcsApprovalSection";
 
 export default function PcsSheetDetail() {
