@@ -205,24 +205,31 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
             <button onClick={() => setPreview(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
+              <colgroup>
+                <col className="w-[55%]" />
+                <col className="w-[10%]" />
+                <col className="w-[13%]" />
+                <col className="w-[16%]" />
+                <col className="w-[6%]" />
+              </colgroup>
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="text-left py-2 px-3 text-xs text-slate-500">Description</th>
-                  <th className="text-left py-2 px-3 text-xs text-slate-500">Unit</th>
-                  <th className="text-left py-2 px-3 text-xs text-slate-500">Qty</th>
-                  <th className="text-left py-2 px-3 text-xs text-slate-500">Price</th>
+                  <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500">Description</th>
+                  <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500">Unit</th>
+                  <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500">Qty</th>
+                  <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500">Price</th>
                   <th className="py-2 px-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {preview.items.map((item, idx) => (
                   <tr key={idx} className="border-b border-slate-50">
-                    <td className="py-1.5 px-2"><input className="w-full text-xs border rounded px-2 py-1" value={item.description} onChange={(e) => updateItem(idx, "description", e.target.value)} /></td>
-                    <td className="py-1.5 px-2"><input className="w-16 text-xs border rounded px-2 py-1" value={item.unit} onChange={(e) => updateItem(idx, "unit", e.target.value)} /></td>
-                    <td className="py-1.5 px-2"><input type="number" className="w-20 text-xs border rounded px-2 py-1" value={item.quantity} onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 0)} /></td>
-                    <td className="py-1.5 px-2"><input type="number" className="w-24 text-xs border rounded px-2 py-1" value={item.selling_price} onChange={(e) => updateItem(idx, "selling_price", parseFloat(e.target.value) || 0)} /></td>
-                    <td className="py-1.5 px-2"><button onClick={() => removeItem(idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button></td>
+                    <td className="py-1.5 px-2"><input className="w-full text-xs border rounded px-2 py-1.5" value={item.description} onChange={(e) => updateItem(idx, "description", e.target.value)} /></td>
+                    <td className="py-1.5 px-2"><input className="w-full text-xs border rounded px-2 py-1.5" value={item.unit} onChange={(e) => updateItem(idx, "unit", e.target.value)} /></td>
+                    <td className="py-1.5 px-2"><input type="number" className="w-full text-xs border rounded px-2 py-1.5" value={item.quantity} onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 0)} /></td>
+                    <td className="py-1.5 px-2"><input type="number" className="w-full text-xs border rounded px-2 py-1.5" value={item.selling_price} onChange={(e) => updateItem(idx, "selling_price", parseFloat(e.target.value) || 0)} /></td>
+                    <td className="py-1.5 px-2 text-center"><button onClick={() => removeItem(idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button></td>
                   </tr>
                 ))}
               </tbody>
