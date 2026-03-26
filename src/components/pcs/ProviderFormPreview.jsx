@@ -31,9 +31,12 @@ function SpringBouncePreview() {
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-6 border border-blue-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Rocket className="w-4 h-4 text-blue-600" />
-        <h3 className="font-semibold text-blue-900">Spring Bounce</h3>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Rocket className="w-4 h-4 text-blue-600" />
+          <h3 className="font-semibold text-blue-900">Spring Bounce</h3>
+        </div>
+        <Badge className="bg-blue-200 text-blue-700 text-xs font-bold">PREVIEW</Badge>
       </div>
       <div className="space-y-2.5">
         {fields.map((field, idx) => (
@@ -47,7 +50,8 @@ function SpringBouncePreview() {
             <Input
               value={field.value}
               readOnly
-              className="text-sm h-9 bg-white border-blue-300"
+              disabled
+              className="text-sm h-9 bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed opacity-70"
             />
           </motion.div>
         ))}
@@ -68,21 +72,24 @@ function ShimmerPreview() {
 
   return (
     <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-6 border border-emerald-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Wind className="w-4 h-4 text-emerald-600" />
-        <h3 className="font-semibold text-emerald-900">Shimmer Gradient</h3>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Wind className="w-4 h-4 text-emerald-600" />
+          <h3 className="font-semibold text-emerald-900">Shimmer Gradient</h3>
+        </div>
+        <Badge className="bg-emerald-200 text-emerald-700 text-xs font-bold">PREVIEW</Badge>
       </div>
       <div className="space-y-3">
         <div>
           <label className="text-xs text-emerald-700 mb-1 block font-medium">Company Name *</label>
-          <div className="relative overflow-hidden rounded-md h-9 bg-white border border-emerald-300">
+          <div className="relative overflow-hidden rounded-md h-9 bg-slate-100 border border-slate-300 opacity-70">
             <motion.div
               key={reset}
               className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200 to-transparent"
               animate={{ x: ["100%", "-100%"] }}
               transition={{ duration: 1.5, ease: "easeInOut" }}
             />
-            <div className="relative h-full px-3 flex items-center text-sm text-emerald-900 font-medium">
+            <div className="relative h-full px-3 flex items-center text-sm text-slate-500 font-medium">
               {SAMPLE.name}
             </div>
           </div>
@@ -106,14 +113,17 @@ function ElasticWavePreview() {
 
   return (
     <div className="bg-gradient-to-br from-violet-50 to-violet-100/50 rounded-xl p-6 border border-violet-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="w-4 h-4 text-violet-600" />
-        <h3 className="font-semibold text-violet-900">Elastic Wave</h3>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-violet-600" />
+          <h3 className="font-semibold text-violet-900">Elastic Wave</h3>
+        </div>
+        <Badge className="bg-violet-200 text-violet-700 text-xs font-bold">PREVIEW</Badge>
       </div>
       <div className="space-y-3">
         <div>
           <label className="text-xs text-violet-700 mb-1 block font-medium">Company Name *</label>
-          <div className="h-9 bg-white border border-violet-300 rounded-md px-3 flex items-center gap-0.5 text-sm font-medium text-violet-900">
+          <div className="h-9 bg-slate-100 border border-slate-300 rounded-md px-3 flex items-center gap-0.5 text-sm font-medium text-slate-500 opacity-70">
             {letters.map((char, idx) => (
               <motion.span
                 key={`${idx}-${reset}`}
@@ -149,9 +159,12 @@ function GlowPulsePreview() {
 
   return (
     <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-6 border border-amber-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Zap className="w-4 h-4 text-amber-600" />
-        <h3 className="font-semibold text-amber-900">Glow Pulse</h3>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 text-amber-600" />
+          <h3 className="font-semibold text-amber-900">Glow Pulse</h3>
+        </div>
+        <Badge className="bg-amber-200 text-amber-700 text-xs font-bold">PREVIEW</Badge>
       </div>
       <div className="space-y-3">
         <div>
@@ -166,7 +179,8 @@ function GlowPulsePreview() {
             <Input
               value={SAMPLE.name}
               readOnly
-              className="text-sm h-9 bg-white border-amber-300 relative z-10"
+              disabled
+              className="text-sm h-9 bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed opacity-70 relative z-10"
             />
           </motion.div>
         </div>
