@@ -28,10 +28,12 @@ export default function PcsLineItemsSection({ pcsId, lineItems }) {
         </h2>
       </div>
 
-      {/* Controls + Drop zone */}
-      <div className="px-5 pt-4 pb-2">
+      {/* Controls + Drop zone — all inline */}
+      <div className="px-5 pt-4 pb-2 flex items-start gap-3 flex-wrap">
         <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
-        <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
+        <div className="flex-1 min-w-[220px]">
+          <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
+        </div>
       </div>
 
       {(!lineItems || lineItems.length === 0) ? (

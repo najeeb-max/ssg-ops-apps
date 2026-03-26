@@ -100,7 +100,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
   };
 
   return (
-    <div className="mb-3">
+    <div>
       {!preview && !extracting && (
         <div
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -108,14 +108,11 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
           style={{ resize: "horizontal", overflow: "hidden", minWidth: "220px", maxWidth: "100%" }}
-          className={`flex items-center justify-center gap-3 border-2 border-dashed rounded-xl py-3 px-4 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
+          className={`flex items-center gap-3 border-2 border-dashed rounded-lg h-9 px-3 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
         >
-          <ImagePlus className={`w-4 h-4 ${dragging ? "text-red-500" : "text-slate-400"}`} />
-          <div className="text-center">
-            <p className="text-xs font-medium text-slate-600">{dragging ? "Release to extract line items" : "Drop a screenshot or click to upload"}</p>
-            <p className="text-xs text-slate-400">Paste from clipboard • PO · RFQ · Quotation tables</p>
-          </div>
-          <span className="ml-auto text-xs bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-medium">AI Extract</span>
+          <ImagePlus className={`w-3.5 h-3.5 flex-shrink-0 ${dragging ? "text-red-500" : "text-slate-400"}`} />
+          <span className="text-xs text-slate-500 truncate">{dragging ? "Release to extract line items" : "Drop screenshot or click to upload"}</span>
+          <span className="ml-auto flex-shrink-0 text-xs bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-medium">AI Extract</span>
           <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
         </div>
       )}
