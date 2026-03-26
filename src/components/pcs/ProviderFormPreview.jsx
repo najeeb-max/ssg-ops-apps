@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Wind, Rocket } from "lucide-react";
+import { Sparkles, Zap, Wind, Rocket, Droplet, Type, RotateCw } from "lucide-react";
 
 const SAMPLE = {
   name: "Supplier Co.",
@@ -190,6 +190,127 @@ function GlowPulsePreview() {
   );
 }
 
+// Style 5: Ink Drop - content spreads like ink
+function InkDropPreview() {
+  const [reset, setReset] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2700);
+    return () => clearTimeout(timer);
+  }, [reset]);
+
+  return (
+    <div className="bg-gradient-to-br from-rose-50 to-rose-100/50 rounded-xl p-6 border border-rose-200">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Droplet className="w-4 h-4 text-rose-600" />
+          <h3 className="font-semibold text-rose-900">Ink Drop</h3>
+        </div>
+        <Badge className="bg-rose-200 text-rose-700 text-xs font-bold">PREVIEW</Badge>
+      </div>
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs text-rose-700 mb-1 block font-medium">Company Name *</label>
+          <motion.div
+            key={reset}
+            initial={{ clipPath: "circle(0% at 0% 50%)" }}
+            animate={{ clipPath: "circle(100% at 0% 50%)" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="h-9 bg-slate-100 border border-slate-300 rounded-md px-3 flex items-center text-sm font-medium text-slate-500 opacity-70 overflow-hidden"
+          >
+            {SAMPLE.name}
+          </motion.div>
+        </div>
+        <p className="text-xs text-rose-600 italic">Content spreads like ink from left...</p>
+      </div>
+    </div>
+  );
+}
+
+// Style 6: Typewriter with Cursor
+function TypewriterPreview() {
+  const [reset, setReset] = useState(0);
+  const [displayText, setDisplayText] = useState("");
+
+  useEffect(() => {
+    const text = SAMPLE.name;
+    if (displayText.length < text.length) {
+      const timer = setTimeout(() => setDisplayText(text.slice(0, displayText.length + 1)), 80);
+      return () => clearTimeout(timer);
+    } else {
+      const resetTimer = setTimeout(() => {
+        setReset(prev => prev + 1);
+        setDisplayText("");
+      }, 2000);
+      return () => clearTimeout(resetTimer);
+    }
+  }, [displayText, reset]);
+
+  return (
+    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100/50 rounded-xl p-6 border border-cyan-200">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Type className="w-4 h-4 text-cyan-600" />
+          <h3 className="font-semibold text-cyan-900">Typewriter</h3>
+        </div>
+        <Badge className="bg-cyan-200 text-cyan-700 text-xs font-bold">PREVIEW</Badge>
+      </div>
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs text-cyan-700 mb-1 block font-medium">Company Name *</label>
+          <div className="h-9 bg-slate-100 border border-slate-300 rounded-md px-3 flex items-center text-sm font-mono text-slate-500 opacity-70">
+            {displayText}
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+              className="inline-block w-1 h-4 bg-cyan-600 ml-0.5"
+            />
+          </div>
+        </div>
+        <p className="text-xs text-cyan-600 italic">Classic typewriter effect with blinking cursor...</p>
+      </div>
+    </div>
+  );
+}
+
+// Style 7: Flip Card - 3D flip animation
+function FlipCardPreview() {
+  const [reset, setReset] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2500);
+    return () => clearTimeout(timer);
+  }, [reset]);
+
+  return (
+    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/50 rounded-xl p-6 border border-indigo-200">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <RotateCw className="w-4 h-4 text-indigo-600" />
+          <h3 className="font-semibold text-indigo-900">Flip Card</h3>
+        </div>
+        <Badge className="bg-indigo-200 text-indigo-700 text-xs font-bold">PREVIEW</Badge>
+      </div>
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs text-indigo-700 mb-1 block font-medium">Company Name *</label>
+          <motion.div
+            key={reset}
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            style={{ perspective: "1000px" }}
+            className="h-9 bg-slate-100 border border-slate-300 rounded-md px-3 flex items-center text-sm font-medium text-slate-500 opacity-70"
+          >
+            {SAMPLE.name}
+          </motion.div>
+        </div>
+        <p className="text-xs text-indigo-600 italic">3D flip rotation into view...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function ProviderFormPreview({ onSelect }) {
   const [selected, setSelected] = useState(null);
 
@@ -220,6 +341,18 @@ export default function ProviderFormPreview({ onSelect }) {
 
         <button onClick={() => handleSelect("glow")} className={`text-left transition-all ${selected === "glow" ? "ring-2 ring-amber-400" : ""}`}>
           <GlowPulsePreview />
+        </button>
+
+        <button onClick={() => handleSelect("inkdrop")} className={`text-left transition-all ${selected === "inkdrop" ? "ring-2 ring-rose-400" : ""}`}>
+          <InkDropPreview />
+        </button>
+
+        <button onClick={() => handleSelect("typewriter")} className={`text-left transition-all ${selected === "typewriter" ? "ring-2 ring-cyan-400" : ""}`}>
+          <TypewriterPreview />
+        </button>
+
+        <button onClick={() => handleSelect("flip")} className={`text-left transition-all ${selected === "flip" ? "ring-2 ring-indigo-400" : ""}`}>
+          <FlipCardPreview />
         </button>
       </div>
 
