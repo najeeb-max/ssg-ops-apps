@@ -82,14 +82,11 @@ export default function PcsSheetDetail() {
           {/* Split Order Summary */}
           <PcsSplitOrderSummary lineItems={lineItems} providers={providers} quotes={quotes} />
 
-          {/* Main Content - Two Column */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column: Suppliers */}
-            <PcsProvidersSection pcsId={sheetId} providers={providers} />
+          {/* Suppliers - Full Width */}
+          <PcsProvidersSection pcsId={sheetId} providers={providers} />
 
-            {/* Right Column: Price Entry Table */}
-            <PcsQuickEntryTable pcsId={sheetId} lineItems={lineItems} providers={providers} quotes={quotes} />
-          </div>
+          {/* Price Comparison Table - Full Width */}
+          <PcsQuickEntryTable pcsId={sheetId} lineItems={lineItems} providers={providers} quotes={quotes} />
 
           {/* Approval Section */}
           <PcsApprovalSection pcsId={sheetId} pcsStatus={sheet.status} />
