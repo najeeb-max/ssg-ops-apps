@@ -46,32 +46,20 @@ function DeadlineCountdown({ sheet }) {
   const bgColor = isUrgent ? "bg-red-50 border-red-200" : isWarning ? "bg-amber-50 border-amber-200" : "bg-emerald-50 border-emerald-200";
 
   return (
-    <div className={`rounded-xl border p-3 ${bgColor}`}>
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          {isUrgent ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <Clock className="w-4 h-4 text-amber-500" />}
-          <span className="text-xs font-semibold text-slate-600">Lead Time Deadline</span>
-        </div>
-        <div className="text-right">
-          <span className={`font-bold text-sm ${textColor}`}>
+    <div className={`rounded-lg border px-3 py-2 flex items-center gap-3 ${bgColor}`}>
+      <div className="flex items-center gap-1">
+        {isUrgent ? <AlertTriangle className="w-3.5 h-3.5 text-red-500" /> : <Clock className="w-3.5 h-3.5 text-amber-500" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-slate-500">Deadline</span>
+          <span className={`font-bold text-xs ${textColor}`}>
             {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Due Today!" : `${Math.abs(daysLeft)}d overdue`}
           </span>
-          <p className="text-xs text-slate-400">{format(deadline, "MMM d, yyyy")}</p>
         </div>
-      </div>
-      <div className="h-1.5 bg-white/60 rounded-full overflow-hidden mb-2">
-        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${progress}%` }} />
-      </div>
-      <div className="text-xs">
-        {pcsSubmitted ? (
-          <span className={`${submissionGapDays > 3 ? "text-amber-600" : "text-emerald-600"}`}>
-            PCS submitted {submissionGapDays}d after PO
-          </span>
-        ) : (
-          <span className={`${poAgeDays > 3 ? "text-red-500" : "text-amber-500"}`}>
-            ⚡ PO is {poAgeDays}d old — submit PCS now!
-          </span>
-        )}
+        <div className="h-1 bg-white/60 rounded-full overflow-hidden mt-1">
+          <div className={`h-full rounded-full ${barColor}`} style={{ width: `${progress}%` }} />
+        </div>
       </div>
     </div>
   );
@@ -91,41 +79,36 @@ export default function PcsSheetHeader({ sheet }) {
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
+    <div className="bg-white rounded-xl border border-slate-200 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <Link to="/pcs-sheets">
-            <Button variant="ghost" size="icon" className="rounded-full border border-slate-200 mt-1">
-              <ArrowLeft className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="rounded-full border border-slate-200 h-7 w-7">
+              <ArrowLeft className="w-3.5 h-3.5" />
             </Button>
           </Link>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap mb-2">
-              <h1 className="text-2xl font-bold text-slate-900">{sheet.pcs_number}</h1>
-              <Badge className={statusStyles[sheet.status]}>{sheet.status?.replace("_", " ")}</Badge>
-            </div>
-            <p className="text-slate-600 flex items-center gap-1.5 mb-3">
-              <Building2 className="w-4 h-4" />{sheet.client_name}
-            </p>
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-500">
-              {sheet.po_number && <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5" />PO: {sheet.po_number}</span>}
-              {sheet.po_date && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />PO Date: {format(new Date(sheet.po_date), "MMM d, yyyy")}</span>}
-              {sheet.rfq_number && <span className="flex items-center gap-1">RFQ: {sheet.rfq_number}</span>}
-              {sheet.sq_number && <span className="flex items-center gap-1">SQ: {sheet.sq_number}</span>}
-              {sheet.date && <span className="flex items-center gap-1">Date: {format(new Date(sheet.date), "MMM d, yyyy")}</span>}
-              {(sheet.quoted_lead_time_weeks || sheet.quoted_lead_time_days) && (
-                <span className="flex items-center gap-1">
-                  <Truck className="w-3.5 h-3.5" />Lead Time:
-                  {sheet.quoted_lead_time_weeks ? ` ${sheet.quoted_lead_time_weeks}w` : ""}
-                  {sheet.quoted_lead_time_days ? ` ${sheet.quoted_lead_time_days}d` : ""}
-                </span>
-              )}
-            </div>
+          <h1 className="text-lg font-bold text-slate-900">{sheet.pcs_number}</h1>
+          <Badge className={statusStyles[sheet.status]}>{sheet.status?.replace("_", " ")}</Badge>
+          <span className="text-slate-600 flex items-center gap-1 text-sm">
+            <Building2 className="w-3.5 h-3.5" />{sheet.client_name}
+          </span>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+            {sheet.po_number && <span className="flex items-center gap-1"><Hash className="w-3 h-3" />PO: {sheet.po_number}</span>}
+            {sheet.rfq_number && <span>RFQ: {sheet.rfq_number}</span>}
+            {sheet.sq_number && <span>SQ: {sheet.sq_number}</span>}
+            {sheet.date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Date: {format(new Date(sheet.date), "MMM d, yyyy")}</span>}
+            {(sheet.quoted_lead_time_weeks || sheet.quoted_lead_time_days) && (
+              <span className="flex items-center gap-1">
+                <Truck className="w-3 h-3" />Lead Time:
+                {sheet.quoted_lead_time_weeks ? ` ${sheet.quoted_lead_time_weeks}w` : ""}
+                {sheet.quoted_lead_time_days ? ` ${sheet.quoted_lead_time_days}d` : ""}
+              </span>
+            )}
           </div>
         </div>
-        <div className="flex flex-col gap-3 md:items-end">
+        <div className="flex items-center gap-3">
           {(sheet.po_date && (sheet.quoted_lead_time_weeks || sheet.quoted_lead_time_days)) && (
-            <div className="w-64"><DeadlineCountdown sheet={sheet} /></div>
+            <div className="w-56"><DeadlineCountdown sheet={sheet} /></div>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
