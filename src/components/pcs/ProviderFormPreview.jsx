@@ -19,15 +19,18 @@ const SAMPLE = {
 function TypewriterPreview() {
   const [chars, setChars] = useState("");
   useEffect(() => {
-    let i = 0;
     const name = SAMPLE.name;
-    const timer = setInterval(() => {
+    let i = 0;
+    const type = () => {
+      setChars(name.substring(0, i));
+      i++;
       if (i <= name.length) {
-        setChars(name.substring(0, i));
-        i++;
-      } else clearInterval(timer);
-    }, 50);
-    return () => clearInterval(timer);
+        setTimeout(type, 50);
+      } else {
+        setTimeout(() => { i = 0; type(); }, 2000);
+      }
+    };
+    type();
   }, []);
 
   return (
@@ -54,11 +57,17 @@ function TypewriterPreview() {
 
 // Style 2: Fade-in staggered - each field fades in sequentially
 function StaggeredFadePreview() {
+  const [reset, setReset] = useState(0);
   const fields = [
     { label: "Company Name *", value: SAMPLE.name },
     { label: "Contact Person", value: SAMPLE.contact_person },
     { label: "Delivery Period", value: SAMPLE.delivery_period },
   ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReset(prev => prev + 1), 2500);
+    return () => clearTimeout(timer);
+  }, [reset]);
 
   return (
     <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-6 border border-emerald-200">
@@ -69,7 +78,7 @@ function StaggeredFadePreview() {
       <div className="space-y-3">
         {fields.map((field, idx) => (
           <motion.div
-            key={idx}
+            key={`${idx}-${reset}`}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.15, duration: 0.4 }}
@@ -94,8 +103,9 @@ function PlaceholderMorphPreview() {
 
   useEffect(() => {
     const timer = setTimeout(() => setShowValue(true), 300);
-    return () => clearTimeout(timer);
-  }, []);
+    const reset = setTimeout(() => setShowValue(false), 2000);
+    return () => { clearTimeout(timer); clearTimeout(reset); };
+  }, [showValue]);
 
   return (
     <div className="bg-gradient-to-br from-violet-50 to-violet-100/50 rounded-xl p-6 border border-violet-200">
@@ -138,12 +148,13 @@ function PulseFillPreview() {
       if (i >= 100) {
         setProgress(100);
         clearInterval(timer);
+        setTimeout(() => setProgress(0), 2000);
       } else {
         setProgress(i);
       }
     }, 80);
     return () => clearInterval(timer);
-  }, []);
+  }, [progress]);
 
   const displayValue = SAMPLE.name.substring(0, Math.ceil((progress / 100) * SAMPLE.name.length));
 
