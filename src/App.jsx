@@ -14,6 +14,7 @@ import PcsDashboard from './pages/PcsDashboard';
 import PcsSheets from './pages/PcsSheets';
 import PcsCreateSheet from './pages/PcsCreateSheet';
 import PcsSheetDetail from './pages/PcsSheetDetail';
+import AnimationPreview from './pages/AnimationPreview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -50,6 +51,7 @@ const AuthenticatedApp = () => {
       <Route path="/pcs-sheets" element={<PcsSheets />} />
       <Route path="/pcs-create" element={<PcsCreateSheet />} />
       <Route path="/pcs-detail" element={<PcsSheetDetail />} />
+      <Route path="/animation-preview" element={<AnimationPreview />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
