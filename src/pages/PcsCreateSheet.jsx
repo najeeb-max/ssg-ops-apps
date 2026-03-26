@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 import Header from "../components/Header";
+import TypewriterInput from "../components/TypewriterInput";
 
 function Field({ label, required, children }) {
   return (
@@ -127,37 +128,37 @@ export default function PcsCreateSheet() {
               <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
                 <h2 className="font-semibold text-slate-800 text-sm uppercase tracking-wide border-b pb-3">Client & Reference Details</h2>
                 <Field label="Client Name" required>
-                  <Input
-                    value={form.client_name}
-                    onChange={(e) => handleChange("client_name", e.target.value)}
-                    placeholder="e.g. Qatar Petroleum"
-                    className="bg-slate-50 focus:bg-white"
-                  />
-                </Field>
-                <Field label="Client PO Number" required>
-                  <Input
-                    value={form.po_number}
-                    onChange={(e) => handleChange("po_number", e.target.value)}
-                    placeholder="e.g. PO-2024-001"
-                    className="bg-red-50 border-red-200 focus:bg-white font-mono text-sm"
-                  />
-                </Field>
-                <Field label="Client RFQ Number" required>
-                  <Input
-                    value={form.rfq_number}
-                    onChange={(e) => handleChange("rfq_number", e.target.value)}
-                    placeholder="e.g. RFQ-2024-001"
-                    className="bg-amber-50 border-amber-200 focus:bg-white font-mono text-sm"
-                  />
-                </Field>
-                <Field label="SSG Sales Order No." required>
-                  <Input
-                    value={form.sq_number}
-                    onChange={(e) => handleChange("sq_number", e.target.value)}
-                    placeholder="e.g. SQ-2024-001"
-                    className="bg-emerald-50 border-emerald-200 focus:bg-white font-mono text-sm"
-                  />
-                </Field>
+                   <TypewriterInput
+                     value={form.client_name}
+                     onChange={(e) => handleChange("client_name", e.target.value)}
+                     placeholder="e.g. Qatar Petroleum"
+                     className="bg-slate-50 focus:bg-white"
+                   />
+                 </Field>
+                 <Field label="Client PO Number" required>
+                   <TypewriterInput
+                     value={form.po_number}
+                     onChange={(e) => handleChange("po_number", e.target.value)}
+                     placeholder="e.g. PO-2024-001"
+                     className="bg-red-50 border-red-200 focus:bg-white font-mono text-sm"
+                   />
+                 </Field>
+                 <Field label="Client RFQ Number" required>
+                   <TypewriterInput
+                     value={form.rfq_number}
+                     onChange={(e) => handleChange("rfq_number", e.target.value)}
+                     placeholder="e.g. RFQ-2024-001"
+                     className="bg-amber-50 border-amber-200 focus:bg-white font-mono text-sm"
+                   />
+                 </Field>
+                 <Field label="SSG Sales Order No." required>
+                   <TypewriterInput
+                     value={form.sq_number}
+                     onChange={(e) => handleChange("sq_number", e.target.value)}
+                     placeholder="e.g. SQ-2024-001"
+                     className="bg-emerald-50 border-emerald-200 focus:bg-white font-mono text-sm"
+                   />
+                 </Field>
               </div>
 
               {/* RIGHT: Dates + Remarks */}

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import TypewriterInput from "../TypewriterInput";
 import { Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -72,8 +73,7 @@ export default function PcsQuickAddItem({ pcsId, lineItems, defaultOpen = false,
             </div>
           </div>
           <div className="mb-3">
-            <label className="text-xs text-slate-500 mb-1 block">Description *</label>
-            <Input placeholder="Full product description..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="text-sm" />
+            <TypewriterInput placeholder="Full product description..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} label="Description *" className="text-sm" />
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-500">Total: <span className="font-bold text-slate-900">{total}</span></span>
