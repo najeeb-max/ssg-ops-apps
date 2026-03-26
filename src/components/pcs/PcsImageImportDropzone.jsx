@@ -225,7 +225,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
               <tbody>
                 {preview.items.map((item, idx) => (
                   <tr key={idx} className="border-b border-slate-50">
-                    <td className="py-1.5 px-2"><input className="w-full text-xs border rounded px-2 py-1.5" value={item.description} onChange={(e) => updateItem(idx, "description", e.target.value)} /></td>
+                    <td className="py-1.5 px-2"><textarea className="w-full text-xs border rounded px-2 py-1.5 resize-none leading-snug" rows={2} value={item.description} onChange={(e) => updateItem(idx, "description", e.target.value)} /></td>
                     <td className="py-1.5 px-2"><input className="w-full text-xs border rounded px-2 py-1.5" value={item.unit} onChange={(e) => updateItem(idx, "unit", e.target.value)} /></td>
                     <td className="py-1.5 px-2"><input type="number" className="w-full text-xs border rounded px-2 py-1.5" value={item.quantity} onChange={(e) => updateItem(idx, "quantity", parseFloat(e.target.value) || 0)} /></td>
                     <td className="py-1.5 px-2"><input type="number" className="w-full text-xs border rounded px-2 py-1.5" value={item.selling_price} onChange={(e) => updateItem(idx, "selling_price", parseFloat(e.target.value) || 0)} /></td>
