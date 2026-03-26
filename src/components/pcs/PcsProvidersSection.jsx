@@ -66,23 +66,23 @@ function ProviderForm({ pcsId, providerCount, onClose }) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Company Name *</label>
-          <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Supplier Co." className="text-sm h-9" />
+          <TypewriterInput value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Supplier Co." className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Contact Person</label>
-          <Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} placeholder="John Doe" className="text-sm h-9" />
+          <TypewriterInput value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} placeholder="John Doe" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Delivery Period</label>
-          <Input value={form.delivery_period} onChange={(e) => setForm({ ...form, delivery_period: e.target.value })} placeholder="4-6 weeks" className="text-sm h-9" />
+          <TypewriterInput value={form.delivery_period} onChange={(e) => setForm({ ...form, delivery_period: e.target.value })} placeholder="4-6 weeks" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Payment Terms</label>
-          <Input value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} placeholder="30 days" className="text-sm h-9" />
+          <TypewriterInput value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} placeholder="30 days" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Delivery Terms</label>
-          <Input value={form.delivery_terms} onChange={(e) => setForm({ ...form, delivery_terms: e.target.value })} placeholder="FOB, CIF..." className="text-sm h-9" />
+          <TypewriterInput value={form.delivery_terms} onChange={(e) => setForm({ ...form, delivery_terms: e.target.value })} placeholder="FOB, CIF..." className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Freight Charges</label>
