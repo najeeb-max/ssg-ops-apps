@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, CheckCircle2, X, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-export default function PcsImageImportDropzone({ pcsId, lineItems }) {
+export default function PcsImageImportDropzone({ pcsId, lineItems, compact = false }) {
   const queryClient = useQueryClient();
   const [dragging, setDragging] = useState(false);
   const [extracting, setExtracting] = useState(false);
@@ -100,8 +100,21 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
   };
 
   return (
-    <div className="mb-4">
+    <div className={compact ? "" : "mb-4"}>
       {!preview && !extracting && (
+        compact ? (
+          <button
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => inputRef.current?.click()}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${dragging ? "border-red-400 bg-red-50 text-red-600" : "border-slate-200 bg-slate-50 hover:border-red-300 hover:bg-red-50/40 text-slate-500"}`}
+          >
+            <ImagePlus className="w-3.5 h-3.5" />
+            AI Import
+            <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
+          </button>
+        ) : (
         <div
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
@@ -114,6 +127,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           <p className="text-xs text-slate-400">Supports any table screenshot — PO, RFQ, quotation</p>
           <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
         </div>
+        )
       )}
 
       {extracting && (

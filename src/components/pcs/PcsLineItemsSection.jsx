@@ -24,10 +24,10 @@ export default function PcsLineItemsSection({ pcsId, lineItems }) {
           <Package className="w-4 h-4" />
           Line Items <span className="text-slate-400 font-normal text-sm">({lineItems?.length || 0})</span>
         </h2>
+        <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} compact={true} />
       </div>
 
       <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
-      <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
 
       {(!lineItems || lineItems.length === 0) ? (
         <div className="text-center py-8 text-slate-400 text-sm">
