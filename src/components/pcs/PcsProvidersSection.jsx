@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import TypewriterInput from "../TypewriterInput";
+
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Users, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -66,23 +66,23 @@ function ProviderForm({ pcsId, providerCount, onClose }) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Company Name *</label>
-          <TypewriterInput value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Supplier Co." className="text-sm h-9" />
+          <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Supplier Co." className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Contact Person</label>
-          <TypewriterInput value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} placeholder="John Doe" className="text-sm h-9" />
+          <Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} placeholder="John Doe" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Delivery Period</label>
-          <TypewriterInput value={form.delivery_period} onChange={(e) => setForm({ ...form, delivery_period: e.target.value })} placeholder="4-6 weeks" className="text-sm h-9" />
+          <Input value={form.delivery_period} onChange={(e) => setForm({ ...form, delivery_period: e.target.value })} placeholder="4-6 weeks" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Payment Terms</label>
-          <TypewriterInput value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} placeholder="30 days" className="text-sm h-9" />
+          <Input value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} placeholder="30 days" className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Delivery Terms</label>
-          <TypewriterInput value={form.delivery_terms} onChange={(e) => setForm({ ...form, delivery_terms: e.target.value })} placeholder="FOB, CIF..." className="text-sm h-9" />
+          <Input value={form.delivery_terms} onChange={(e) => setForm({ ...form, delivery_terms: e.target.value })} placeholder="FOB, CIF..." className="text-sm h-9" />
         </div>
         <div>
           <label className="text-xs text-slate-500 mb-1 block">Freight Charges</label>
