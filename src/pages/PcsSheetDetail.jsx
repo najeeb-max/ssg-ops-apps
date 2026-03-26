@@ -14,12 +14,14 @@ export default function PcsSheetDetail() {
   const urlParams = new URLSearchParams(window.location.search);
   const sheetId = urlParams.get("id");
 
-  const { data: sheets, isLoading: loadingSheet } = useQuery({
+  const { data: sheet, isLoading: loadingSheet } = useQuery({
     queryKey: ["pcs-sheet", sheetId],
-    queryFn: () => base44.entities.PriceComparisonSheet.filter({ id: sheetId }),
+    queryFn: async () => {
+      const sheets = await base44.entities.PriceComparisonSheet.list();
+      return sheets.find(s => s.id === sheetId) || null;
+    },
     enabled: !!sheetId,
   });
-  const sheet = sheets?.[0];
 
   const { data: lineItems = [] } = useQuery({
     queryKey: ["line-items", sheetId],
