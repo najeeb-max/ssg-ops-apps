@@ -22,7 +22,10 @@ export default function PcsSheetDetail() {
 
   const { data: sheet, isLoading: loadingSheet } = useQuery({
     queryKey: ["pcs-sheet", sheetId],
-    queryFn: () => base44.entities.PriceComparisonSheet.filter({ id: sheetId }).then(r => r[0] || null),
+    queryFn: async () => {
+      const all = await base44.entities.PriceComparisonSheet.list();
+      return all.find(s => s.id === sheetId) || null;
+    },
     enabled: !!sheetId,
   });
 
