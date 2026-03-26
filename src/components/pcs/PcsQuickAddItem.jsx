@@ -7,8 +7,8 @@ import { Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-export default function PcsQuickAddItem({ pcsId, lineItems }) {
-  const [open, setOpen] = useState(false);
+export default function PcsQuickAddItem({ pcsId, lineItems, defaultOpen = false, onClose }) {
+  const [open, setOpen] = useState(defaultOpen);
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     description: "",
@@ -41,16 +41,18 @@ export default function PcsQuickAddItem({ pcsId, lineItems }) {
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <div className="flex items-center gap-2 mb-3">
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-1.5 text-sm font-medium">
-            <Plus className="w-3.5 h-3.5" /> Add New Line Item
-            {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </Button>
-        </CollapsibleTrigger>
-      </div>
+      {!defaultOpen && (
+        <div className="flex items-center gap-2 mb-3">
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5 text-sm font-medium">
+              <Plus className="w-3.5 h-3.5" /> Add New Line Item
+              {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+      )}
       <CollapsibleContent>
-        <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 mb-4">
+        <div className="rounded-xl p-1">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
             <div>
               <label className="text-xs text-slate-500 mb-1 block">Item #</label>
@@ -75,9 +77,14 @@ export default function PcsQuickAddItem({ pcsId, lineItems }) {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-500">Total: <span className="font-bold text-slate-900">{total}</span></span>
-            <Button size="sm" onClick={handleAdd} disabled={createMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white gap-1.5">
-              <Plus className="w-3.5 h-3.5" />{createMutation.isPending ? "Adding..." : "Add Item"}
-            </Button>
+            <div className="flex items-center gap-2">
+              {defaultOpen && onClose && (
+                <Button size="sm" variant="ghost" onClick={onClose} className="text-slate-400 hover:text-slate-600">Cancel</Button>
+              )}
+              <Button size="sm" onClick={handleAdd} disabled={createMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white gap-1.5">
+                <Plus className="w-3.5 h-3.5" />{createMutation.isPending ? "Adding..." : "Add Item"}
+              </Button>
+            </div>
           </div>
         </div>
       </CollapsibleContent>
