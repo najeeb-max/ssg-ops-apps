@@ -7,7 +7,7 @@ import PcsSheetHeader from "../components/pcs/PcsSheetHeader";
 import PcsLineItemsSection from "../components/pcs/PcsLineItemsSection";
 import PcsProvidersSection from "../components/pcs/PcsProvidersSection.jsx";
 import PcsQuickEntryTable from "../components/pcs/PcsQuickEntryTable.jsx";
-import PcsSummaryCard from "../components/pcs/PcsSummaryCard";
+import PcsSummaryCard from "../components/pcs/PcsSummaryCard.jsx";
 import PcsSplitOrderSummary from "../components/pcs/PcsSplitOrderSummary.jsx";
 import PcsApprovalSection from "../components/pcs/PcsApprovalSection";
 
