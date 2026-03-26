@@ -4,11 +4,20 @@ import { Input } from "@/components/ui/input";
 
 export default function TypewriterInput({ value, onChange, onFocus, onBlur, placeholder, label, ...props }) {
   const [displayText, setDisplayText] = useState("");
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (value && displayText.length < value.length) {
-      const timer = setTimeout(() => setDisplayText(value.slice(0, displayText.length + 1)), 40);
+    if (value && value.length > displayText.length) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => {
+        setDisplayText(value.slice(0, displayText.length + 1));
+      }, 40);
       return () => clearTimeout(timer);
+    } else if (!value) {
+      setDisplayText("");
+      setIsAnimating(false);
+    } else if (displayText.length === value.length) {
+      setIsAnimating(false);
     }
   }, [displayText, value]);
 
@@ -23,7 +32,7 @@ export default function TypewriterInput({ value, onChange, onFocus, onBlur, plac
         placeholder={placeholder}
         {...props}
       />
-      {value && displayText.length < value.length && (
+      {isAnimating && displayText && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -31,7 +40,7 @@ export default function TypewriterInput({ value, onChange, onFocus, onBlur, plac
           className="absolute inset-0 pointer-events-none flex items-center px-3 text-sm text-amber-400 font-semibold"
           style={{ paddingTop: '0.375rem' }}
         >
-          <span className="opacity-60">{displayText}</span>
+          <span>{displayText}</span>
           <motion.span
             animate={{ opacity: [1, 0] }}
             transition={{ duration: 0.6, repeat: Infinity }}
