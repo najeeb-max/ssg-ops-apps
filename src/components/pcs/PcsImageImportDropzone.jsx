@@ -107,7 +107,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
-          style={{ resize: "vertical", overflow: "hidden", minHeight: "52px", maxHeight: "240px" }}
+          style={{ resize: "horizontal", overflow: "hidden", minWidth: "220px", maxWidth: "100%" }}
           className={`flex items-center justify-center gap-3 border-2 border-dashed rounded-xl py-3 px-4 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
         >
           <ImagePlus className={`w-4 h-4 ${dragging ? "text-red-500" : "text-slate-400"}`} />
