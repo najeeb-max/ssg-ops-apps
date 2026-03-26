@@ -92,18 +92,32 @@ export default function PcsSheetHeader({ sheet }) {
           <span className="text-slate-600 flex items-center gap-1 text-sm">
             <Building2 className="w-3.5 h-3.5" />{sheet.client_name}
           </span>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-slate-700">
-            {sheet.po_number && <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5 text-slate-400" /><span className="text-slate-400 font-normal text-xs">PO</span> <span className="font-semibold">{sheet.po_number}</span></span>}
-            {sheet.rfq_number && <span className="flex items-center gap-1"><span className="text-slate-400 font-normal text-xs">RFQ</span> <span className="font-semibold">{sheet.rfq_number}</span></span>}
-            {sheet.sq_number && <span className="flex items-center gap-1"><span className="text-slate-400 font-normal text-xs">SQ</span> <span className="font-semibold">{sheet.sq_number}</span></span>}
-            {sheet.date && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-slate-400" /><span className="font-semibold">{format(new Date(sheet.date), "MMM d, yyyy")}</span></span>}
+          <div className="flex flex-wrap gap-1.5">
+            {sheet.po_number && (
+              <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-xs font-medium border border-slate-200">
+                <Hash className="w-3 h-3 text-slate-400" /><span className="text-slate-400">PO</span>{sheet.po_number}
+              </span>
+            )}
+            {sheet.rfq_number && (
+              <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-xs font-medium border border-slate-200">
+                <span className="text-slate-400">RFQ</span>{sheet.rfq_number}
+              </span>
+            )}
+            {sheet.sq_number && (
+              <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-xs font-medium border border-slate-200">
+                <span className="text-slate-400">SQ</span>{sheet.sq_number}
+              </span>
+            )}
+            {sheet.date && (
+              <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-xs font-medium border border-slate-200">
+                <Calendar className="w-3 h-3 text-slate-400" />{format(new Date(sheet.date), "MMM d, yyyy")}
+              </span>
+            )}
             {(sheet.quoted_lead_time_weeks || sheet.quoted_lead_time_days) && (
-              <span className="flex items-center gap-1">
-                <Truck className="w-3.5 h-3.5 text-slate-400" />
-                <span className="font-semibold">
-                  {sheet.quoted_lead_time_weeks ? `${sheet.quoted_lead_time_weeks}w` : ""}
-                  {sheet.quoted_lead_time_days ? ` ${sheet.quoted_lead_time_days}d` : ""}
-                </span>
+              <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 rounded-md px-2 py-0.5 text-xs font-medium border border-slate-200">
+                <Truck className="w-3 h-3 text-slate-400" />
+                {sheet.quoted_lead_time_weeks ? `${sheet.quoted_lead_time_weeks}w` : ""}
+                {sheet.quoted_lead_time_days ? ` ${sheet.quoted_lead_time_days}d` : ""}
               </span>
             )}
           </div>

@@ -18,56 +18,63 @@ export default function PcsLineItemsSection({ pcsId, lineItems }) {
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-          <Package className="w-4 h-4" />
-          Line Items <span className="text-slate-400 font-normal text-sm">({lineItems?.length || 0})</span>
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      {/* Section Header */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60">
+        <h2 className="font-semibold text-slate-800 flex items-center gap-2 text-sm">
+          <Package className="w-4 h-4 text-slate-500" />
+          Line Items
+          <span className="bg-slate-200 text-slate-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">{lineItems?.length || 0}</span>
         </h2>
-        <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} compact={true} />
       </div>
 
-      <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
+      {/* Controls + Drop zone */}
+      <div className="px-5 pt-4 pb-2">
+        <PcsQuickAddItem pcsId={pcsId} lineItems={lineItems} />
+        <PcsImageImportDropzone pcsId={pcsId} lineItems={lineItems} />
+      </div>
 
       {(!lineItems || lineItems.length === 0) ? (
-        <div className="text-center py-8 text-slate-400 text-sm">
-          No line items yet. Add one above to get started.
+        <div className="text-center py-10 text-slate-400 text-sm px-5 pb-5">
+          No line items yet. Add one above or drop a screenshot to get started.
         </div>
       ) : (
-        <div className="overflow-x-auto mt-4">
+        <div className="overflow-x-auto border-t border-slate-100 mt-2">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">#</th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Description</th>
-                <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Unit</th>
-                <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Qty</th>
-                <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Price</th>
-                <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Total</th>
-                <th className="py-2 px-3"></th>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-10">#</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">Description</th>
+                <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-16">Unit</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-20">Qty</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-28">Unit Price</th>
+                <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-32">Total</th>
+                <th className="w-10"></th>
               </tr>
             </thead>
-            <tbody>
-              {lineItems.sort((a, b) => (a.item_number || 0) - (b.item_number || 0)).map((item) => (
-                <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                  <td className="py-2 px-3 text-slate-500">{item.item_number}</td>
-                  <td className="py-2 px-3 text-slate-800 max-w-xs">{item.description}</td>
-                  <td className="py-2 px-3 text-slate-500">{item.unit}</td>
-                  <td className="py-2 px-3 text-right text-slate-700">{item.quantity?.toLocaleString()}</td>
-                  <td className="py-2 px-3 text-right text-slate-700">{item.selling_price?.toFixed(2)}</td>
-                  <td className="py-2 px-3 text-right font-medium text-slate-900">{item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td className="py-2 px-3">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-300 hover:text-destructive" onClick={() => deleteMutation.mutate(item.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
+            <tbody className="divide-y divide-slate-50">
+              {lineItems.sort((a, b) => (a.item_number || 0) - (b.item_number || 0)).map((item, idx) => (
+                <tr key={item.id} className={`hover:bg-blue-50/30 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
+                  <td className="py-2.5 px-4 text-slate-400 font-mono text-xs">{item.item_number}</td>
+                  <td className="py-2.5 px-4 text-slate-800 font-medium">{item.description}</td>
+                  <td className="py-2.5 px-4">
+                    <span className="bg-slate-100 text-slate-600 text-xs font-medium px-1.5 py-0.5 rounded">{item.unit}</span>
+                  </td>
+                  <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">{item.quantity?.toLocaleString()}</td>
+                  <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">{item.selling_price?.toFixed(2)}</td>
+                  <td className="py-2.5 px-4 text-right font-semibold text-slate-900 tabular-nums">{item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td className="py-2.5 px-4">
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(item.id)}>
+                      <Trash2 className="w-3 h-3" />
                     </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t-2 border-slate-200">
-                <td colSpan={5} className="py-2 px-3 text-right text-sm font-semibold text-slate-700">TOTAL:</td>
-                <td className="py-2 px-3 text-right font-bold text-slate-900">
+              <tr className="bg-slate-50 border-t-2 border-slate-200">
+                <td colSpan={5} className="py-3 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wide">Total Selling Value</td>
+                <td className="py-3 px-4 text-right font-bold text-slate-900 tabular-nums text-sm">
                   {lineItems.reduce((sum, i) => sum + (i.total_selling_price || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </td>
                 <td></td>

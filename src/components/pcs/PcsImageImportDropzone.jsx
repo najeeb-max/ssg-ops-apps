@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, CheckCircle2, X, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-export default function PcsImageImportDropzone({ pcsId, lineItems, compact = false }) {
+export default function PcsImageImportDropzone({ pcsId, lineItems }) {
   const queryClient = useQueryClient();
   const [dragging, setDragging] = useState(false);
   const [extracting, setExtracting] = useState(false);
@@ -100,34 +100,23 @@ export default function PcsImageImportDropzone({ pcsId, lineItems, compact = fal
   };
 
   return (
-    <div className={compact ? "" : "mb-4"}>
+    <div className="mb-3">
       {!preview && !extracting && (
-        compact ? (
-          <button
-            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${dragging ? "border-red-400 bg-red-50 text-red-600" : "border-slate-200 bg-slate-50 hover:border-red-300 hover:bg-red-50/40 text-slate-500"}`}
-          >
-            <ImagePlus className="w-3.5 h-3.5" />
-            AI Import
-            <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
-          </button>
-        ) : (
         <div
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
-          className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl py-4 px-4 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 bg-slate-50/60 hover:border-red-300 hover:bg-red-50/30"}`}
+          className={`flex items-center justify-center gap-3 border-2 border-dashed rounded-xl py-3 px-4 cursor-pointer transition-all ${dragging ? "border-red-400 bg-red-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/80"}`}
         >
-          <ImagePlus className="w-5 h-5 text-slate-400" />
-          <p className="text-sm text-slate-500">{dragging ? "Drop to extract line items" : "Drop screenshot or paste from clipboard"}</p>
-          <p className="text-xs text-slate-400">Supports any table screenshot — PO, RFQ, quotation</p>
+          <ImagePlus className={`w-4 h-4 ${dragging ? "text-red-500" : "text-slate-400"}`} />
+          <div className="text-center">
+            <p className="text-xs font-medium text-slate-600">{dragging ? "Release to extract line items" : "Drop a screenshot or click to upload"}</p>
+            <p className="text-xs text-slate-400">Paste from clipboard • PO · RFQ · Quotation tables</p>
+          </div>
+          <span className="ml-auto text-xs bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-medium">AI Extract</span>
           <input type="file" accept="image/*" className="hidden" ref={inputRef} onChange={(e) => handleFiles(e.target.files)} />
         </div>
-        )
       )}
 
       {extracting && (
