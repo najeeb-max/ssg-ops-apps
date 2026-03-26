@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export default function PcsApprovalSection({ pcsId, pcsStatus }) {
   const [remarks, setRemarks] = useState("");
   const queryClient = useQueryClient();
-  const [currentUser, setCurrentUser] = React.useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => setCurrentUser(null));
