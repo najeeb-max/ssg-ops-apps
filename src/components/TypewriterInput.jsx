@@ -3,25 +3,20 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 
 export default function TypewriterInput({ value, onChange, onFocus, onBlur, placeholder, label, ...props }) {
-  const [isFocused, setIsFocused] = useState(false);
   const [displayText, setDisplayText] = useState("");
 
   useEffect(() => {
-    if (isFocused && value && displayText.length < value.length) {
-      const timer = setTimeout(() => setDisplayText(value.slice(0, displayText.length + 1)), 60);
+    if (value && displayText.length < value.length) {
+      const timer = setTimeout(() => setDisplayText(value.slice(0, displayText.length + 1)), 50);
       return () => clearTimeout(timer);
-    } else if (!isFocused) {
-      setDisplayText("");
     }
-  }, [displayText, isFocused, value]);
+  }, [displayText, value]);
 
   const handleFocus = (e) => {
-    setIsFocused(true);
     onFocus?.(e);
   };
 
   const handleBlur = (e) => {
-    setIsFocused(false);
     onBlur?.(e);
   };
 
@@ -37,18 +32,17 @@ export default function TypewriterInput({ value, onChange, onFocus, onBlur, plac
           placeholder={placeholder}
           {...props}
         />
-        {isFocused && value && (
+        {value && displayText.length < value.length && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 pointer-events-none rounded-md px-3 flex items-center text-sm font-mono text-slate-700 overflow-hidden top-0"
-            style={{ paddingTop: '0.5625rem' }}
+            className="absolute inset-0 pointer-events-none rounded-md px-3 py-2 flex items-center text-sm text-slate-500 overflow-hidden"
           >
             {displayText}
             <motion.span
               animate={{ opacity: [1, 0] }}
               transition={{ duration: 0.5, repeat: Infinity }}
-              className="inline-block w-0.5 h-4 bg-slate-700 ml-0.5"
+              className="inline-block w-0.5 h-4 bg-slate-500 ml-0.5"
             />
           </motion.div>
         )}
