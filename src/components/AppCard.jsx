@@ -8,7 +8,7 @@ function CardContent({ name, description, icon: Icon, color, customImage, hideNa
       {/* Banner */}
       <div className={`${customImage ? 'bg-gray-50' : color} h-44 flex items-center justify-center`}>
         {customImage
-          ? <img src={customImage} alt={name} style={{width: 150, height: 150}} className="object-contain" />
+          ? <img src={customImage} alt={name} style={{width: 200, height: 200}} className="object-contain" />
           : <Icon className="w-16 h-16 text-white" />}
       </div>
       {/* Content */}
