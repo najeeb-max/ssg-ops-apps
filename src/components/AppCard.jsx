@@ -6,18 +6,18 @@ function CardContent({ name, description, icon: Icon, color, customImage, hideNa
   return (
     <div className="h-full bg-white border-2 border-gray-200 hover:border-red-600 rounded-2xl cursor-pointer group overflow-hidden shadow-sm hover:shadow-lg transition-all">
       {/* Banner */}
-      <div className={`${customImage ? 'bg-gray-50' : color} h-44 flex items-center justify-center`}>
+      <div className={`${customImage ? 'bg-gray-50' : color} h-36 flex items-center justify-center`}>
         {customImage
-          ? <img src={customImage} alt={name} style={{width: 200, height: 200}} className="object-contain" />
-          : <Icon className="w-16 h-16 text-white" />}
+          ? <img src={customImage} alt={name} style={{width: 150, height: 150}} className="object-contain" />
+          : <Icon className="w-12 h-12 text-white" />}
       </div>
       {/* Content */}
-      <div className="p-5">
-        {!hideName && <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-red-600 transition-colors">{name}</h3>}
-        <p className="text-gray-500 text-sm leading-relaxed mb-4">{description}</p>
-        <div className="flex items-center text-red-600 font-bold text-sm">
+      <div className="p-3">
+        {!hideName && <h3 className="text-base font-bold text-slate-900 mb-0.5 group-hover:text-red-600 transition-colors">{name}</h3>}
+        <p className="text-gray-500 text-xs leading-relaxed mb-2">{description}</p>
+        <div className="flex items-center text-red-600 font-bold text-xs">
           Launch App
-          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform" />
+          <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
         </div>
       </div>
     </div>
