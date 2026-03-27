@@ -21,7 +21,7 @@ const COMPANY_APPS = [
     link: '/tradeflow',
     category: 'Collaboration',
     hideName: true,
-    customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/bfff32728_ChatGPTImageMar27202604_14_29AM.png'
+    customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/686c2d1b3_tradeflow_clean.png'
   },
   {
     id: 8,
