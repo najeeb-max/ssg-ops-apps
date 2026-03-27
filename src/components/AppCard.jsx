@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const CardContent = ({ name, description, icon: Icon, color }) => (
+const CardContent = ({ name, description, icon: Icon, color, customImage }) => (
   <div className="h-full bg-white border-2 border-gray-200 hover:border-red-600 rounded-2xl p-7 cursor-pointer group overflow-hidden relative shadow-sm hover:shadow-lg transition-all">
     <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
     <div className="relative">
-      <div className={`w-14 h-14 rounded-xl ${color} flex items-center justify-center mb-5 group-hover:scale-125 transition-transform`}>
-        <Icon className="w-7 h-7 text-white" />
+      <div className={`w-14 h-14 rounded-xl ${customImage ? 'bg-white' : color} flex items-center justify-center mb-5 group-hover:scale-125 transition-transform overflow-hidden`}>
+        {customImage ? <img src={customImage} alt={name} className="w-full h-full object-contain" /> : <Icon className="w-7 h-7 text-white" />}
       </div>
       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-red-600 transition-colors">{name}</h3>
       <p className="text-gray-600 text-sm mb-6 leading-relaxed">{description}</p>
@@ -19,7 +19,7 @@ const CardContent = ({ name, description, icon: Icon, color }) => (
   </div>
 );
 
-export default function AppCard({ name, description, icon, color, link }) {
+export default function AppCard({ name, description, icon, color, link, customImage }) {
   const isExternal = link.startsWith('http');
 
   return (
@@ -30,11 +30,11 @@ export default function AppCard({ name, description, icon, color, link }) {
     >
       {isExternal ? (
         <a href={link} target="_blank" rel="noopener noreferrer">
-          <CardContent name={name} description={description} icon={icon} color={color} />
+          <CardContent name={name} description={description} icon={icon} color={color} customImage={customImage} />
         </a>
       ) : (
         <Link to={link}>
-          <CardContent name={name} description={description} icon={icon} color={color} />
+          <CardContent name={name} description={description} icon={icon} color={color} customImage={customImage} />
         </Link>
       )}
     </motion.div>
