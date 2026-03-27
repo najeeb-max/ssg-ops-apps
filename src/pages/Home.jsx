@@ -7,10 +7,20 @@ import { Search } from 'lucide-react';
 import {
   Files,
   BookOpen,
-  ShoppingCart
+  ShoppingCart,
+  Ship
 } from 'lucide-react';
 
 const COMPANY_APPS = [
+  {
+    id: 9,
+    name: 'TradeFlow',
+    description: 'Manage orders, shipments, suppliers and customers for China hub and direct express logistics',
+    icon: Ship,
+    color: 'bg-indigo-600',
+    link: '/tradeflow',
+    category: 'Collaboration'
+  },
   {
     id: 8,
     name: 'PCS',

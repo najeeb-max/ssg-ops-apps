@@ -1,0 +1,325 @@
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
+import SupplierQuotesSection from './SupplierQuotesSection';
+
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'INR', 'CNY', 'JPY'];
+const TEAM_MEMBERS = ['Najeeb', 'Hilal', 'Prasad', 'Kiptta', 'SSG', 'Jassim', 'Ishan'];
+
+const STATUSES_HUB = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'received_at_hub', label: 'Received at Hub' },
+  { value: 'in_transit', label: 'In Transit' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
+const STATUSES_DIRECT = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'confirmed', label: 'Ordered / Confirmed' },
+  { value: 'in_transit', label: 'Shipped / In Transit' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
+const PLATFORMS = [
+  { value: 'Alibaba', label: 'Alibaba', type: 'china_hub', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/597a9d494_image.png', logoOnly: true },
+  { value: 'eBay', label: 'eBay', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/b83155519_Screenshot2026-03-18220909.png', logoOnly: true },
+  { value: 'Amazon', label: 'Amazon.com', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/527d85689_image.png', logoOnly: true },
+  { value: 'TEM', label: 'TEM', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/36c75e972_image.png', logoOnly: true },
+  { value: 'Alibaba Direct', label: 'Alibaba Direct', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/597a9d494_image.png', logoOnly: true },
+  { value: 'Other Direct', label: 'Other (Direct)', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/efc049276_image.png', logoOnly: true },
+];
+
+const emptyForm = () => ({
+  alibaba_order_ref: '',
+  platform_order_ref: '',
+  source_platform: 'Alibaba',
+  fulfillment_type: 'china_hub',
+  product_name: '',
+  quantity: '',
+  unit: '',
+  unit_price: '',
+  currency: 'USD',
+  customer_name: '',
+  supplier_name: '',
+  supplier_salesperson: '',
+  supplier_wechat: '',
+  team_member_name: '',
+  status: 'pending',
+  domestic_tracking_number: '',
+  express_tracking_number: '',
+  estimated_delivery_date: '',
+  weight_kgs: '',
+  cbm: '',
+  num_cartons: '',
+  order_date: new Date().toISOString().split('T')[0],
+  notes: '',
+  supplier_quotes: [],
+});
+
+export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) {
+  const [form, setForm] = useState(emptyForm());
+  const [saving, setSaving] = useState(false);
+
+  const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me() });
+  const { data: allOrders = [] } = useQuery({
+    queryKey: ['orders-for-seq'],
+    queryFn: () => base44.entities.Order.list('-created_date', 200),
+    enabled: !order,
+  });
+
+  const generateSSGOrderNumber = () => {
+    const ssgNums = allOrders.map(o => {
+      const match = o.alibaba_order_ref?.match(/^SSG-(\d+)$/);
+      return match ? parseInt(match[1], 10) : 0;
+    }).filter(n => n > 0);
+    const next = ssgNums.length > 0 ? Math.max(...ssgNums) + 1 : 1;
+    return `SSG-${String(next).padStart(4, '0')}`;
+  };
+
+  useEffect(() => {
+    if (order) {
+      setForm({
+        alibaba_order_ref: order.alibaba_order_ref || '',
+        platform_order_ref: order.platform_order_ref || '',
+        source_platform: order.source_platform || 'Alibaba',
+        fulfillment_type: order.fulfillment_type || 'china_hub',
+        product_name: order.product_name || '',
+        quantity: order.quantity || '',
+        unit: order.unit || '',
+        unit_price: order.unit_price || '',
+        currency: order.currency || 'USD',
+        customer_name: order.customer_name || '',
+        supplier_name: order.supplier_name || '',
+        supplier_salesperson: order.supplier_salesperson || '',
+        supplier_wechat: order.supplier_wechat || '',
+        team_member_name: order.team_member_name || '',
+        status: order.status || 'pending',
+        domestic_tracking_number: order.domestic_tracking_number || '',
+        express_tracking_number: order.express_tracking_number || '',
+        estimated_delivery_date: order.estimated_delivery_date || '',
+        weight_kgs: order.weight_kgs || '',
+        cbm: order.cbm || '',
+        num_cartons: order.num_cartons || '',
+        order_date: order.order_date || new Date().toISOString().split('T')[0],
+        notes: order.notes || '',
+        supplier_quotes: order.supplier_quotes || [],
+      });
+    } else {
+      setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
+    }
+  }, [order, open, currentUser, allOrders]);
+
+  const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const handlePlatformChange = (value) => {
+    const platform = PLATFORMS.find(p => p.value === value);
+    setForm(f => ({ ...f, source_platform: value, fulfillment_type: platform?.type || 'china_hub' }));
+  };
+
+  const isDirectExpress = form.fulfillment_type === 'direct_express';
+  const statuses = isDirectExpress ? STATUSES_DIRECT : STATUSES_HUB;
+
+  const totalAmount = form.quantity && form.unit_price
+    ? (Number(form.quantity) * Number(form.unit_price)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    const data = {
+      ...form,
+      quantity: form.quantity ? Number(form.quantity) : undefined,
+      unit_price: form.unit_price ? Number(form.unit_price) : undefined,
+      total_amount: form.quantity && form.unit_price ? Number(form.quantity) * Number(form.unit_price) : undefined,
+      weight_kgs: form.weight_kgs ? Number(form.weight_kgs) : undefined,
+      cbm: form.cbm ? Number(form.cbm) : undefined,
+      num_cartons: form.num_cartons ? Number(form.num_cartons) : undefined,
+    };
+    if (order) {
+      await base44.entities.Order.update(order.id, data);
+    } else {
+      await base44.entities.Order.create(data);
+    }
+    setSaving(false);
+    onSaved();
+    onOpenChange(false);
+  };
+
+  const selectedPlatform = PLATFORMS.find(p => p.value === form.source_platform);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <DialogTitle className="text-lg font-bold">{order ? '✏️ Edit Order' : '+ New Order'}</DialogTitle>
+            <p className="text-xs text-slate-500">{isDirectExpress ? '⚡ Direct Express → Qatar' : '🏭 China Hub Consolidation → Qatar'}</p>
+          </div>
+          {form.alibaba_order_ref && <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{form.alibaba_order_ref}</span>}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Product Section */}
+          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">📦 Product / Commodity</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label>Source Platform</Label>
+                <Select value={form.source_platform} onValueChange={handlePlatformChange}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Alibaba" disabled className="font-semibold text-xs text-slate-400">🏭 China Hub Consolidation</SelectItem>
+                    {PLATFORMS.filter(p => p.type === 'china_hub').map(p => (
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    ))}
+                    <SelectItem value="eBay" disabled className="font-semibold text-xs text-slate-400">⚡ Direct to Qatar</SelectItem>
+                    {PLATFORMS.filter(p => p.type === 'direct_express').map(p => (
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Platform Order Ref #</Label>
+                <Input value={form.platform_order_ref} onChange={set('platform_order_ref')} placeholder="Platform ref..." className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Order Date</Label>
+                <Input type="date" value={form.order_date} onChange={set('order_date')} className="h-9" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Product Name *</Label>
+              <Input value={form.product_name} onChange={set('product_name')} placeholder="e.g. Steel pipes 2 inch..." required />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{isDirectExpress ? 'Seller / Store' : 'Supplier'}</Label>
+              <Input value={form.supplier_name} onChange={set('supplier_name')} placeholder="Supplier name" />
+            </div>
+            {!isDirectExpress && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Sales Contact</Label>
+                  <Input value={form.supplier_salesperson} onChange={set('supplier_salesperson')} placeholder="Contact name" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>WeChat / Phone</Label>
+                  <Input value={form.supplier_wechat} onChange={set('supplier_wechat')} placeholder="WeChat ID" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Logistics & Financials */}
+          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Logistics & Financials</p>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label>KGS</Label>
+                <Input type="number" value={form.weight_kgs} onChange={set('weight_kgs')} placeholder="0" className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>CBM</Label>
+                <Input type="number" value={form.cbm} onChange={set('cbm')} placeholder="0" className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Cartons</Label>
+                <Input type="number" value={form.num_cartons} onChange={set('num_cartons')} placeholder="0" className="h-9" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label>Quantity</Label>
+                <Input type="number" value={form.quantity} onChange={set('quantity')} placeholder="0" className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Unit Price {totalAmount && <span className="text-emerald-600 font-semibold">= {form.currency} {totalAmount}</span>}</Label>
+                <Input type="number" value={form.unit_price} onChange={set('unit_price')} placeholder="0.00" className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Currency</Label>
+                <Select value={form.currency} onValueChange={v => setForm({ ...form, currency: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Tracking & Status */}
+          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tracking & Status</p>
+            <div className="grid grid-cols-2 gap-3">
+              {isDirectExpress ? (
+                <>
+                  <div className="space-y-1.5">
+                    <Label>Express Tracking #</Label>
+                    <Input value={form.express_tracking_number} onChange={set('express_tracking_number')} className="h-9" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Estimated Delivery to Qatar</Label>
+                    <Input type="date" value={form.estimated_delivery_date} onChange={set('estimated_delivery_date')} className="h-9" />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-1.5 col-span-2">
+                  <Label>China Domestic Tracking #</Label>
+                  <Input value={form.domestic_tracking_number} onChange={set('domestic_tracking_number')} className="h-9" />
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Status</Label>
+                <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>{statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Team Member</Label>
+                <Select value={form.team_member_name} onValueChange={v => setForm({ ...form, team_member_name: v })}>
+                  <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
+                  <SelectContent>{TEAM_MEMBERS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Customer Name</Label>
+              <Input value={form.customer_name} onChange={set('customer_name')} placeholder="End customer" className="h-9" />
+            </div>
+          </div>
+
+          {/* Supplier Quotes */}
+          <div className="p-4 bg-slate-50 rounded-xl">
+            <SupplierQuotesSection quotes={form.supplier_quotes || []} onChange={v => setForm({ ...form, supplier_quotes: v })} />
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-1.5">
+            <Label>Notes</Label>
+            <Textarea value={form.notes} onChange={set('notes')} rows={2} placeholder="Any additional notes..." />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
+              {saving ? 'Saving...' : order ? 'Save Changes' : 'Create Order'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

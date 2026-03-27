@@ -1,0 +1,121 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "alibaba_order_ref": {
+      "type": "string",
+      "description": "SSG order reference or Alibaba order number"
+    },
+    "platform_order_ref": {
+      "type": "string",
+      "description": "Platform-specific order reference"
+    },
+    "source_platform": {
+      "type": "string",
+      "enum": [
+        "Alibaba",
+        "eBay",
+        "Amazon",
+        "TEM",
+        "Alibaba Direct",
+        "Other Direct"
+      ],
+      "default": "Alibaba"
+    },
+    "fulfillment_type": {
+      "type": "string",
+      "enum": [
+        "china_hub",
+        "direct_express"
+      ],
+      "default": "china_hub"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Product or commodity name"
+    },
+    "quantity": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "unit_price": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "total_amount": {
+      "type": "number"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "supplier_salesperson": {
+      "type": "string"
+    },
+    "supplier_wechat": {
+      "type": "string"
+    },
+    "team_member_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "received_at_hub",
+        "in_transit",
+        "delivered",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "domestic_tracking_number": {
+      "type": "string"
+    },
+    "express_tracking_number": {
+      "type": "string"
+    },
+    "estimated_delivery_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "order_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "weight_kgs": {
+      "type": "number"
+    },
+    "cbm": {
+      "type": "number"
+    },
+    "num_cartons": {
+      "type": "number"
+    },
+    "shipment_id": {
+      "type": "string",
+      "description": "Reference to Shipment"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "supplier_quotes": {
+      "type": "array",
+      "description": "Array of supplier quotes"
+    }
+  },
+  "required": [
+    "product_name"
+  ]
+}

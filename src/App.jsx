@@ -15,6 +15,12 @@ import PcsSheets from './pages/PcsSheets';
 import PcsCreateSheet from './pages/PcsCreateSheet';
 import PcsSheetDetail from './pages/PcsSheetDetail';
 import AnimationPreview from './pages/AnimationPreview';
+import TradeflowLayout from './components/tradeflow/AppLayout';
+import TradeflowDashboard from './pages/TradeflowDashboard';
+import TradeflowOrders from './pages/TradeflowOrders';
+import TradeflowShipments from './pages/TradeflowShipments';
+import TradeflowCustomers from './pages/TradeflowCustomers';
+import TradeflowSuppliers from './pages/TradeflowSuppliers';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +58,13 @@ const AuthenticatedApp = () => {
       <Route path="/pcs-create" element={<PcsCreateSheet />} />
       <Route path="/pcs-detail" element={<PcsSheetDetail />} />
       <Route path="/animation-preview" element={<AnimationPreview />} />
+      <Route path="/tradeflow" element={<TradeflowLayout />}>
+        <Route index element={<TradeflowDashboard />} />
+        <Route path="orders" element={<TradeflowOrders />} />
+        <Route path="shipments" element={<TradeflowShipments />} />
+        <Route path="customers" element={<TradeflowCustomers />} />
+        <Route path="suppliers" element={<TradeflowSuppliers />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

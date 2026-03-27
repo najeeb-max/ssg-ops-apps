@@ -1,0 +1,78 @@
+{
+  "name": "Shipment",
+  "type": "object",
+  "properties": {
+    "shipment_number": {
+      "type": "string",
+      "description": "Shipment reference number"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "preparing",
+        "booked",
+        "in_transit",
+        "customs",
+        "delivered",
+        "cancelled"
+      ],
+      "default": "preparing"
+    },
+    "transport_mode": {
+      "type": "string",
+      "enum": [
+        "sea",
+        "air",
+        "road",
+        "rail",
+        "express"
+      ],
+      "default": "sea"
+    },
+    "carrier": {
+      "type": "string"
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string",
+      "default": "Shenzhen, China"
+    },
+    "destination": {
+      "type": "string"
+    },
+    "departure_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "arrival_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "order_ids": {
+      "type": "array",
+      "description": "Array of order IDs in this shipment"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "received_in_qatar": {
+      "type": "boolean",
+      "default": false
+    },
+    "qatar_received_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "qatar_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "shipment_number"
+  ]
+}
