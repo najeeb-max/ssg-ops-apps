@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import SSGLogo from './SSGLogo';
-import { LogOut, Cloud, UserPlus } from 'lucide-react';
+import { LogOut, Cloud, UserPlus, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -59,13 +59,22 @@ export default function Header() {
         
         <div className="flex items-center gap-2">
           {user?.role === 'admin' && (
-            <Link
-              to="/bulk-invite"
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
-            >
-              <UserPlus className="w-4 h-4" />
-              Invite Users
-            </Link>
+            <>
+              <Link
+                to="/bulk-invite"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
+              >
+                <UserPlus className="w-4 h-4" />
+                Invite Users
+              </Link>
+              <Link
+                to="/settings"
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors text-sm font-medium"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
+              </Link>
+            </>
           )}
           <button
             onClick={handleLogout}
