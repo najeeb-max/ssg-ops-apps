@@ -6,9 +6,9 @@ function CardContent({ name, description, icon: Icon, color, customImage, hideNa
   return (
     <div className="h-full bg-white border-2 border-gray-200 hover:border-red-600 rounded-2xl cursor-pointer group overflow-hidden shadow-sm hover:shadow-lg transition-all">
       {/* Banner */}
-      <div className={`${customImage ? 'bg-gray-50' : color} h-40 flex items-center justify-center`}>
+      <div className={`${customImage ? 'bg-gray-50' : color} h-44 flex items-center justify-center`}>
         {customImage
-          ? <img src={customImage} alt={name} className="h-32 w-32 object-contain" />
+          ? <img src={customImage} alt={name} style={{width: 150, height: 150}} className="object-contain" />
           : <Icon className="w-16 h-16 text-white" />}
       </div>
       {/* Content */}
