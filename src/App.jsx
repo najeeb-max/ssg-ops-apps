@@ -5,22 +5,23 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+// Add page imports here — lazy loaded for better performance (Point 1)
+import { lazy, Suspense } from 'react';
 import Home from './pages/Home';
-import QatarNews from './pages/QatarNews';
-import AppViewer from './pages/AppViewer';
-import BulkInvite from './pages/BulkInvite';
-import PcsDashboard from './pages/PcsDashboard';
-import PcsSheets from './pages/PcsSheets';
-import PcsCreateSheet from './pages/PcsCreateSheet';
-import PcsSheetDetail from './pages/PcsSheetDetail';
-import AnimationPreview from './pages/AnimationPreview';
-import TradeflowLayout from './components/tradeflow/AppLayout';
-import TradeflowDashboard from './pages/TradeflowDashboard';
-import TradeflowOrders from './pages/TradeflowOrders';
-import TradeflowShipments from './pages/TradeflowShipments';
-import TradeflowCustomers from './pages/TradeflowCustomers';
-import TradeflowSuppliers from './pages/TradeflowSuppliers';
+const QatarNews = lazy(() => import('./pages/QatarNews'));
+const AppViewer = lazy(() => import('./pages/AppViewer'));
+const BulkInvite = lazy(() => import('./pages/BulkInvite'));
+const PcsDashboard = lazy(() => import('./pages/PcsDashboard'));
+const PcsSheets = lazy(() => import('./pages/PcsSheets'));
+const PcsCreateSheet = lazy(() => import('./pages/PcsCreateSheet'));
+const PcsSheetDetail = lazy(() => import('./pages/PcsSheetDetail'));
+const AnimationPreview = lazy(() => import('./pages/AnimationPreview'));
+const TradeflowLayout = lazy(() => import('./components/tradeflow/AppLayout'));
+const TradeflowDashboard = lazy(() => import('./pages/TradeflowDashboard'));
+const TradeflowOrders = lazy(() => import('./pages/TradeflowOrders'));
+const TradeflowShipments = lazy(() => import('./pages/TradeflowShipments'));
+const TradeflowCustomers = lazy(() => import('./pages/TradeflowCustomers'));
+const TradeflowSuppliers = lazy(() => import('./pages/TradeflowSuppliers'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -45,8 +46,15 @@ const AuthenticatedApp = () => {
     }
   }
 
+  const fallback = (
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+    </div>
+  );
+
   // Render the main app
   return (
+    <Suspense fallback={fallback}>
     <Routes>
       {/* Add your page Route elements here */}
       <Route path="/" element={<Home />} />
@@ -67,6 +75,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
   );
 };
 

@@ -1,44 +1,11 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Ship, ShoppingCart, Files, BookOpen } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { COMPANY_APPS } from "@/lib/constants";
 
-const APPS = [
-  {
-    id: 1,
-    name: "TradeFlow",
-    description: "Manage orders, shipments, suppliers and customers for China hub logistics",
-    icon: Ship,
-    color: "bg-indigo-600",
-    link: "/tradeflow",
-  },
-  {
-    id: 2,
-    name: "PCS",
-    description: "Overview of SSG procurement price comparisons for Existing System Orders",
-    icon: ShoppingCart,
-    color: "bg-red-600",
-    customImage: "https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/32d269562_ChatGPTImageMar27202603_38_22AM.png",
-    link: "/pcs",
-  },
-  {
-    id: 3,
-    name: "Document Hub",
-    description: "Create, edit, and collaborate on documents with seamless Google Docs sync",
-    icon: Files,
-    color: "bg-red-700",
-    link: "/documents",
-  },
-  {
-    id: 4,
-    name: "Training Portal",
-    description: "Access courses and track learning progress via Google Classroom",
-    icon: BookOpen,
-    color: "bg-red-700",
-    link: "/learning",
-  },
-];
+const APPS = COMPANY_APPS;
 
 // Layout 1: Standard Grid (current style)
 function StyleStandardGrid({ apps }) {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ShipmentFormDialog from '../components/tradeflow/shipments/ShipmentFormDialog';
@@ -33,12 +34,14 @@ export default function TradeflowShipments() {
   const isLoading = loadingShipments || loadingOrders;
 
   const handleDelete = async () => {
+    // Point 16: Unlink all orders before deleting shipment to prevent orphaned shipment_ids
     const linked = orders.filter(o => o.shipment_id === toDelete.id);
-    await Promise.all(linked.map(o => base44.entities.Order.update(o.id, { shipment_id: null })));
+    await Promise.all(linked.map(o => base44.entities.Order.update(o.id, { shipment_id: null, status: o.status === 'in_transit' ? 'received_at_hub' : o.status })));
     await base44.entities.Shipment.delete(toDelete.id);
     setToDelete(null);
     queryClient.invalidateQueries({ queryKey: ['shipments'] });
     queryClient.invalidateQueries({ queryKey: ['orders'] });
+    toast.success(`Shipment "${toDelete?.shipment_number}" deleted. ${linked.length} order(s) returned to unassigned pool.`);
   };
 
   const handleAssign = async (order, shipment) => {
@@ -68,11 +71,19 @@ export default function TradeflowShipments() {
       received_in_qatar: true, qatar_received_date, qatar_notes, status: 'delivered',
     });
     queryClient.invalidateQueries({ queryKey: ['shipments'] });
+    toast.success(`Shipment "${qatarTarget?.shipment_number}" marked as received in Qatar.`);
     setQatarTarget(null);
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>;
+    return (
+      <div className="p-6 space-y-4">
+        <div className="h-8 bg-slate-100 rounded w-48 animate-pulse" />
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-slate-50 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    );
   }
 
   return (

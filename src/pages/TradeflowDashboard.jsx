@@ -18,11 +18,13 @@ export default function TradeflowDashboard() {
   const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: () => base44.entities.Order.list('-created_date', 200),
+    staleTime: 30_000,
   });
 
   const { data: shipments = [] } = useQuery({
     queryKey: ['shipments'],
     queryFn: () => base44.entities.Shipment.list('-created_date'),
+    staleTime: 30_000,
   });
 
   const totalValue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import { Plus, Search, Pencil, Trash2, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,17 +21,20 @@ export default function TradeflowCustomers() {
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ['customers'],
     queryFn: () => base44.entities.Customer.list('-created_date'),
+    staleTime: 30_000,
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ['orders'],
     queryFn: () => base44.entities.Order.list(),
+    staleTime: 30_000,
   });
 
   const handleDelete = async () => {
     await base44.entities.Customer.delete(deleteCustomer.id);
     setDeleteCustomer(null);
     queryClient.invalidateQueries({ queryKey: ['customers'] });
+    toast.success(`Customer "${deleteCustomer?.name}" deleted.`);
   };
 
   const filteredCustomers = customers.filter(c =>

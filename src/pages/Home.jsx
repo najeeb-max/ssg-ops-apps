@@ -4,56 +4,7 @@ import Header from '../components/Header';
 import AppCard from '../components/AppCard';
 import QatarNewsTile from '../components/QatarNewsTile';
 import { Search } from 'lucide-react';
-import {
-  Files,
-  BookOpen,
-  ShoppingCart,
-  Ship
-} from 'lucide-react';
-
-const COMPANY_APPS = [
-  {
-    id: 9,
-    name: 'TradeFlow',
-    description: 'Manage orders, shipments, suppliers and customers for China hub and direct express logistics',
-    icon: Ship,
-    color: 'bg-white',
-    link: '/tradeflow',
-    category: 'Collaboration',
-    hideName: true,
-    customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/686c2d1b3_tradeflow_clean.png'
-  },
-  {
-    id: 8,
-    name: 'PCS',
-    description: 'Overview of SSG procurement price comparisons for Existing System Orders',
-    icon: ShoppingCart,
-    color: 'bg-red-600',
-    link: '/pcs',
-    category: 'Collaboration',
-    hideName: true,
-    customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/24c7c041b_price_comparison_clean.png'
-  },
-  {
-    id: 2,
-    name: 'Document Hub',
-    description: 'Create, edit, and collaborate on documents with seamless Google Docs sync',
-    icon: Files,
-    color: 'bg-red-700',
-    link: '/documents',
-    category: 'Collaboration'
-  },
-  {
-    id: 5,
-    name: 'Training Portal',
-    description: 'Access courses and track learning progress via Google Classroom',
-    icon: BookOpen,
-    color: 'bg-red-700',
-    link: '/learning',
-    category: 'Learning'
-  },
-
-];
+import { COMPANY_APPS } from '@/lib/constants';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');

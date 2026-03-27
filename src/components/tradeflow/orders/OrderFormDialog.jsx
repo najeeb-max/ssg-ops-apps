@@ -7,36 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import SupplierQuotesSection from './SupplierQuotesSection';
+import { CURRENCIES, TEAM_MEMBERS, PLATFORMS, ORDER_STATUSES_HUB, ORDER_STATUSES_DIRECT } from '@/lib/constants';
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'INR', 'CNY', 'JPY'];
-const TEAM_MEMBERS = ['Najeeb', 'Hilal', 'Prasad', 'Kiptta', 'SSG', 'Jassim', 'Ishan'];
-
-const STATUSES_HUB = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'received_at_hub', label: 'Received at Hub' },
-  { value: 'in_transit', label: 'In Transit' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
-];
-
-const STATUSES_DIRECT = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'confirmed', label: 'Ordered / Confirmed' },
-  { value: 'in_transit', label: 'Shipped / In Transit' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
-];
-
-const PLATFORMS = [
-  { value: 'Alibaba', label: 'Alibaba', type: 'china_hub', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/597a9d494_image.png', logoOnly: true },
-  { value: 'eBay', label: 'eBay', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/b83155519_Screenshot2026-03-18220909.png', logoOnly: true },
-  { value: 'Amazon', label: 'Amazon.com', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/527d85689_image.png', logoOnly: true },
-  { value: 'TEM', label: 'TEM', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/36c75e972_image.png', logoOnly: true },
-  { value: 'Alibaba Direct', label: 'Alibaba Direct', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/597a9d494_image.png', logoOnly: true },
-  { value: 'Other Direct', label: 'Other (Direct)', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/efc049276_image.png', logoOnly: true },
-];
+const STATUSES_HUB = ORDER_STATUSES_HUB;
+const STATUSES_DIRECT = ORDER_STATUSES_DIRECT;
 
 const emptyForm = () => ({
   alibaba_order_ref: '',
@@ -132,8 +108,20 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
     ? (Number(form.quantity) * Number(form.unit_price)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : null;
 
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const errs = {};
+    if (!form.product_name?.trim()) errs.product_name = 'Product name is required';
+    if (form.quantity && isNaN(Number(form.quantity))) errs.quantity = 'Must be a number';
+    if (form.unit_price && isNaN(Number(form.unit_price))) errs.unit_price = 'Must be a number';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
     setSaving(true);
     const data = {
       ...form,
@@ -146,8 +134,10 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
     };
     if (order) {
       await base44.entities.Order.update(order.id, data);
+      toast.success('Order updated successfully');
     } else {
       await base44.entities.Order.create(data);
+      toast.success('Order created successfully');
     }
     setSaving(false);
     onSaved();
@@ -201,7 +191,8 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
             </div>
             <div className="space-y-1.5">
               <Label>Product Name *</Label>
-              <Input value={form.product_name} onChange={set('product_name')} placeholder="e.g. Steel pipes 2 inch..." required />
+              <Input value={form.product_name} onChange={set('product_name')} placeholder="e.g. Steel pipes 2 inch..." required className={errors.product_name ? 'border-red-400' : ''} />
+              {errors.product_name && <p className="text-xs text-red-500">{errors.product_name}</p>}
             </div>
             <div className="space-y-1.5">
               <Label>{isDirectExpress ? 'Seller / Store' : 'Supplier'}</Label>
