@@ -17,9 +17,11 @@ const COMPANY_APPS = [
     name: 'TradeFlow',
     description: 'Manage orders, shipments, suppliers and customers for China hub and direct express logistics',
     icon: Ship,
-    color: 'bg-indigo-600',
+    color: 'bg-white',
     link: '/tradeflow',
-    category: 'Collaboration'
+    category: 'Collaboration',
+    hideName: true,
+    customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/bfff32728_ChatGPTImageMar27202604_14_29AM.png'
   },
   {
     id: 8,
