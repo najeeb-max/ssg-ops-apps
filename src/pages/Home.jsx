@@ -50,24 +50,7 @@ const COMPANY_APPS = [
     link: '/learning',
     category: 'Learning'
   },
-  {
-    id: 6,
-    name: 'Presentations',
-    description: 'Create and deliver presentations using Google Slides',
-    icon: Monitor,
-    color: 'bg-red-600',
-    link: '/presentations',
-    category: 'Collaboration'
-  },
-  {
-    id: 7,
-    name: 'Team Directory',
-    description: 'View team members, contact information, and organizational structure',
-    icon: Users,
-    color: 'bg-red-800',
-    link: '/directory',
-    category: 'People'
-  },
+
 ];
 
 export default function Home() {
