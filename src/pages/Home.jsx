@@ -101,7 +101,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredApps.map((app) => (
-              <AppCard key={app.id} {...app} />
+              <AppCard key={app.id} {...app} layoutStyle="largelogo" />
             ))}
             {newsTileMatchesSearch && (
               <QatarNewsTile />
