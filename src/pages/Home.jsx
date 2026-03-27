@@ -5,11 +5,8 @@ import AppCard from '../components/AppCard';
 import QatarNewsTile from '../components/QatarNewsTile';
 import { Search } from 'lucide-react';
 import {
-  Calendar,
   Files,
   BookOpen,
-  Monitor,
-  Users,
   ShoppingCart
 } from 'lucide-react';
 
@@ -22,15 +19,6 @@ const COMPANY_APPS = [
     color: 'bg-red-600',
     link: '/pcs',
     category: 'Collaboration'
-  },
-  {
-    id: 1,
-    name: 'Calendar & Events',
-    description: 'Manage team schedules, meetings, and events with Google Calendar integration',
-    icon: Calendar,
-    color: 'bg-red-600',
-    link: '/calendar',
-    category: 'Communication'
   },
   {
     id: 2,
@@ -55,20 +43,14 @@ const COMPANY_APPS = [
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
-
-  const allCategories = ['All', 'Communication', 'Collaboration', 'Learning', 'People', 'News'];
 
   const filteredApps = useMemo(() => {
-    return COMPANY_APPS.filter(app => {
-      const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        app.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = activeCategory === 'All' || app.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchQuery, activeCategory]);
+    return COMPANY_APPS.filter(app =>
+      app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
-  const showNewsTile = activeCategory === 'All' || activeCategory === 'News';
   const newsTileMatchesSearch =
     'qatar news'.includes(searchQuery.toLowerCase()) ||
     'headlines'.includes(searchQuery.toLowerCase()) ||
@@ -98,22 +80,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Category Filter */}
-          <div className="flex gap-2 justify-center flex-wrap mb-8">
-            {allCategories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                  activeCategory === category
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+
         </div>
       </div>
 
@@ -124,12 +91,12 @@ export default function Home() {
             {filteredApps.map((app) => (
               <AppCard key={app.id} {...app} />
             ))}
-            {showNewsTile && newsTileMatchesSearch && (
+            {newsTileMatchesSearch && (
               <QatarNewsTile />
             )}
           </div>
 
-          {filteredApps.length === 0 && !(showNewsTile && newsTileMatchesSearch) && (
+          {filteredApps.length === 0 && !newsTileMatchesSearch && (
             <div className="text-center py-12">
               <p className="text-gray-600">No applications found matching your search</p>
             </div>
