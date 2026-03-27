@@ -29,6 +29,7 @@ const COMPANY_APPS = [
     color: 'bg-red-600',
     link: '/pcs',
     category: 'Collaboration',
+    hideName: true,
     customImage: 'https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/32d269562_ChatGPTImageMar27202603_38_22AM.png'
   },
   {
