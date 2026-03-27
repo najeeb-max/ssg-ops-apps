@@ -161,6 +161,57 @@ function StyleSideBannerCard({ apps }) {
   );
 }
 
+const DEMO_IMAGE = "https://media.base44.com/images/public/69bc62c36ed6e9abb825f80f/686c2d1b3_tradeflow_clean.png";
+
+const ANIM_STYLES = [
+  {
+    id: "spin",
+    label: "Spin / Revolve",
+    description: "Full 360° rotation on hover",
+    logoMotion: { rotate: 360 },
+    transition: { duration: 0.7, ease: "easeInOut" },
+  },
+  {
+    id: "bounce",
+    label: "Bounce / Pulse",
+    description: "Scale up and bounce on hover",
+    logoMotion: { scale: 1.25 },
+    transition: { type: "spring", stiffness: 300, damping: 10 },
+  },
+  {
+    id: "wobble",
+    label: "Wobble / Shake",
+    description: "Side-to-side wiggle on hover",
+    logoMotion: { rotate: [0, -12, 12, -8, 8, -4, 4, 0] },
+    transition: { duration: 0.6 },
+  },
+];
+
+function AnimCard({ style }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      className="bg-white border-2 border-gray-200 hover:border-red-500 rounded-xl overflow-hidden cursor-pointer transition-colors"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="bg-gray-50 h-36 flex items-center justify-center">
+        <motion.img
+          src={DEMO_IMAGE}
+          alt="logo"
+          style={{ width: 150, height: 150, objectFit: "contain" }}
+          animate={hovered ? style.logoMotion : {}}
+          transition={style.transition}
+        />
+      </div>
+      <div className="p-3">
+        <p className="font-bold text-slate-900 text-sm">{style.label}</p>
+        <p className="text-xs text-gray-500 mt-0.5">{style.description}</p>
+      </div>
+    </div>
+  );
+}
+
 const LAYOUTS = [
   { id: "grid", label: "Standard Grid", component: StyleStandardGrid },
   { id: "list", label: "Horizontal List", component: StyleHorizontalList },
@@ -184,11 +235,23 @@ export default function AnimationPreview() {
           Back to Home
         </Link>
 
+        {/* Logo Hover Animation Section */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 mb-6">
+          <h1 className="text-3xl font-bold text-slate-900 mb-1">Logo Hover Animations</h1>
+          <p className="text-slate-500 mb-6">Hover over each card to preview the animation effect.</p>
+          <div className="grid grid-cols-3 gap-4">
+            {ANIM_STYLES.map(style => <AnimCard key={style.id} style={style} />)}
+          </div>
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs text-blue-700">Tell me which animation you'd like applied to the live Home page cards.</p>
+          </div>
+        </div>
+
+        {/* Layout Styles Section */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-1">Sample Viewer</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-1">Card Layout Styles</h1>
           <p className="text-slate-500 mb-8">Preview different card layout styles using the existing app logos.</p>
 
-          {/* Layout Selector */}
           <div className="flex flex-wrap gap-2 mb-8">
             {LAYOUTS.map((layout) => (
               <button
@@ -205,7 +268,6 @@ export default function AnimationPreview() {
             ))}
           </div>
 
-          {/* Preview */}
           <motion.div
             key={selected}
             initial={{ opacity: 0, y: 12 }}
