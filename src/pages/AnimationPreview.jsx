@@ -185,6 +185,48 @@ const ANIM_STYLES = [
     logoMotion: { rotate: [0, -12, 12, -8, 8, -4, 4, 0] },
     transition: { duration: 0.6 },
   },
+  {
+    id: "flip",
+    label: "Flip",
+    description: "Flip horizontally on hover",
+    logoMotion: { rotateY: 180 },
+    transition: { duration: 0.6, ease: "easeInOut" },
+  },
+  {
+    id: "rubber",
+    label: "Rubber Band",
+    description: "Elastic stretch effect",
+    logoMotion: { scaleX: [1, 1.4, 0.75, 1.15, 0.95, 1], scaleY: [1, 0.75, 1.2, 0.9, 1.05, 1] },
+    transition: { duration: 0.7 },
+  },
+  {
+    id: "float",
+    label: "Float Up",
+    description: "Gently rises upward",
+    logoMotion: { y: -18 },
+    transition: { type: "spring", stiffness: 200, damping: 12 },
+  },
+  {
+    id: "swing",
+    label: "Swing",
+    description: "Pendulum swing from top",
+    logoMotion: { rotate: [0, 20, -16, 12, -8, 5, 0] },
+    transition: { duration: 0.8, ease: "easeInOut" },
+  },
+  {
+    id: "zoom",
+    label: "Zoom In",
+    description: "Smooth zoom with shadow pop",
+    logoMotion: { scale: 1.35, filter: "drop-shadow(0 8px 16px rgba(239,68,68,0.4))" },
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+  {
+    id: "tilt",
+    label: "Tilt & Lift",
+    description: "Tilts and floats up",
+    logoMotion: { rotate: -8, y: -12, scale: 1.1 },
+    transition: { type: "spring", stiffness: 250, damping: 15 },
+  },
 ];
 
 function AnimCard({ style }) {
