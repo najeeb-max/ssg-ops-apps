@@ -1,4 +1,4 @@
-// ─── Shared App List (Point 7) ───────────────────────────────────────────────
+// Shared App List
 import { Files, BookOpen, ShoppingCart, Ship } from 'lucide-react';
 
 export const COMPANY_APPS = [
@@ -44,7 +44,7 @@ export const COMPANY_APPS = [
   },
 ];
 
-// ─── TradeFlow Constants (Point 9) ───────────────────────────────────────────
+// TradeFlow Constants
 export const CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'INR', 'CNY', 'JPY'];
 
 export const TEAM_MEMBERS = ['Najeeb', 'Hilal', 'Prasad', 'Kiptta', 'SSG', 'Jassim', 'Ishan'];

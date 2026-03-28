@@ -5,7 +5,7 @@ import { TEAM_MEMBERS } from '@/lib/constants';
 import { X, Plus, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
-// In-memory override — persisted via localStorage for simplicity
+// In-memory override - persisted via localStorage for simplicity
 const STORAGE_KEY = 'ssg_team_members';
 
 function getMembers() {
