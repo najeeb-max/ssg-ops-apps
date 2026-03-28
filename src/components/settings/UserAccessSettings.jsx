@@ -2,25 +2,19 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
-import {
-  ShieldCheck, Loader2, Plus, X, Users,
-  FileSpreadsheet, TrendingUp, ChevronDown
-} from 'lucide-react';
+import { ShieldCheck, Loader2, Plus, X, Users, FileSpreadsheet, TrendingUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// ─── Module Registry ───────────────────────────────────────────────────────────
-// To add a new module, just add an entry here — the UI scales automatically.
 const MODULES = [
   {
     key: 'can_access_pcs',
     label: 'PCS Module',
-    description: 'Price Comparison Sheets — procurement quoting workflow',
+    description: 'Price Comparison Sheets - procurement quoting workflow',
     icon: FileSpreadsheet,
     color: 'text-red-600',
     bg: 'bg-red-50',
     border: 'border-red-200',
     badgeColor: 'bg-red-100 text-red-700',
-    accentDot: 'bg-red-500',
   },
   {
     key: 'can_access_tradeflow',
@@ -31,11 +25,9 @@ const MODULES = [
     bg: 'bg-indigo-50',
     border: 'border-indigo-200',
     badgeColor: 'bg-indigo-100 text-indigo-700',
-    accentDot: 'bg-indigo-500',
   },
 ];
 
-// ─── UserPill ─────────────────────────────────────────────────────────────────
 function UserPill({ user, onRemove }) {
   const initials = (user.full_name || user.email || '?')
     .split(' ')
@@ -45,7 +37,7 @@ function UserPill({ user, onRemove }) {
     .toUpperCase();
 
   return (
-    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full pl-1 pr-2 py-1 shadow-sm group">
+    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full pl-1 pr-2 py-1 shadow-sm">
       <div className="w-6 h-6 rounded-full bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
         {initials}
       </div>
@@ -55,7 +47,6 @@ function UserPill({ user, onRemove }) {
       <button
         onClick={() => onRemove(user)}
         className="text-slate-300 hover:text-red-500 transition-colors flex-shrink-0"
-        title="Remove access"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -63,7 +54,6 @@ function UserPill({ user, onRemove }) {
   );
 }
 
-// ─── AddUserDropdown ──────────────────────────────────────────────────────────
 function AddUserDropdown({ available, onAdd }) {
   const [open, setOpen] = useState(false);
 
@@ -86,18 +76,18 @@ function AddUserDropdown({ available, onAdd }) {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute left-0 top-9 z-20 bg-white border border-slate-200 rounded-xl shadow-lg w-56 py-1 overflow-hidden">
-            {available.map(user => (
+            {available.map(u => (
               <button
-                key={user.id}
-                onClick={() => { onAdd(user); setOpen(false); }}
+                key={u.id}
+                onClick={() => { onAdd(u); setOpen(false); }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 text-left transition-colors"
               >
                 <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
-                  {(user.full_name || user.email || '?')[0].toUpperCase()}
+                  {(u.full_name || u.email || '?')[0].toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-800 truncate">{user.full_name || '—'}</p>
-                  <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                  <p className="text-xs font-medium text-slate-800 truncate">{u.full_name || '-'}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
                 </div>
               </button>
             ))}
@@ -108,7 +98,6 @@ function AddUserDropdown({ available, onAdd }) {
   );
 }
 
-// ─── ModuleCard ───────────────────────────────────────────────────────────────
 function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
   const Icon = module.icon;
   const regularUsers = allUsers.filter(u => u.role !== 'admin');
@@ -118,7 +107,6 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
 
   return (
     <div className={`rounded-2xl border-2 ${module.border} overflow-hidden`}>
-      {/* Card Header */}
       <div className={`${module.bg} px-5 py-4 flex items-start justify-between gap-4`}>
         <div className="flex items-start gap-3">
           <div className={`w-9 h-9 rounded-xl ${module.bg} border ${module.border} flex items-center justify-center flex-shrink-0`}>
@@ -134,12 +122,10 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
         </div>
       </div>
 
-      {/* Card Body */}
       <div className="bg-white px-5 py-4 space-y-4">
-        {/* Admins — always full access */}
         <div>
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <ShieldCheck className="w-3 h-3" /> Admins — Always Full Access
+            <ShieldCheck className="w-3 h-3" /> Admins - Always Full Access
           </p>
           <div className="flex flex-wrap gap-2">
             {admins.map(u => (
@@ -155,10 +141,8 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="border-t border-slate-100" />
 
-        {/* Granted Users */}
         <div>
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
             <Users className="w-3 h-3" /> Granted Access
@@ -174,7 +158,6 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
           </div>
         </div>
 
-        {/* Add User */}
         <div className="pt-1">
           <AddUserDropdown available={available} onAdd={onAdd} />
           {available.length === 0 && regularUsers.length > 0 && (
@@ -186,7 +169,6 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function UserAccessSettings() {
   const queryClient = useQueryClient();
 
@@ -195,15 +177,14 @@ export default function UserAccessSettings() {
     queryFn: () => base44.entities.User.list(),
   });
 
-  // Normalize users: merge data sub-object fields to top level for consistent access
+  // Normalize: custom fields live inside user.data on the SDK response
   const users = rawUsers.map(u => ({
     ...u,
     role: u.role || u.data?.role || 'user',
-    can_access_pcs: u.data?.can_access_pcs ?? u.can_access_pcs ?? false,
-    can_access_tradeflow: u.data?.can_access_tradeflow ?? u.can_access_tradeflow ?? false,
+    can_access_pcs: !!(u.data?.can_access_pcs ?? u.can_access_pcs),
+    can_access_tradeflow: !!(u.data?.can_access_tradeflow ?? u.can_access_tradeflow),
   }));
 
-  // Helper: read permission flag — users are normalized, so just read top-level
   const hasPerm = (user, key) => !!user[key];
 
   const grantAccess = async (user, moduleKey, moduleLabel) => {
@@ -228,7 +209,6 @@ export default function UserAccessSettings() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div>
         <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4" /> Module Access Control
@@ -238,7 +218,6 @@ export default function UserAccessSettings() {
         </p>
       </div>
 
-      {/* Module Cards */}
       <div className="grid gap-4">
         {MODULES.map(module => {
           const grantedUsers = users.filter(u => u.role !== 'admin' && hasPerm(u, module.key));
@@ -255,7 +234,6 @@ export default function UserAccessSettings() {
         })}
       </div>
 
-      {/* Footer note */}
       <p className="text-[11px] text-slate-400 pt-1">
         To add a new restricted module, contact your system administrator.
       </p>
