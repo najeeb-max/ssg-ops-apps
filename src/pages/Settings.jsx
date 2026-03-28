@@ -2,15 +2,13 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Header from '@/components/Header';
-import TeamMembersSettings from '@/components/settings/TeamMembersSettings';
 import CurrenciesSettings from '@/components/settings/CurrenciesSettings';
 import AppInfoSettings from '@/components/settings/AppInfoSettings';
 import UserAccessSettings from '@/components/settings/UserAccessSettings';
-import { Users, DollarSign, Settings2, ShieldCheck } from 'lucide-react';
+import { DollarSign, Settings2, ShieldCheck } from 'lucide-react';
 
 const TABS = [
-  { id: 'access', label: 'User Access', icon: ShieldCheck },
-  { id: 'team', label: 'Team Members', icon: Users },
+  { id: 'access', label: 'User Access & Team', icon: ShieldCheck },
   { id: 'currencies', label: 'Currencies', icon: DollarSign },
   { id: 'app', label: 'App Info', icon: Settings2 },
 ];
@@ -63,7 +61,6 @@ export default function Settings() {
 
         <div className="bg-white border border-slate-200 rounded-2xl p-6">
           {activeTab === 'access' && <UserAccessSettings />}
-          {activeTab === 'team' && <TeamMembersSettings />}
           {activeTab === 'currencies' && <CurrenciesSettings />}
           {activeTab === 'app' && <AppInfoSettings />}
         </div>
