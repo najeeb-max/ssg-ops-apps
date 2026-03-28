@@ -5,7 +5,7 @@ const CACHE = {};
 /**
  * Fetches exchange rate from `currency` to QAR using frankfurter.app (ECB data, free, no key).
  * Returns { fetchRate, loading }
- * fetchRate(currency) → resolves to rate (number) or null on error
+ * fetchRate(currency) - resolves to rate (number) or null on error
  */
 export function useFxRate() {
   const [loading, setLoading] = useState(false);

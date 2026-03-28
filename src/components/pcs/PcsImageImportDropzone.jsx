@@ -110,7 +110,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           return;
         }
       }
-      toast.error("No image in clipboard — take a screenshot first (PrtScr / Cmd+Shift+4)");
+      toast.error("No image in clipboard - take a screenshot first (PrtScr / Cmd+Shift+4)");
     } catch {
       // Fallback: just trigger file picker
       inputRef.current?.click();
@@ -200,7 +200,7 @@ export default function PcsImageImportDropzone({ pcsId, lineItems }) {
           <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium text-slate-700">{preview.items.length} items extracted — review & confirm</span>
+              <span className="text-sm font-medium text-slate-700">{preview.items.length} items extracted - review &amp; confirm</span>
             </div>
             <button onClick={() => setPreview(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
           </div>
