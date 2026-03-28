@@ -129,7 +129,7 @@ function ModuleCard(props) {
           </div>
         </div>
         <div className={'flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ' + module.badgeColor}>
-          {users.length} user{users.length !== 1 ? 's' : ''}
+          {users.length + admins.length} user{(users.length + admins.length) !== 1 ? 's' : ''}
         </div>
       </div>
 
