@@ -190,22 +190,30 @@ function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
 export default function UserAccessSettings() {
   const queryClient = useQueryClient();
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: rawUsers = [], isLoading } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.entities.User.list(),
   });
 
-  // Helper: read permission flag — SDK returns custom fields nested under `data`
-  const hasPerm = (user, key) => !!(user[key] ?? user.data?.[key]);
+  // Normalize users: merge data sub-object fields to top level for consistent access
+  const users = rawUsers.map(u => ({
+    ...u,
+    role: u.role || u.data?.role || 'user',
+    can_access_pcs: u.data?.can_access_pcs ?? u.can_access_pcs ?? false,
+    can_access_tradeflow: u.data?.can_access_tradeflow ?? u.can_access_tradeflow ?? false,
+  }));
+
+  // Helper: read permission flag — users are normalized, so just read top-level
+  const hasPerm = (user, key) => !!user[key];
 
   const grantAccess = async (user, moduleKey, moduleLabel) => {
-    await base44.entities.User.update(user.id, { [moduleKey]: true });
+    await base44.entities.User.update(user.id, { data: { ...user.data, [moduleKey]: true } });
     queryClient.invalidateQueries({ queryKey: ['all-users'] });
     toast.success(`${user.full_name || user.email} granted access to ${moduleLabel}`);
   };
 
   const revokeAccess = async (user, moduleKey, moduleLabel) => {
-    await base44.entities.User.update(user.id, { [moduleKey]: false });
+    await base44.entities.User.update(user.id, { data: { ...user.data, [moduleKey]: false } });
     queryClient.invalidateQueries({ queryKey: ['all-users'] });
     toast.success(`Access to ${moduleLabel} removed for ${user.full_name || user.email}`);
   };
