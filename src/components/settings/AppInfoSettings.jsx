@@ -1,6 +1,6 @@
 import { Settings2, Info } from 'lucide-react';
 
-const INFO_ROWS = [
+var INFO_ROWS = [
   { label: 'App Name', value: 'SSG OPS' },
   { label: 'Version', value: '2.0' },
   { label: 'Built on', value: 'Base44' },
@@ -20,17 +20,19 @@ export default function AppInfoSettings() {
       </div>
 
       <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 overflow-hidden">
-        {INFO_ROWS.map(({ label, value }) => (
-          <div key={label} className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-slate-500">{label}</span>
-            <span className="text-sm font-medium text-slate-800">{value}</span>
-          </div>
-        ))}
+        {INFO_ROWS.map(function(row) {
+          return (
+            <div key={row.label} className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm text-slate-500">{row.label}</span>
+              <span className="text-sm font-medium text-slate-800">{row.value}</span>
+            </div>
+          );
+        })}
       </div>
 
       <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
         <Info className="w-4 h-4 mt-0.5 shrink-0" />
-        <span>To make deeper configuration changes (branding, modules, integrations), contact your system administrator.</span>
+        <span>To make deeper configuration changes, contact your system administrator.</span>
       </div>
     </div>
   );

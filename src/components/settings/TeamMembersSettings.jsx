@@ -5,14 +5,13 @@ import { TEAM_MEMBERS } from '@/lib/constants';
 import { X, Plus, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
-// In-memory override - persisted via localStorage for simplicity
-const STORAGE_KEY = 'ssg_team_members';
+var STORAGE_KEY = 'ssg_team_members';
 
 function getMembers() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    var stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : TEAM_MEMBERS;
-  } catch {
+  } catch (e) {
     return TEAM_MEMBERS;
   }
 }
@@ -22,35 +21,35 @@ function saveMembers(members) {
 }
 
 export default function TeamMembersSettings() {
-  const [members, setMembers] = useState(getMembers);
-  const [newName, setNewName] = useState('');
+  var [members, setMembers] = useState(getMembers);
+  var [newName, setNewName] = useState('');
 
-  const handleAdd = () => {
-    const trimmed = newName.trim();
+  function handleAdd() {
+    var trimmed = newName.trim();
     if (!trimmed) return;
     if (members.includes(trimmed)) {
       toast.error('Member already exists');
       return;
     }
-    const updated = [...members, trimmed];
+    var updated = members.concat([trimmed]);
     setMembers(updated);
     saveMembers(updated);
     setNewName('');
-    toast.success(`${trimmed} added`);
-  };
+    toast.success(trimmed + ' added');
+  }
 
-  const handleRemove = (name) => {
-    const updated = members.filter(m => m !== name);
+  function handleRemove(name) {
+    var updated = members.filter(function(m) { return m !== name; });
     setMembers(updated);
     saveMembers(updated);
-    toast.success(`${name} removed`);
-  };
+    toast.success(name + ' removed');
+  }
 
-  const handleReset = () => {
+  function handleReset() {
     setMembers(TEAM_MEMBERS);
     saveMembers(TEAM_MEMBERS);
     toast.success('Reset to defaults');
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -64,12 +63,11 @@ export default function TeamMembersSettings() {
         <Button variant="outline" size="sm" onClick={handleReset}>Reset to default</Button>
       </div>
 
-      {/* Add new */}
       <div className="flex gap-2">
         <Input
           value={newName}
-          onChange={e => setNewName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleAdd()}
+          onChange={function(e) { setNewName(e.target.value); }}
+          onKeyDown={function(e) { if (e.key === 'Enter') handleAdd(); }}
           placeholder="New member name..."
           className="h-9"
         />
@@ -78,20 +76,20 @@ export default function TeamMembersSettings() {
         </Button>
       </div>
 
-      {/* List */}
       <div className="flex flex-wrap gap-2">
-        {members.map(name => (
-          <span key={name} className="flex items-center gap-1.5 bg-slate-100 text-slate-700 text-sm px-3 py-1.5 rounded-full">
-            {name}
-            <button onClick={() => handleRemove(name)} className="text-slate-400 hover:text-destructive transition-colors">
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </span>
-        ))}
+        {members.map(function(name) {
+          return (
+            <span key={name} className="flex items-center gap-1.5 bg-slate-100 text-slate-700 text-sm px-3 py-1.5 rounded-full">
+              {name}
+              <button onClick={function() { handleRemove(name); }} className="text-slate-400 hover:text-destructive transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// Export helper for other components to read current members
 export { getMembers };
