@@ -32,7 +32,7 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
         </h2>
       </div>
 
-      {/* Action Cards — only for editors */}
+      {/* Action Cards - only for editors */}
       {canEdit && (
         <div className="px-5 pt-4 pb-3">
           <div className="grid grid-cols-2 gap-3">

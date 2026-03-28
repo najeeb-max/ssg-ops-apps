@@ -52,7 +52,7 @@ export default function Header() {
             </motion.p>
             <div className="flex items-center justify-center gap-2 mt-0.5">
               <Cloud className="w-3.5 h-3.5 text-gray-500" />
-              <span className="text-xs text-gray-500">{weather.condition} • {weather.temp}</span>
+              <span className="text-xs text-gray-500">{weather.condition} - {weather.temp}</span>
             </div>
           </motion.div>
         </div>

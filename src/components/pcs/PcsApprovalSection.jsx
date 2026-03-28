@@ -144,7 +144,7 @@ export default function PcsApprovalSection({ pcsId, sheet, currentUser }) {
       {/* Current owner info */}
       <div className="flex items-center gap-2 text-xs text-slate-500 mb-5 bg-slate-50 rounded-lg px-3 py-2">
         <UserCog className="w-3.5 h-3.5 flex-shrink-0" />
-        <span>Responsible: <strong className="text-slate-700">{effectiveOwner || "—"}</strong></span>
+        <span>Responsible: <strong className="text-slate-700">{effectiveOwner || "-"}</strong></span>
         {sheet?.assigned_to && sheet.assigned_to !== sheet.created_by && (
           <Badge className="ml-auto text-xs bg-amber-50 text-amber-700 border-amber-200">Reassigned</Badge>
         )}
@@ -227,7 +227,7 @@ export default function PcsApprovalSection({ pcsId, sheet, currentUser }) {
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm text-blue-700 bg-blue-50 rounded-lg px-3 py-2 mb-2">
             <Clock className="w-4 h-4" />
-            Submitted by <strong>{sheet?.submitted_by || "user"}</strong> — awaiting your review.
+            Submitted by <strong>{sheet?.submitted_by || "user"}</strong> - awaiting your review.
           </div>
           <Textarea
             value={remarks}
@@ -251,7 +251,7 @@ export default function PcsApprovalSection({ pcsId, sheet, currentUser }) {
       {pcsStatus === "pending_approval" && !isManager && (
         <div className="text-center py-3 text-sm text-slate-500 bg-blue-50 rounded-lg">
           <Clock className="w-5 h-5 text-blue-400 mx-auto mb-1" />
-          Awaiting manager approval…
+          Awaiting manager approval...
         </div>
       )}
     </div>

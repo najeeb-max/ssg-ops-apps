@@ -29,7 +29,7 @@ export default function TradeflowLayout() {
         <ShieldOff className="w-12 h-12 text-slate-300" />
         <h2 className="text-lg font-semibold text-slate-700">Access Restricted</h2>
         <p className="text-sm text-slate-500">You don't have permission to access TradeFlow.</p>
-        <Link to="/" className="text-sm text-indigo-600 hover:underline">← Back to Portal</Link>
+        <Link to="/" className="text-sm text-indigo-600 hover:underline">Back to Portal</Link>
       </div>
     );
   }
@@ -43,6 +43,7 @@ export default function TradeflowLayout() {
             <ArrowLeft className="w-3 h-3" /> Back to Portal
           </Link>
           <span className="text-lg font-bold text-indigo-700 tracking-tight">TradeFlow</span>
+
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => {

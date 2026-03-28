@@ -57,7 +57,7 @@ export default function PcsSummaryCard({ sheet, lineItems, providers, quotes }) 
         <div>
           <p className="text-[11px] font-medium text-slate-500">Operating Margin</p>
           <p className={`text-base font-bold leading-tight ${savings > 0 ? "text-amber-900" : "text-slate-400"}`}>
-            {savings > 0 ? `QAR ${savings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
+            {savings > 0 ? `QAR ${savings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "-"}
           </p>
           <p className="text-[11px] text-slate-400">{savings > 0 ? `${savingsPercent}% margin` : "Enter quotes"}</p>
         </div>

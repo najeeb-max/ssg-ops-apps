@@ -6,7 +6,7 @@ import { Star } from "lucide-react";
 import { toast } from "sonner";
 
 const fmt = (n, decimals = 2) =>
-  n != null ? Number(n).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : "—";
+  n != null ? Number(n).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : "-";
 
 export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes, canEdit = true }) {
   const queryClient = useQueryClient();
@@ -60,7 +60,7 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
       <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/60">
         <h2 className="font-semibold text-slate-800 text-sm">Price Comparison Table</h2>
-        <p className="text-xs text-slate-400 mt-0.5">Enter supplier quotes — lowest QAR price is highlighted. Totals converted to QAR.</p>
+        <p className="text-xs text-slate-400 mt-0.5">Enter supplier quotes - lowest QAR price is highlighted. Totals converted to QAR.</p>
       </div>
 
       <div className="overflow-x-auto">
@@ -105,7 +105,7 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                               className={`text-xs h-7 text-center w-28 tabular-nums ${isLowest ? "border-emerald-300 bg-emerald-50" : ""}`}
                             />
                           ) : (
-                            <span className="text-xs tabular-nums">{q?.unit_price ? `${currency} ${fmt(q.unit_price)}` : "—"}</span>
+                            <span className="text-xs tabular-nums">{q?.unit_price ? `${currency} ${fmt(q.unit_price)}` : "-"}</span>
                           )}
                           {q?.total_price != null && (
                             <div className="text-xs text-slate-400 tabular-nums">

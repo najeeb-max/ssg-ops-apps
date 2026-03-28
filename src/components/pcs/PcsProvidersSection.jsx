@@ -185,9 +185,9 @@ export default function PcsProvidersSection({ pcsId, providers, canEdit = true }
                   <tr key={p.id} className={`hover:bg-blue-50/30 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
                     <td className="py-2 px-3 text-slate-400 font-mono text-xs">{p.provider_number}</td>
                     <td className="py-2 px-3 font-medium text-slate-800">{p.name}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.contact_person || "—"}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.delivery_period || "—"}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.payment_terms || "—"}</td>
+                    <td className="py-2 px-3 text-slate-600">{p.contact_person || "-"}</td>
+                    <td className="py-2 px-3 text-slate-600">{p.delivery_period || "-"}</td>
+                    <td className="py-2 px-3 text-slate-600">{p.payment_terms || "-"}</td>
                     <td className="py-2 px-3">
                       <Badge variant="outline" className="text-xs font-semibold">{p.currency || "QAR"}</Badge>
                       {p.currency && p.currency !== "QAR" && (
@@ -195,7 +195,7 @@ export default function PcsProvidersSection({ pcsId, providers, canEdit = true }
                       )}
                     </td>
                     <td className="py-2 px-3 text-right text-slate-600">
-                      {p.freight_charges ? `${p.currency || "QAR"} ${Number(p.freight_charges).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : "—"}
+                      {p.freight_charges ? `${p.currency || "QAR"} ${Number(p.freight_charges).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : "-"}
                     </td>
                     <td className="py-2 px-3">
                       {canEdit && (

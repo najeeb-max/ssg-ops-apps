@@ -72,7 +72,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-300 py-6 px-6 mt-auto">
         <div className="max-w-7xl mx-auto">
-          <p className="text-center text-gray-600 text-xs">&copy; 2026 SSG OPS. All rights reserved.</p>
+          <p className="text-center text-gray-600 text-xs">2026 SSG OPS. All rights reserved.</p>
         </div>
       </footer>
     </div>

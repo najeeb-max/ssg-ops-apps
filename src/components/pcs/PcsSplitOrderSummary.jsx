@@ -42,7 +42,7 @@ export default function PcsSplitOrderSummary({ lineItems, providers, quotes }) {
       <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/60 flex items-center gap-2">
         <Award className="w-4 h-4 text-violet-500" />
         <h2 className="font-semibold text-slate-800 text-sm">Split Order Summary</h2>
-        <span className="text-xs text-slate-400 ml-1">— best price per line item</span>
+        <span className="text-xs text-slate-400 ml-1">- best price per line item</span>
       </div>
 
       <div className="p-5 space-y-5">

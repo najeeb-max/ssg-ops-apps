@@ -57,7 +57,7 @@ export default function PcsDashboard() {
           <ShieldOff className="w-12 h-12 text-slate-300" />
           <h2 className="text-lg font-semibold text-slate-700">Access Restricted</h2>
           <p className="text-sm text-slate-500">You don't have permission to access the PCS module.</p>
-          <Link to="/" className="text-sm text-red-600 hover:underline">← Back to Portal</Link>
+          <Link to="/" className="text-sm text-red-600 hover:underline">Back to Portal</Link>
         </div>
       </div>
     );
