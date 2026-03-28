@@ -195,6 +195,9 @@ export default function UserAccessSettings() {
     queryFn: () => base44.entities.User.list(),
   });
 
+  // Helper: read permission flag — SDK returns custom fields nested under `data`
+  const hasPerm = (user, key) => !!(user[key] ?? user.data?.[key]);
+
   const grantAccess = async (user, moduleKey, moduleLabel) => {
     await base44.entities.User.update(user.id, { [moduleKey]: true });
     queryClient.invalidateQueries({ queryKey: ['all-users'] });
@@ -230,7 +233,7 @@ export default function UserAccessSettings() {
       {/* Module Cards */}
       <div className="grid gap-4">
         {MODULES.map(module => {
-          const grantedUsers = users.filter(u => u.role !== 'admin' && !!u[module.key]);
+          const grantedUsers = users.filter(u => u.role !== 'admin' && hasPerm(u, module.key));
           return (
             <ModuleCard
               key={module.key}
