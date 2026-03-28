@@ -205,18 +205,24 @@ export default function UserAccessSettings() {
   }
 
   function grantAccess(user, moduleKey, moduleLabel) {
-    var dataPayload = Object.assign({}, user.data, { [moduleKey]: true });
+    var currentData = rawUsers.find(function(u) { return u.id === user.id; })?.data || {};
+    var dataPayload = Object.assign({}, currentData, { [moduleKey]: true });
     base44.entities.User.update(user.id, { data: dataPayload }).then(function() {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
       toast.success((user.full_name || user.email) + ' granted access to ' + moduleLabel);
+    }).catch(function(err) {
+      toast.error('Failed to grant access: ' + (err.message || err));
     });
   }
 
   function revokeAccess(user, moduleKey, moduleLabel) {
-    var dataPayload = Object.assign({}, user.data, { [moduleKey]: false });
+    var currentData = rawUsers.find(function(u) { return u.id === user.id; })?.data || {};
+    var dataPayload = Object.assign({}, currentData, { [moduleKey]: false });
     base44.entities.User.update(user.id, { data: dataPayload }).then(function() {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
       toast.success('Access to ' + moduleLabel + ' removed for ' + (user.full_name || user.email));
+    }).catch(function(err) {
+      toast.error('Failed to revoke access: ' + (err.message || err));
     });
   }
 
