@@ -49,7 +49,7 @@ export default function PcsDashboard() {
       })
     : sheets;
 
-  if (!userLoading && currentUser && currentUser.role !== 'admin' && !(currentUser.can_access_pcs ?? currentUser.data?.can_access_pcs)) {
+  if (!userLoading && currentUser && currentUser.role !== 'admin' && !(currentUser.data?.can_access_pcs)) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header />

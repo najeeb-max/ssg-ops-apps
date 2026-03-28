@@ -15,16 +15,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing targetUserId or moduleKey' }, { status: 400 });
     }
 
-    // Fetch the target user's current data using service role
-    const targetUser = await base44.asServiceRole.entities.User.get(targetUserId);
-    // user.data is the custom data object (not the top-level entity fields)
-    const currentData = (targetUser?.data && typeof targetUser.data === 'object' && !Array.isArray(targetUser.data))
-      ? Object.fromEntries(Object.entries(targetUser.data).filter(([k]) => k !== 'data'))
-      : {};
-
-    const updatedData = Object.assign({}, currentData, { [moduleKey]: value });
-
-    await base44.asServiceRole.entities.User.update(targetUserId, { data: updatedData });
+    // Update the permission as a top-level field directly on the User entity
+    await base44.asServiceRole.entities.User.update(targetUserId, { [moduleKey]: value });
 
     return Response.json({ success: true });
   } catch (error) {

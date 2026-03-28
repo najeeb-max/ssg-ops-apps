@@ -193,10 +193,12 @@ export default function UserAccessSettings() {
   var isLoading = queryResult.isLoading;
 
   var users = rawUsers.map(function(u) {
+    // The User entity stores custom fields inside u.data at the top level
+    var d = u.data || {};
     return Object.assign({}, u, {
-      role: u.role || (u.data && u.data.role) || 'user',
-      can_access_pcs: !!(u.data ? u.data.can_access_pcs : u.can_access_pcs),
-      can_access_tradeflow: !!(u.data ? u.data.can_access_tradeflow : u.can_access_tradeflow),
+      role: u.role || d.role || 'user',
+      can_access_pcs: !!(d.can_access_pcs),
+      can_access_tradeflow: !!(d.can_access_tradeflow),
     });
   });
 
