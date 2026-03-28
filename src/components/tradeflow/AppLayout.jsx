@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Ship, Users, Building2, Menu, X, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Ship, Users, Building2, Menu, X, LogOut, ArrowLeft, ShieldOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 
 const navItems = [
   { label: 'Dashboard', path: '/tradeflow', icon: LayoutDashboard },
@@ -15,6 +16,23 @@ const navItems = [
 export default function TradeflowLayout() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen"><div className="w-6 h-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" /></div>;
+  }
+
+  if (user && user.role !== 'admin' && !user.can_access_tradeflow) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 gap-4">
+        <ShieldOff className="w-12 h-12 text-slate-300" />
+        <h2 className="text-lg font-semibold text-slate-700">Access Restricted</h2>
+        <p className="text-sm text-slate-500">You don't have permission to access TradeFlow.</p>
+        <Link to="/" className="text-sm text-indigo-600 hover:underline">← Back to Portal</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">

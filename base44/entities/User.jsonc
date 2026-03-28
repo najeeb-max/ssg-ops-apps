@@ -1,0 +1,25 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user",
+      "description": "User role"
+    },
+    "can_access_pcs": {
+      "type": "boolean",
+      "default": false,
+      "description": "Access to PCS (Price Comparison Sheets) module"
+    },
+    "can_access_tradeflow": {
+      "type": "boolean",
+      "default": false,
+      "description": "Access to TradeFlow (Orders & Shipments) module"
+    }
+  }
+}

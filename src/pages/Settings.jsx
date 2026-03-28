@@ -5,16 +5,18 @@ import Header from '@/components/Header';
 import TeamMembersSettings from '@/components/settings/TeamMembersSettings';
 import CurrenciesSettings from '@/components/settings/CurrenciesSettings';
 import AppInfoSettings from '@/components/settings/AppInfoSettings';
-import { Users, DollarSign, Settings2 } from 'lucide-react';
+import UserAccessSettings from '@/components/settings/UserAccessSettings';
+import { Users, DollarSign, Settings2, ShieldCheck } from 'lucide-react';
 
 const TABS = [
+  { id: 'access', label: 'User Access', icon: ShieldCheck },
   { id: 'team', label: 'Team Members', icon: Users },
   { id: 'currencies', label: 'Currencies', icon: DollarSign },
   { id: 'app', label: 'App Info', icon: Settings2 },
 ];
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState('team');
+  const [activeTab, setActiveTab] = useState('access');
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
@@ -55,6 +57,7 @@ export default function Settings() {
 
         {/* Tab Panels */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6">
+          {activeTab === 'access' && <UserAccessSettings />}
           {activeTab === 'team' && <TeamMembersSettings />}
           {activeTab === 'currencies' && <CurrenciesSettings />}
           {activeTab === 'app' && <AppInfoSettings />}

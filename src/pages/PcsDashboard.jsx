@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, X, ArrowLeft } from "lucide-react";
+import { Plus, Search, X, ArrowLeft, ShieldOff } from "lucide-react";
 import Header from "../components/Header";
 import PcsStatsGrid from "../components/pcs/PcsStatsGrid";
 import PcsRecentSheets from "../components/pcs/PcsRecentSheets";
@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PcsDashboard() {
   const [search, setSearch] = useState("");
+
+  const { data: currentUser, isLoading: userLoading } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
 
   const { data: sheets = [], isLoading } = useQuery({
     queryKey: ["pcs-sheets"],
@@ -46,6 +48,20 @@ export default function PcsDashboard() {
         );
       })
     : sheets;
+
+  if (!userLoading && currentUser && currentUser.role !== 'admin' && !currentUser.can_access_pcs) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex flex-col items-center justify-center flex-1 gap-4">
+          <ShieldOff className="w-12 h-12 text-slate-300" />
+          <h2 className="text-lg font-semibold text-slate-700">Access Restricted</h2>
+          <p className="text-sm text-slate-500">You don't have permission to access the PCS module.</p>
+          <Link to="/" className="text-sm text-red-600 hover:underline">← Back to Portal</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
