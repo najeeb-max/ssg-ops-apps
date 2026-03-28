@@ -102,7 +102,7 @@ function ModuleCard({ module, allUsers, onGrant, onRevoke }) {
   var Icon = module.icon;
   var admins = allUsers.filter(u => u.role === 'admin');
   var regularUsers = allUsers.filter(u => u.role !== 'admin');
-  var grantedUsers = regularUsers.filter(u => !!(u.data && u.data[module.key]));
+  var grantedUsers = regularUsers.filter(u => !!(u[module.key]));
   var grantedIds = new Set(grantedUsers.map(u => u.id));
   var available = regularUsers.filter(u => !grantedIds.has(u.id));
 
@@ -227,14 +227,13 @@ export default function UserAccessSettings() {
 
   var { data: rawUsers = [], isLoading } = useQuery({
     queryKey: ['all-users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => base44.functions.invoke('getAllUsers', {}).then(r => r.data.users),
   });
 
-  // Normalize: role lives at top-level u.role; permissions inside u.data
+  // Service role returns permissions at top level (e.g. u.can_access_pcs)
   var allUsers = rawUsers.map(u => ({
     ...u,
     role: u.role || 'user',
-    data: u.data || {},
   }));
 
   function grantAccess(user, module) {
