@@ -25,7 +25,7 @@ export default function Settings() {
       <div className="min-h-screen bg-slate-50">
         <Header />
         <div className="pt-28 flex items-center justify-center">
-          <p className="text-slate-500">Access denied — admins only.</p>
+          <p className="text-slate-500">Access denied - admins only.</p>
         </div>
       </div>
     );
