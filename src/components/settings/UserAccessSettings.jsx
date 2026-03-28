@@ -107,7 +107,7 @@ function ModuleCard({ module, allUsers, onGrant, onRevoke }) {
   var available = regularUsers.filter(u => !grantedIds.has(u.id));
 
   return (
-    <div className={`rounded-2xl border-2 ${a.border} overflow-hidden`}>
+    <div className={`rounded-2xl border-2 ${a.border}`}>
       {/* Header */}
       <div className={`${a.bg} px-5 py-4 flex items-start justify-between gap-4`}>
         <div className="flex items-start gap-3">

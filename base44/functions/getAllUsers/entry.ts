@@ -9,7 +9,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const users = await base44.asServiceRole.entities.User.list();
+    const rawUsers = await base44.asServiceRole.entities.User.list();
+
+    // _app_role is the actual role within this app (admin/user)
+    // Custom fields like can_access_pcs are stored in data.* but also surfaced at top level
+    const users = rawUsers.map(u => ({
+      ...u,
+      role: u._app_role || u.role || 'user',
+      can_access_pcs: !!(u.can_access_pcs || (u.data && u.data.can_access_pcs)),
+      can_access_tradeflow: !!(u.can_access_tradeflow || (u.data && u.data.can_access_tradeflow)),
+    }));
 
     return Response.json({ users });
   } catch (error) {
