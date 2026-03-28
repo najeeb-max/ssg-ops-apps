@@ -1,30 +1,192 @@
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
-import { ShieldCheck, Loader2 } from 'lucide-react';
+import {
+  ShieldCheck, Loader2, Plus, X, Users,
+  FileSpreadsheet, TrendingUp, ChevronDown
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
+// ─── Module Registry ───────────────────────────────────────────────────────────
+// To add a new module, just add an entry here — the UI scales automatically.
 const MODULES = [
-  { key: 'can_access_pcs', label: 'PCS Module', description: 'Price Comparison Sheets' },
-  { key: 'can_access_tradeflow', label: 'TradeFlow Module', description: 'Orders & Shipments' },
+  {
+    key: 'can_access_pcs',
+    label: 'PCS Module',
+    description: 'Price Comparison Sheets — procurement quoting workflow',
+    icon: FileSpreadsheet,
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    border: 'border-red-200',
+    badgeColor: 'bg-red-100 text-red-700',
+    accentDot: 'bg-red-500',
+  },
+  {
+    key: 'can_access_tradeflow',
+    label: 'TradeFlow Module',
+    description: 'Orders, Shipments, Customers & Suppliers management',
+    icon: TrendingUp,
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50',
+    border: 'border-indigo-200',
+    badgeColor: 'bg-indigo-100 text-indigo-700',
+    accentDot: 'bg-indigo-500',
+  },
 ];
 
-function Toggle({ enabled, onChange }) {
+// ─── UserPill ─────────────────────────────────────────────────────────────────
+function UserPill({ user, onRemove }) {
+  const initials = (user.full_name || user.email || '?')
+    .split(' ')
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
   return (
-    <button
-      onClick={onChange}
-      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
-        enabled ? 'bg-emerald-500' : 'bg-slate-200'
-      }`}
-    >
-      <span
-        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-          enabled ? 'translate-x-5' : 'translate-x-1'
-        }`}
-      />
-    </button>
+    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full pl-1 pr-2 py-1 shadow-sm group">
+      <div className="w-6 h-6 rounded-full bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+        {initials}
+      </div>
+      <span className="text-xs font-medium text-slate-700 truncate max-w-[120px]">
+        {user.full_name || user.email}
+      </span>
+      <button
+        onClick={() => onRemove(user)}
+        className="text-slate-300 hover:text-red-500 transition-colors flex-shrink-0"
+        title="Remove access"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
   );
 }
 
+// ─── AddUserDropdown ──────────────────────────────────────────────────────────
+function AddUserDropdown({ available, onAdd }) {
+  const [open, setOpen] = useState(false);
+
+  if (available.length === 0) return null;
+
+  return (
+    <div className="relative">
+      <Button
+        variant="outline"
+        size="sm"
+        className="gap-1.5 text-xs h-8 border-dashed"
+        onClick={() => setOpen(o => !o)}
+      >
+        <Plus className="w-3.5 h-3.5" />
+        Add User
+        <ChevronDown className="w-3 h-3 text-slate-400" />
+      </Button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-9 z-20 bg-white border border-slate-200 rounded-xl shadow-lg w-56 py-1 overflow-hidden">
+            {available.map(user => (
+              <button
+                key={user.id}
+                onClick={() => { onAdd(user); setOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 text-left transition-colors"
+              >
+                <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                  {(user.full_name || user.email || '?')[0].toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-800 truncate">{user.full_name || '—'}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── ModuleCard ───────────────────────────────────────────────────────────────
+function ModuleCard({ module, users, allUsers, onAdd, onRemove }) {
+  const Icon = module.icon;
+  const regularUsers = allUsers.filter(u => u.role !== 'admin');
+  const grantedIds = new Set(users.map(u => u.id));
+  const available = regularUsers.filter(u => !grantedIds.has(u.id));
+  const admins = allUsers.filter(u => u.role === 'admin');
+
+  return (
+    <div className={`rounded-2xl border-2 ${module.border} overflow-hidden`}>
+      {/* Card Header */}
+      <div className={`${module.bg} px-5 py-4 flex items-start justify-between gap-4`}>
+        <div className="flex items-start gap-3">
+          <div className={`w-9 h-9 rounded-xl ${module.bg} border ${module.border} flex items-center justify-center flex-shrink-0`}>
+            <Icon className={`w-5 h-5 ${module.color}`} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">{module.label}</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{module.description}</p>
+          </div>
+        </div>
+        <div className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${module.badgeColor}`}>
+          {users.length} user{users.length !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="bg-white px-5 py-4 space-y-4">
+        {/* Admins — always full access */}
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <ShieldCheck className="w-3 h-3" /> Admins — Always Full Access
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {admins.map(u => (
+              <div key={u.id} className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full pl-1 pr-3 py-1">
+                <div className="w-6 h-6 rounded-full bg-amber-400 text-white text-[10px] font-bold flex items-center justify-center">
+                  {(u.full_name || u.email || '?')[0].toUpperCase()}
+                </div>
+                <span className="text-xs font-medium text-amber-800 truncate max-w-[120px]">
+                  {u.full_name || u.email}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-slate-100" />
+
+        {/* Granted Users */}
+        <div>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <Users className="w-3 h-3" /> Granted Access
+          </p>
+          <div className="flex flex-wrap gap-2 min-h-[32px]">
+            {users.length === 0 ? (
+              <p className="text-xs text-slate-400 italic self-center">No users granted yet</p>
+            ) : (
+              users.map(u => (
+                <UserPill key={u.id} user={u} onRemove={onRemove} />
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Add User */}
+        <div className="pt-1">
+          <AddUserDropdown available={available} onAdd={onAdd} />
+          {available.length === 0 && regularUsers.length > 0 && (
+            <p className="text-xs text-slate-400 italic">All users have access</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function UserAccessSettings() {
   const queryClient = useQueryClient();
 
@@ -33,99 +195,59 @@ export default function UserAccessSettings() {
     queryFn: () => base44.entities.User.list(),
   });
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
-
-  const toggle = async (user, moduleKey) => {
-    const newValue = !user[moduleKey];
-    await base44.entities.User.update(user.id, { [moduleKey]: newValue });
+  const grantAccess = async (user, moduleKey, moduleLabel) => {
+    await base44.entities.User.update(user.id, { [moduleKey]: true });
     queryClient.invalidateQueries({ queryKey: ['all-users'] });
-    const mod = MODULES.find(m => m.key === moduleKey);
-    toast.success(`${user.full_name}: ${mod.label} ${newValue ? 'enabled' : 'disabled'}`);
+    toast.success(`${user.full_name || user.email} granted access to ${moduleLabel}`);
+  };
+
+  const revokeAccess = async (user, moduleKey, moduleLabel) => {
+    await base44.entities.User.update(user.id, { [moduleKey]: false });
+    queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    toast.success(`Access to ${moduleLabel} removed for ${user.full_name || user.email}`);
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-16">
         <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
       </div>
     );
   }
 
-  // Sort: admins first, then by name
-  const sorted = [...users].sort((a, b) => {
-    if (a.role === 'admin' && b.role !== 'admin') return -1;
-    if (b.role === 'admin' && a.role !== 'admin') return 1;
-    return (a.full_name || '').localeCompare(b.full_name || '');
-  });
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Header */}
       <div>
         <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4" /> Module Access Control
         </h2>
-        <p className="text-xs text-slate-500 mt-0.5">Admins always have full access. Toggle modules on/off per user below.</p>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Each module has its own access list. Admins always have full access. Add or remove users per module.
+        </p>
       </div>
 
-      <div className="rounded-xl border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Role</th>
-              {MODULES.map(m => (
-                <th key={m.key} className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <p>{m.label}</p>
-                  <p className="font-normal normal-case text-slate-400">{m.description}</p>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {sorted.map(user => {
-              const isAdmin = user.role === 'admin';
-              const isMe = user.email === me?.email;
-              return (
-                <tr key={user.id} className={`transition-colors ${isMe ? 'bg-blue-50/40' : 'hover:bg-slate-50'}`}>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-slate-800">
-                      {user.full_name || '—'}
-                      {isMe && <span className="ml-1.5 text-xs text-blue-500 font-normal">(you)</span>}
-                    </p>
-                    <p className="text-xs text-slate-400">{user.email}</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      isAdmin ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {isAdmin ? 'Admin' : 'User'}
-                    </span>
-                  </td>
-                  {MODULES.map(m => (
-                    <td key={m.key} className="px-4 py-3 text-center">
-                      {isAdmin ? (
-                        <span className="text-xs text-emerald-600 font-medium">Always ✓</span>
-                      ) : (
-                        <div className="flex justify-center">
-                          <Toggle
-                            enabled={!!user[m.key]}
-                            onChange={() => toggle(user, m.key)}
-                          />
-                        </div>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-            {sorted.length === 0 && (
-              <tr>
-                <td colSpan={2 + MODULES.length} className="text-center py-10 text-slate-400 text-sm">No users found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Module Cards */}
+      <div className="grid gap-4">
+        {MODULES.map(module => {
+          const grantedUsers = users.filter(u => u.role !== 'admin' && !!u[module.key]);
+          return (
+            <ModuleCard
+              key={module.key}
+              module={module}
+              users={grantedUsers}
+              allUsers={users}
+              onAdd={user => grantAccess(user, module.key, module.label)}
+              onRemove={user => revokeAccess(user, module.key, module.label)}
+            />
+          );
+        })}
       </div>
+
+      {/* Footer note */}
+      <p className="text-[11px] text-slate-400 pt-1">
+        To add a new restricted module, contact your system administrator.
+      </p>
     </div>
   );
 }
