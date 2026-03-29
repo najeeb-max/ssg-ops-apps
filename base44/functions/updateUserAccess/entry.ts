@@ -15,17 +15,22 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing targetUserId or moduleKey' }, { status: 400 });
     }
 
-    // Fetch current user data first to merge
+    // Fetch current user to get clean data (no nested data.data)
     const targetUsers = await base44.asServiceRole.entities.User.filter({ id: targetUserId });
     const targetUser = targetUsers[0];
     if (!targetUser) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const existingData = targetUser.data || {};
-    const updatedData = { ...existingData, [moduleKey]: value };
+    // Only keep known permission keys — never merge nested/corrupted data
+    const existing = targetUser.data || {};
+    const cleanData = {
+      can_access_pcs: !!(existing.can_access_pcs),
+      can_access_tradeflow: !!(existing.can_access_tradeflow),
+      [moduleKey]: value,
+    };
 
-    await base44.asServiceRole.entities.User.update(targetUserId, { data: updatedData });
+    await base44.asServiceRole.entities.User.update(targetUserId, { data: cleanData });
 
     return Response.json({ success: true });
   } catch (error) {
