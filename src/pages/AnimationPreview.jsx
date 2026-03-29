@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Paperclip, Link2, ImageIcon, FileText, X, ExternalLink, Upload, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Paperclip, Link2, ImageIcon, FileText, X, ExternalLink, Upload, Plus, Package, Ship, Clock, CheckCircle2, AlertCircle, Truck, ChevronDown, Globe, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { COMPANY_APPS } from "@/lib/constants";
+import ChinaAgentPortalPreview from "@/components/preview/ChinaAgentPortalPreview";
 
 const APPS = COMPANY_APPS;
 
@@ -487,6 +488,9 @@ export default function AnimationPreview() {
             <p className="text-xs text-emerald-700 mt-1">Let me know which layout you'd like applied to the Home page.</p>
           </div>
         </div>
+
+        {/* China Agent Portal Preview Section */}
+        <ChinaAgentPortalPreview />
 
         {/* PCS Attachments Preview Section */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8 mt-6">
