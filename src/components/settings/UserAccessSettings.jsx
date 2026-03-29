@@ -3,183 +3,168 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import {
-  ShieldCheck, Loader2, Users, FileSpreadsheet, TrendingUp,
-  ChevronDown, Plus, X, UserCheck, Crown
+  ShieldCheck, Loader2, FileSpreadsheet, TrendingUp,
+  Crown, Plus, X, UserCheck, Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 // ─── Module definitions ────────────────────────────────────────────────────
-var MODULES = [
+const MODULES = [
   {
     key: 'can_access_pcs',
-    label: 'PCS Module',
-    description: 'Price Comparison Sheets — procurement quoting workflow',
+    label: 'PCS',
+    description: 'Price Comparison Sheets',
     icon: FileSpreadsheet,
-    accent: 'red',
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    border: 'border-red-200',
   },
   {
     key: 'can_access_tradeflow',
-    label: 'TradeFlow Module',
-    description: 'Orders, Shipments, Customers & Suppliers management',
+    label: 'TradeFlow',
+    description: 'Orders & Shipments',
     icon: TrendingUp,
-    accent: 'indigo',
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50',
+    border: 'border-indigo-200',
   },
 ];
 
-var ACCENT = {
-  red:    { border: 'border-red-200',    bg: 'bg-red-50',    icon: 'text-red-600',    badge: 'bg-red-100 text-red-700' },
-  indigo: { border: 'border-indigo-200', bg: 'bg-indigo-50', icon: 'text-indigo-600', badge: 'bg-indigo-100 text-indigo-700' },
-};
-
 // ─── Team Members (localStorage) ──────────────────────────────────────────
-var STORAGE_KEY = 'ssg_team_members';
-var DEFAULT_MEMBERS = ['Najeeb Siddiqui', 'Hilal Ayyaz', 'Jassim Karim', 'Padam Prasad Ghimire', 'Kiptta Christofar', 'Muhammad Umair'];
+const STORAGE_KEY = 'ssg_team_members';
+const DEFAULT_MEMBERS = ['Najeeb Siddiqui', 'Hilal Ayyaz', 'Jassim Karim', 'Padam Prasad Ghimire', 'Kiptta Christofar', 'Muhammad Umair'];
 
 function getStoredMembers() {
   try {
-    var s = localStorage.getItem(STORAGE_KEY);
+    const s = localStorage.getItem(STORAGE_KEY);
     return s ? JSON.parse(s) : DEFAULT_MEMBERS;
   } catch { return DEFAULT_MEMBERS; }
 }
 function saveMembers(list) { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
 
-// ─── Sub-components ────────────────────────────────────────────────────────
-function Avatar({ name, size = 'sm' }) {
-  var initials = (name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  var sz = size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs';
+// ─── Avatar ────────────────────────────────────────────────────────────────
+function Avatar({ name, isAdmin }) {
+  const initials = (name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
   return (
-    <div className={`${sz} rounded-full bg-slate-700 text-white font-bold flex items-center justify-center flex-shrink-0`}>
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${isAdmin ? 'bg-amber-500' : 'bg-slate-600'}`}>
       {initials}
     </div>
   );
 }
 
-function UserPill({ user, onRemove }) {
+// ─── Toggle Switch ─────────────────────────────────────────────────────────
+function ToggleSwitch({ checked, onChange, disabled }) {
   return (
-    <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-full pl-1 pr-2 py-1 shadow-sm">
-      <Avatar name={user.full_name || user.email} />
-      <span className="text-xs font-medium text-slate-700 truncate max-w-[130px]">{user.full_name || user.email}</span>
-      <button onClick={() => onRemove(user)} className="text-slate-300 hover:text-red-500 transition-colors ml-0.5">
-        <X className="w-3 h-3" />
-      </button>
+    <button
+      onClick={() => !disabled && onChange(!checked)}
+      disabled={disabled}
+      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
+      } ${checked ? 'bg-emerald-500' : 'bg-slate-200'}`}
+    >
+      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-4' : 'translate-x-1'}`} />
+    </button>
+  );
+}
+
+// ─── Module Badge ──────────────────────────────────────────────────────────
+function ModuleBadge({ module }) {
+  const Icon = module.icon;
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${module.bg} ${module.color} border ${module.border}`}>
+      <Icon className="w-3 h-3" />
+      {module.label}
     </div>
   );
 }
 
-function AddUserDropdown({ available, onAdd }) {
-  var [open, setOpen] = useState(false);
-  if (available.length === 0) return null;
-  return (
-    <div className="relative">
-      <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8 border-dashed"
-        onClick={() => setOpen(o => !o)}>
-        <Plus className="w-3.5 h-3.5" /> Add User <ChevronDown className="w-3 h-3 text-slate-400" />
-      </Button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-9 z-20 bg-white border border-slate-200 rounded-xl shadow-lg w-60 py-1 overflow-hidden">
-            {available.map(u => (
-              <button key={u.id} onClick={() => { onAdd(u); setOpen(false); }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 text-left transition-colors">
-                <Avatar name={u.full_name || u.email} />
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-800 truncate">{u.full_name || '—'}</p>
-                  <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-function ModuleCard({ module, allUsers, onGrant, onRevoke }) {
-  var a = ACCENT[module.accent];
-  var Icon = module.icon;
-  var admins = allUsers.filter(u => u.role === 'admin');
-  var regularUsers = allUsers.filter(u => u.role !== 'admin');
-  var grantedUsers = regularUsers.filter(u => !!(u[module.key]));
-  var grantedIds = new Set(grantedUsers.map(u => u.id));
-  var available = regularUsers.filter(u => !grantedIds.has(u.id));
+// ─── Main Access Table ─────────────────────────────────────────────────────
+function AccessTable({ allUsers, onToggle }) {
+  const admins = allUsers.filter(u => u.role === 'admin');
+  const regularUsers = allUsers.filter(u => u.role !== 'admin');
 
   return (
-    <div className={`rounded-2xl border-2 ${a.border}`}>
-      {/* Header */}
-      <div className={`${a.bg} px-5 py-4 flex items-start justify-between gap-4`}>
-        <div className="flex items-start gap-3">
-          <div className={`w-9 h-9 rounded-xl ${a.bg} border ${a.border} flex items-center justify-center flex-shrink-0`}>
-            <Icon className={`w-5 h-5 ${a.icon}`} />
+    <div className="rounded-xl border border-slate-200 overflow-hidden">
+      {/* Header row */}
+      <div className="grid bg-slate-50 border-b border-slate-200 px-4 py-3" style={{ gridTemplateColumns: `1fr repeat(${MODULES.length}, 120px)` }}>
+        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">User</div>
+        {MODULES.map(m => (
+          <div key={m.key} className="text-center">
+            <ModuleBadge module={m} />
           </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">{module.label}</h3>
-            <p className="text-xs text-slate-500 mt-0.5">{module.description}</p>
-          </div>
-        </div>
-        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${a.badge}`}>
-          {grantedUsers.length + admins.length} user{(grantedUsers.length + admins.length) !== 1 ? 's' : ''}
-        </span>
+        ))}
       </div>
 
-      {/* Body */}
-      <div className="bg-white px-5 py-4 space-y-4">
-        {/* Admins */}
-        <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <Crown className="w-3 h-3" /> Admins — Always Full Access
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {admins.map(u => (
-              <div key={u.id} className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full pl-1 pr-3 py-1">
-                <div className="w-6 h-6 rounded-full bg-amber-400 text-white text-[10px] font-bold flex items-center justify-center">
-                  {(u.full_name || u.email || '?')[0].toUpperCase()}
-                </div>
-                <span className="text-xs font-medium text-amber-800 truncate max-w-[130px]">{u.full_name || u.email}</span>
+      {/* Admin rows */}
+      {admins.map(u => (
+        <div key={u.id} className="grid items-center px-4 py-3 border-b border-slate-100 bg-amber-50/40" style={{ gridTemplateColumns: `1fr repeat(${MODULES.length}, 120px)` }}>
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar name={u.full_name || u.email} isAdmin />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-slate-900 truncate">{u.full_name || '—'}</p>
+              <p className="text-xs text-slate-400 truncate">{u.email}</p>
+            </div>
+            <span className="flex items-center gap-1 text-[10px] font-semibold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full flex-shrink-0">
+              <Crown className="w-2.5 h-2.5" /> Admin
+            </span>
+          </div>
+          {MODULES.map(m => (
+            <div key={m.key} className="flex justify-center">
+              <Check className="w-4 h-4 text-emerald-500" />
+            </div>
+          ))}
+        </div>
+      ))}
+
+      {/* Regular user rows */}
+      {regularUsers.length === 0 ? (
+        <div className="px-4 py-8 text-center text-sm text-slate-400">No regular users registered yet.</div>
+      ) : (
+        regularUsers.map((u, idx) => (
+          <div
+            key={u.id}
+            className={`grid items-center px-4 py-3 ${idx < regularUsers.length - 1 ? 'border-b border-slate-100' : ''}`}
+            style={{ gridTemplateColumns: `1fr repeat(${MODULES.length}, 120px)` }}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <Avatar name={u.full_name || u.email} isAdmin={false} />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-slate-900 truncate">{u.full_name || '—'}</p>
+                <p className="text-xs text-slate-400 truncate">{u.email}</p>
+              </div>
+            </div>
+            {MODULES.map(m => (
+              <div key={m.key} className="flex justify-center">
+                <ToggleSwitch
+                  checked={!!u[m.key]}
+                  onChange={(val) => onToggle(u, m, val)}
+                />
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="border-t border-slate-100" />
-
-        {/* Granted users */}
-        <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <Users className="w-3 h-3" /> Granted Access
-          </p>
-          <div className="flex flex-wrap gap-2 min-h-[32px]">
-            {grantedUsers.length === 0
-              ? <p className="text-xs text-slate-400 italic self-center">No users granted yet</p>
-              : grantedUsers.map(u => <UserPill key={u.id} user={u} onRemove={u => onRevoke(u, module)} />)
-            }
-          </div>
-        </div>
-
-        <AddUserDropdown available={available} onAdd={u => onGrant(u, module)} />
-      </div>
+        ))
+      )}
     </div>
   );
 }
 
 // ─── Team Members Panel ────────────────────────────────────────────────────
 function TeamMembersPanel() {
-  var [members, setMembers] = useState(getStoredMembers);
-  var [newName, setNewName] = useState('');
+  const [members, setMembers] = useState(getStoredMembers);
+  const [newName, setNewName] = useState('');
 
   function handleAdd() {
-    var t = newName.trim();
+    const t = newName.trim();
     if (!t) return;
     if (members.includes(t)) { toast.error('Already exists'); return; }
-    var updated = [...members, t];
+    const updated = [...members, t];
     setMembers(updated); saveMembers(updated); setNewName('');
-    toast.success(t + ' added');
+    toast.success(`${t} added`);
   }
 
   function handleRemove(name) {
-    var updated = members.filter(m => m !== name);
+    const updated = members.filter(m => m !== name);
     setMembers(updated); saveMembers(updated);
   }
 
@@ -189,7 +174,7 @@ function TeamMembersPanel() {
   }
 
   return (
-    <div className="space-y-4 pt-4 border-t border-slate-100">
+    <div className="space-y-4 pt-6 border-t border-slate-100">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
@@ -223,33 +208,23 @@ function TeamMembersPanel() {
 
 // ─── Main Component ────────────────────────────────────────────────────────
 export default function UserAccessSettings() {
-  var queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-  var { data: rawUsers = [], isLoading } = useQuery({
+  const { data: rawUsers = [], isLoading } = useQuery({
     queryKey: ['all-users'],
     queryFn: () => base44.functions.invoke('getAllUsers', {}).then(r => r.data.users),
   });
 
-  // Service role returns permissions at top level (e.g. u.can_access_pcs)
-  var allUsers = rawUsers.map(u => ({
+  const allUsers = rawUsers.map(u => ({
     ...u,
-    role: u.role || 'user',
+    role: u._app_role || u.role || 'user',
   }));
 
-  function grantAccess(user, module) {
-    base44.functions.invoke('updateUserAccess', { targetUserId: user.id, moduleKey: module.key, value: true })
+  function handleToggle(user, module, value) {
+    base44.functions.invoke('updateUserAccess', { targetUserId: user.id, moduleKey: module.key, value })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['all-users'] });
-        toast.success(`${user.full_name || user.email} granted access to ${module.label}`);
-      })
-      .catch(err => toast.error('Failed: ' + (err.message || err)));
-  }
-
-  function revokeAccess(user, module) {
-    base44.functions.invoke('updateUserAccess', { targetUserId: user.id, moduleKey: module.key, value: false })
-      .then(() => {
-        queryClient.invalidateQueries({ queryKey: ['all-users'] });
-        toast.success(`Access to ${module.label} removed for ${user.full_name || user.email}`);
+        toast.success(`${user.full_name || user.email} — ${module.label} access ${value ? 'granted' : 'revoked'}`);
       })
       .catch(err => toast.error('Failed: ' + (err.message || err)));
   }
@@ -262,6 +237,9 @@ export default function UserAccessSettings() {
     );
   }
 
+  const adminCount = allUsers.filter(u => (u._app_role || u.role) === 'admin').length;
+  const userCount = allUsers.length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -270,29 +248,24 @@ export default function UserAccessSettings() {
           <ShieldCheck className="w-4 h-4" /> Module Access Control
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Admins always have full access. Toggle module access for regular users below.
+          Toggle module access for each user. Admins always have full access.
         </p>
         <p className="text-xs text-slate-400 mt-1">
-          {allUsers.length} user{allUsers.length !== 1 ? 's' : ''} registered
-          &nbsp;·&nbsp; {allUsers.filter(u => u.role === 'admin').length} admin
-          {allUsers.filter(u => u.role === 'admin').length !== 1 ? 's' : ''}
+          {userCount} user{userCount !== 1 ? 's' : ''} · {adminCount} admin{adminCount !== 1 ? 's' : ''}
         </p>
       </div>
 
-      {/* Module cards */}
-      <div className="grid gap-4">
-        {MODULES.map(module => (
-          <ModuleCard
-            key={module.key}
-            module={module}
-            allUsers={allUsers}
-            onGrant={grantAccess}
-            onRevoke={revokeAccess}
-          />
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3">
+        {MODULES.map(m => (
+          <ModuleBadge key={m.key} module={m} />
         ))}
       </div>
 
-      {/* Team members (merged) */}
+      {/* Access Table */}
+      <AccessTable allUsers={allUsers} onToggle={handleToggle} />
+
+      {/* Team members */}
       <TeamMembersPanel />
     </div>
   );
