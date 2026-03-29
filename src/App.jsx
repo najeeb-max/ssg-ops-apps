@@ -28,6 +28,17 @@ const ChinaAgentPortal = lazy(() => import('./pages/ChinaAgentPortal'));
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
+  // China Agent Portal is public — token-authenticated, no login needed
+  if (window.location.pathname === '/china-agent') {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" /></div>}>
+        <Routes>
+          <Route path="/china-agent" element={<ChinaAgentPortal />} />
+        </Routes>
+      </Suspense>
+    );
+  }
+
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
