@@ -49,7 +49,19 @@ export default function PcsDashboard() {
       })
     : sheets;
 
-  if (!userLoading && currentUser && currentUser.role !== 'admin' && !(currentUser.data?.can_access_pcs)) {
+  // Show nothing until we know who the user is
+  if (userLoading || !currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-700 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (currentUser.role !== 'admin' && !(currentUser.data?.can_access_pcs)) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header />

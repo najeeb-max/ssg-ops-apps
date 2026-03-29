@@ -219,7 +219,6 @@ export default function UserAccessSettings() {
 
   const allUsers = rawUsers.map(u => ({
     ...u,
-    role: u._app_role || u.role || 'user',
     // Apply optimistic overrides on top of server data
     ...overrides[u.id],
   }));
@@ -254,7 +253,7 @@ export default function UserAccessSettings() {
     );
   }
 
-  const adminCount = allUsers.filter(u => (u._app_role || u.role) === 'admin').length;
+  const adminCount = allUsers.filter(u => u.role === 'admin').length;
   const userCount = allUsers.length;
 
   return (
