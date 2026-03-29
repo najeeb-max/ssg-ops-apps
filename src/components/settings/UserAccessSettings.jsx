@@ -215,18 +215,35 @@ export default function UserAccessSettings() {
     queryFn: () => base44.functions.invoke('getAllUsers', {}).then(r => r.data.users),
   });
 
+  const [overrides, setOverrides] = useState({});
+
   const allUsers = rawUsers.map(u => ({
     ...u,
     role: u._app_role || u.role || 'user',
+    // Apply optimistic overrides on top of server data
+    ...overrides[u.id],
   }));
 
   function handleToggle(user, module, value) {
+    // Optimistic update immediately
+    setOverrides(prev => ({
+      ...prev,
+      [user.id]: { ...prev[user.id], [module.key]: value },
+    }));
+
     base44.functions.invoke('updateUserAccess', { targetUserId: user.id, moduleKey: module.key, value })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['all-users'] });
         toast.success(`${user.full_name || user.email} — ${module.label} access ${value ? 'granted' : 'revoked'}`);
       })
-      .catch(err => toast.error('Failed: ' + (err.message || err)));
+      .catch(err => {
+        // Revert optimistic update on failure
+        setOverrides(prev => ({
+          ...prev,
+          [user.id]: { ...prev[user.id], [module.key]: !value },
+        }));
+        toast.error('Failed: ' + (err.message || err));
+      });
   }
 
   if (isLoading) {

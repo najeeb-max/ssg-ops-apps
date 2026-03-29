@@ -15,8 +15,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing targetUserId or moduleKey' }, { status: 400 });
     }
 
-    // Update the permission as a top-level field directly on the User entity
-    await base44.asServiceRole.entities.User.update(targetUserId, { [moduleKey]: value });
+    // Fetch current user data first to merge
+    const targetUsers = await base44.asServiceRole.entities.User.filter({ id: targetUserId });
+    const targetUser = targetUsers[0];
+    if (!targetUser) {
+      return Response.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const existingData = targetUser.data || {};
+    const updatedData = { ...existingData, [moduleKey]: value };
+
+    await base44.asServiceRole.entities.User.update(targetUserId, { data: updatedData });
 
     return Response.json({ success: true });
   } catch (error) {

@@ -11,14 +11,19 @@ Deno.serve(async (req) => {
 
     const rawUsers = await base44.asServiceRole.entities.User.list();
 
-    // _app_role is the actual role within this app (admin/user)
-    // Custom fields like can_access_pcs are stored in data.* but also surfaced at top level
-    const users = rawUsers.map(u => ({
-      ...u,
-      role: u._app_role || u.role || 'user',
-      can_access_pcs: !!(u.can_access_pcs || (u.data && u.data.can_access_pcs)),
-      can_access_tradeflow: !!(u.can_access_tradeflow || (u.data && u.data.can_access_tradeflow)),
-    }));
+    // Permissions are stored inside user.data — normalize them here
+    const users = rawUsers.map(u => {
+      const d = u.data || {};
+      return {
+        id: u.id,
+        email: u.email,
+        full_name: u.full_name,
+        role: u.role || 'user',
+        created_date: u.created_date,
+        can_access_pcs: !!(d.can_access_pcs),
+        can_access_tradeflow: !!(d.can_access_tradeflow),
+      };
+    });
 
     return Response.json({ users });
   } catch (error) {
