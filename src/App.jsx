@@ -23,6 +23,7 @@ const TradeflowShipments = lazy(() => import('./pages/TradeflowShipments'));
 const TradeflowCustomers = lazy(() => import('./pages/TradeflowCustomers'));
 const TradeflowSuppliers = lazy(() => import('./pages/TradeflowSuppliers'));
 const Settings = lazy(() => import('./pages/Settings'));
+const ChinaAgentPortal = lazy(() => import('./pages/ChinaAgentPortal'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
         <Route path="suppliers" element={<TradeflowSuppliers />} />
       </Route>
       <Route path="/settings" element={<Settings />} />
+      <Route path="/china-agent" element={<ChinaAgentPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </Suspense>

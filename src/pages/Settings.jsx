@@ -5,11 +5,13 @@ import Header from '@/components/Header';
 import CurrenciesSettings from '@/components/settings/CurrenciesSettings';
 import AppInfoSettings from '@/components/settings/AppInfoSettings';
 import UserAccessSettings from '@/components/settings/UserAccessSettings';
-import { DollarSign, Settings2, ShieldCheck } from 'lucide-react';
+import ChinaAgentTokenSettings from '@/components/settings/ChinaAgentTokenSettings';
+import { DollarSign, Settings2, ShieldCheck, Globe } from 'lucide-react';
 
 const TABS = [
   { id: 'access', label: 'User Access & Team', icon: ShieldCheck },
   { id: 'currencies', label: 'Currencies', icon: DollarSign },
+  { id: 'china_agent', label: 'China Agent', icon: Globe },
   { id: 'app', label: 'App Info', icon: Settings2 },
 ];
 
@@ -62,6 +64,7 @@ export default function Settings() {
         <div className="bg-white border border-slate-200 rounded-2xl p-6">
           {activeTab === 'access' && <UserAccessSettings />}
           {activeTab === 'currencies' && <CurrenciesSettings />}
+          {activeTab === 'china_agent' && <ChinaAgentTokenSettings />}
           {activeTab === 'app' && <AppInfoSettings />}
         </div>
       </div>
