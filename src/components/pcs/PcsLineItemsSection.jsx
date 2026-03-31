@@ -6,6 +6,7 @@ import { Trash2, Package, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import PcsQuickAddItem from "./PcsQuickAddItem";
 import PcsImageImportDropzone from "./PcsImageImportDropzone";
+import LineItemImageAttachment from "./LineItemImageAttachment";
 
 export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }) {
   const queryClient = useQueryClient();
@@ -116,6 +117,7 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-20">Qty</th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-28">Unit Price</th>
                 <th className="text-right py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-32">Total</th>
+                <th className="py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wide w-28">Images</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
@@ -131,6 +133,9 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
                   <td className="py-2.5 px-4 text-right text-slate-700 tabular-nums">QAR {item.selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="py-2.5 px-4 text-right font-semibold text-slate-900 tabular-nums">QAR {item.total_selling_price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="py-2.5 px-4">
+                    <LineItemImageAttachment item={item} canEdit={canEdit} pcsId={pcsId} />
+                  </td>
+                  <td className="py-2.5 px-4">
                     {canEdit && (
                       <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(item.id)}>
                         <Trash2 className="w-3 h-3" />
@@ -142,7 +147,7 @@ export default function PcsLineItemsSection({ pcsId, lineItems, canEdit = true }
             </tbody>
             <tfoot>
               <tr className="bg-slate-50 border-t-2 border-slate-200">
-                <td colSpan={5} className="py-3 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wide">Total Selling Value</td>
+                <td colSpan={6} className="py-3 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wide">Total Selling Value</td>
                 <td className="py-3 px-4 text-right font-bold text-slate-900 tabular-nums text-sm">
                   QAR {lineItems.reduce((sum, i) => sum + (i.total_selling_price || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>

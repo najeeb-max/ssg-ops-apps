@@ -1,0 +1,49 @@
+{
+  "name": "LineItem",
+  "type": "object",
+  "properties": {
+    "pcs_id": {
+      "type": "string",
+      "description": "Reference to PriceComparisonSheet"
+    },
+    "item_number": {
+      "type": "number",
+      "description": "Line item sequence number"
+    },
+    "description": {
+      "type": "string",
+      "description": "Product/item description"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measure (PCS, MTR, PKT, SET, etc.)"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Quantity required"
+    },
+    "selling_price": {
+      "type": "number",
+      "description": "Unit selling price"
+    },
+    "total_selling_price": {
+      "type": "number",
+      "description": "Total selling price (qty \u00d7 unit price)"
+    },
+    "awarded_provider_id": {
+      "type": "string",
+      "description": "ID of the awarded provider for this item"
+    },
+    "image_urls": {
+      "type": "array",
+      "description": "Reference images attached to this line item",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "pcs_id",
+    "description"
+  ]
+}
