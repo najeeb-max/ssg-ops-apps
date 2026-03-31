@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PcsDashboard() {
   const [search, setSearch] = useState("");
+  const [statFilter, setStatFilter] = useState(null); // null | "total" | "completed" | "in_progress" | "awarded"
 
   const { data: currentUser, isLoading: userLoading } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
 
@@ -35,19 +36,19 @@ export default function PcsDashboard() {
     queryFn: () => base44.entities.ProviderQuote.list(),
   });
 
-  const filteredSheets = search.trim()
-    ? sheets.filter((s) => {
-        const q = search.toLowerCase();
-        return (
-          s.client_name?.toLowerCase().includes(q) ||
-          s.pcs_number?.toLowerCase().includes(q) ||
-          s.po_number?.toLowerCase().includes(q) ||
-          s.sq_number?.toLowerCase().includes(q) ||
-          s.rfq_number?.toLowerCase().includes(q) ||
-          s.remarks?.toLowerCase().includes(q)
-        );
-      })
-    : sheets;
+  const filteredSheets = sheets.filter((s) => {
+    const q = search.trim().toLowerCase();
+    const matchesSearch = !q || (
+      s.client_name?.toLowerCase().includes(q) ||
+      s.pcs_number?.toLowerCase().includes(q) ||
+      s.po_number?.toLowerCase().includes(q) ||
+      s.sq_number?.toLowerCase().includes(q) ||
+      s.rfq_number?.toLowerCase().includes(q) ||
+      s.remarks?.toLowerCase().includes(q)
+    );
+    const matchesStat = !statFilter || statFilter === "total" || s.status === statFilter;
+    return matchesSearch && matchesStat;
+  });
 
   // Show nothing until we know who the user is
   if (userLoading || !currentUser) {
@@ -123,10 +124,10 @@ export default function PcsDashboard() {
             </div>
           ) : (
             <>
-              <PcsStatsGrid sheets={sheets} />
+              <PcsStatsGrid sheets={sheets} activeFilter={statFilter} onFilter={(key) => { setStatFilter(key); setSearch(""); }} />
               <PcsRecentSheets
                 sheets={filteredSheets}
-                searchActive={!!search.trim()}
+                searchActive={!!search.trim() || !!statFilter}
                 allProviders={allProviders}
                 allLineItems={allLineItems}
                 allQuotes={allQuotes}
