@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Users, RefreshCw, Loader2 } from "lucide-react";
+import { Plus, Trash2, Users, RefreshCw, Loader2, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useFxRate } from "@/hooks/useFxRate";
 
@@ -131,17 +131,137 @@ function ProviderForm({ pcsId, providerCount, onClose }) {
   );
 }
 
-export default function PcsProvidersSection({ pcsId, providers, canEdit = true }) {
+// Inline editable row for an existing provider
+function ProviderRow({ p, canEdit, pcsId }) {
   const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
+  const { fetchRate, loading: fxLoading } = useFxRate();
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    currency: p.currency || "QAR",
+    exchange_rate: p.exchange_rate || 1,
+    freight_charges: p.freight_charges || 0,
+    delivery_period: p.delivery_period || "",
+    payment_terms: p.payment_terms || "",
+    delivery_terms: p.delivery_terms || "",
+    contact_person: p.contact_person || "",
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => base44.entities.Provider.update(p.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers", pcsId] });
+      toast.success("Provider updated");
+      setEditing(false);
+    },
+  });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Provider.delete(id),
+    mutationFn: () => base44.entities.Provider.delete(p.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providers", pcsId] });
       toast.success("Provider removed");
     },
   });
+
+  const handleCurrencyChange = async (currency) => {
+    setForm((f) => ({ ...f, currency }));
+    if (currency !== "QAR") {
+      const rate = await fetchRate(currency);
+      if (rate) setForm((f) => ({ ...f, exchange_rate: rate }));
+    } else {
+      setForm((f) => ({ ...f, exchange_rate: 1 }));
+    }
+  };
+
+  if (editing) {
+    return (
+      <tr className="bg-blue-50/40 border-y border-blue-100">
+        <td className="py-2 px-3 text-slate-400 font-mono text-xs">{p.provider_number}</td>
+        <td className="py-2 px-3 font-medium text-slate-800">{p.name}</td>
+        <td className="py-2 px-3">
+          <Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} className="h-7 text-xs w-28" />
+        </td>
+        <td className="py-2 px-3">
+          <Input value={form.delivery_period} onChange={(e) => setForm({ ...form, delivery_period: e.target.value })} className="h-7 text-xs w-24" />
+        </td>
+        <td className="py-2 px-3">
+          <Input value={form.payment_terms} onChange={(e) => setForm({ ...form, payment_terms: e.target.value })} className="h-7 text-xs w-24" />
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex items-center gap-1.5">
+            <select
+              value={form.currency}
+              onChange={(e) => handleCurrencyChange(e.target.value)}
+              className="text-xs h-7 border border-input rounded px-1.5 bg-background"
+            >
+              {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            {form.currency !== "QAR" && (
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  value={form.exchange_rate}
+                  onChange={(e) => setForm({ ...form, exchange_rate: e.target.value })}
+                  className="h-7 text-xs w-20"
+                />
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => fetchRate(form.currency).then(r => r && setForm(f => ({ ...f, exchange_rate: r })))} disabled={fxLoading}>
+                  {fxLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                </Button>
+              </div>
+            )}
+          </div>
+        </td>
+        <td className="py-2 px-3 text-right">
+          <Input type="number" value={form.freight_charges} onChange={(e) => setForm({ ...form, freight_charges: e.target.value })} className="h-7 text-xs w-24 ml-auto text-right" />
+        </td>
+        <td className="py-2 px-3">
+          <div className="flex gap-1">
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-600 hover:bg-emerald-50" onClick={() => updateMutation.mutate({ ...form, exchange_rate: parseFloat(form.exchange_rate) || 1, freight_charges: parseFloat(form.freight_charges) || 0 })} disabled={updateMutation.isPending}>
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:bg-slate-100" onClick={() => setEditing(false)}>
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr className="hover:bg-blue-50/30 transition-colors">
+      <td className="py-2 px-3 text-slate-400 font-mono text-xs">{p.provider_number}</td>
+      <td className="py-2 px-3 font-medium text-slate-800">{p.name}</td>
+      <td className="py-2 px-3 text-slate-600">{p.contact_person || "-"}</td>
+      <td className="py-2 px-3 text-slate-600">{p.delivery_period || "-"}</td>
+      <td className="py-2 px-3 text-slate-600">{p.payment_terms || "-"}</td>
+      <td className="py-2 px-3">
+        <Badge variant="outline" className="text-xs font-semibold">{p.currency || "QAR"}</Badge>
+        {p.currency && p.currency !== "QAR" && (
+          <span className="text-xs text-slate-400 ml-1">@ {(p.exchange_rate || 1).toFixed(4)}</span>
+        )}
+      </td>
+      <td className="py-2 px-3 text-right text-slate-600">
+        {p.freight_charges ? `${p.currency || "QAR"} ${Number(p.freight_charges).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : "-"}
+      </td>
+      <td className="py-2 px-3">
+        {canEdit && (
+          <div className="flex gap-1">
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-blue-600 hover:bg-blue-50" onClick={() => setEditing(true)}>
+              <Pencil className="w-3 h-3" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate()}>
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+}
+
+export default function PcsProvidersSection({ pcsId, providers, canEdit = true }) {
+  const [showForm, setShowForm] = useState(false);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
@@ -177,34 +297,12 @@ export default function PcsProvidersSection({ pcsId, providers, canEdit = true }
                   <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Payment</th>
                   <th className="text-left py-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Currency</th>
                   <th className="text-right py-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Freight</th>
-                  <th className="w-8"></th>
+                  <th className="w-16"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {(providers || []).sort((a, b) => (a.provider_number || 0) - (b.provider_number || 0)).map((p, idx) => (
-                  <tr key={p.id} className={`hover:bg-blue-50/30 transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
-                    <td className="py-2 px-3 text-slate-400 font-mono text-xs">{p.provider_number}</td>
-                    <td className="py-2 px-3 font-medium text-slate-800">{p.name}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.contact_person || "-"}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.delivery_period || "-"}</td>
-                    <td className="py-2 px-3 text-slate-600">{p.payment_terms || "-"}</td>
-                    <td className="py-2 px-3">
-                      <Badge variant="outline" className="text-xs font-semibold">{p.currency || "QAR"}</Badge>
-                      {p.currency && p.currency !== "QAR" && (
-                        <span className="text-xs text-slate-400 ml-1">@ {(p.exchange_rate || 1).toFixed(4)}</span>
-                      )}
-                    </td>
-                    <td className="py-2 px-3 text-right text-slate-600">
-                      {p.freight_charges ? `${p.currency || "QAR"} ${Number(p.freight_charges).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : "-"}
-                    </td>
-                    <td className="py-2 px-3">
-                      {canEdit && (
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate(p.id)}>
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
+                {(providers || []).sort((a, b) => (a.provider_number || 0) - (b.provider_number || 0)).map((p) => (
+                  <ProviderRow key={p.id} p={p} canEdit={canEdit} pcsId={pcsId} />
                 ))}
               </tbody>
             </table>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
-  CheckCircle2, XCircle, Clock, Send, UserCog, ChevronDown, RotateCcw
+  CheckCircle2, XCircle, Clock, Send, UserCog, ChevronDown, RotateCcw, Award, Trophy, Loader2
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -93,6 +93,12 @@ export default function PcsApprovalSection({ pcsId, sheet, currentUser }) {
   const revertMutation = useMutation({
     mutationFn: () => base44.entities.PriceComparisonSheet.update(pcsId, { status: "in_progress" }),
     onSuccess: () => { invalidate(); toast.success("Sheet returned to In Progress"); },
+  });
+
+  // Manager/admin marks as Awarded (final step)
+  const awardMutation = useMutation({
+    mutationFn: () => base44.entities.PriceComparisonSheet.update(pcsId, { status: "awarded" }),
+    onSuccess: () => { invalidate(); toast.success("PCS marked as Awarded ✓"); },
   });
 
   // Manager reassigns ownership
@@ -198,6 +204,33 @@ export default function PcsApprovalSection({ pcsId, sheet, currentUser }) {
           </div>
           <p className="text-xs text-slate-600"><strong>By:</strong> {approval.approved_by}</p>
           {approval.remarks && <p className="text-xs text-slate-600 mt-1 italic">"{approval.remarks}"</p>}
+          {isManager && (
+            <Button
+              size="sm"
+              onClick={() => awardMutation.mutate()}
+              disabled={awardMutation.isPending}
+              className="mt-3 bg-violet-600 hover:bg-violet-700 text-white gap-2 text-xs h-8"
+            >
+              {awardMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trophy className="w-3.5 h-3.5" />}
+              Award PCS to Suppliers
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Awarded notice */}
+      {pcsStatus === "awarded" && (
+        <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Award className="w-4 h-4 text-violet-600" />
+            <span className="font-semibold text-violet-700 text-sm">Awarded</span>
+          </div>
+          <p className="text-xs text-slate-600">This PCS has been formally awarded to the selected suppliers.</p>
+          {isManager && (
+            <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs h-7 border-violet-200 text-violet-600" onClick={() => revertMutation.mutate()}>
+              <RotateCcw className="w-3 h-3" /> Revert to In Progress
+            </Button>
+          )}
         </div>
       )}
 

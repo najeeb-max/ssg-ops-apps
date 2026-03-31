@@ -60,7 +60,7 @@ export default function PcsSplitOrderSummary({ lineItems, providers, quotes }) {
                   <span className="font-semibold text-slate-800 text-sm">{p.name}</span>
                   <Badge variant="outline" className="text-xs">{currency}</Badge>
                   {currency !== "QAR" && (
-                    <span className="text-xs text-slate-400">@ {rate.toFixed(4)} per QAR</span>
+                    <span className="text-xs text-slate-400">1 {currency} = {rate.toFixed(4)} QAR</span>
                   )}
                 </div>
                 <div className="text-right">
