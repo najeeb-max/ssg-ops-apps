@@ -68,14 +68,11 @@ export default function OrderFormDialog({ open, onOpenChange, order, draftId, on
   const [activeDraftId, setActiveDraftId] = useState(null);
 
   const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me() });
-  const { data: allOrders = [] } = useQuery({
-    queryKey: ['orders-for-seq'],
-    queryFn: () => base44.entities.Order.list('-created_date', 200),
-    enabled: !order,
-  });
 
-  const generateSSGOrderNumber = () => {
-    const ssgNums = allOrders.map(o => {
+  // Always fetch fresh from server at submit time to avoid stale-cache duplicate numbers
+  const generateSSGOrderNumber = async () => {
+    const freshOrders = await base44.entities.Order.list('-created_date', 500);
+    const ssgNums = freshOrders.map(o => {
       const match = o.alibaba_order_ref?.match(/^SSG-(\d+)$/);
       return match ? parseInt(match[1], 10) : 0;
     }).filter(n => n > 0);
@@ -216,7 +213,8 @@ export default function OrderFormDialog({ open, onOpenChange, order, draftId, on
       toast.success('Order updated successfully');
     } else {
       // Assign SSG order number only NOW when the order is confirmed/created
-      data.alibaba_order_ref = generateSSGOrderNumber();
+      // generateSSGOrderNumber fetches fresh from server to prevent duplicates
+      data.alibaba_order_ref = await generateSSGOrderNumber();
       await base44.entities.Order.create(data);
       // Remove draft if this was created from one
       if (activeDraftId) deleteDraft(activeDraftId);
