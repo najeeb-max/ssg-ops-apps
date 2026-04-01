@@ -11,18 +11,14 @@ import { toast } from 'sonner';
 import SupplierQuotesSection from './SupplierQuotesSection';
 import { CURRENCIES, TEAM_MEMBERS, PLATFORMS, ORDER_STATUSES_HUB, ORDER_STATUSES_DIRECT } from '@/lib/constants';
 import UnsavedDraftDialog from './UnsavedDraftDialog';
-
-const DRAFT_KEY = 'tradeflow_order_draft';
+import { saveDraft, deleteDraft, getDraftById } from '@/lib/orderDrafts';
 
 // Only string fields that a user explicitly types count as meaningful.
-// Numbers stored as 0 or '' are NOT meaningful — only non-empty strings are.
 const MEANINGFUL_FIELDS = [
   'product_name', 'supplier_name', 'supplier_salesperson', 'supplier_wechat',
   'customer_name', 'platform_order_ref', 'domestic_tracking_number',
   'express_tracking_number', 'notes',
 ];
-
-// Numeric fields — only meaningful if > 0
 const MEANINGFUL_NUMERIC_FIELDS = ['quantity', 'unit_price', 'weight_kgs', 'cbm', 'num_cartons'];
 
 function hasMeaningfulData(formData) {
@@ -37,11 +33,7 @@ function hasMeaningfulData(formData) {
   return hasText || hasNumber;
 }
 
-const STATUSES_HUB = ORDER_STATUSES_HUB;
-const STATUSES_DIRECT = ORDER_STATUSES_DIRECT;
-
 const emptyForm = () => ({
-  alibaba_order_ref: '',
   platform_order_ref: '',
   source_platform: 'Alibaba',
   fulfillment_type: 'china_hub',
@@ -67,11 +59,13 @@ const emptyForm = () => ({
   supplier_quotes: [],
 });
 
-export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) {
+export default function OrderFormDialog({ open, onOpenChange, order, draftId, onSaved, onDraftSaved }) {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  // Track which draft we're currently editing (so we can update it, not create a new one)
+  const [activeDraftId, setActiveDraftId] = useState(null);
 
   const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me() });
   const { data: allOrders = [] } = useQuery({
@@ -91,7 +85,9 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
 
   useEffect(() => {
     if (!open) return;
+
     if (order) {
+      // Editing an existing real order
       setForm({
         alibaba_order_ref: order.alibaba_order_ref || '',
         platform_order_ref: order.platform_order_ref || '',
@@ -119,28 +115,26 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
         supplier_quotes: order.supplier_quotes || [],
       });
       setIsDirty(false);
-    } else {
-      // Check for a saved draft first
-      const draft = localStorage.getItem(DRAFT_KEY);
+      setActiveDraftId(null);
+    } else if (draftId) {
+      // Resuming a saved draft — do NOT assign SSG number yet
+      const draft = getDraftById(draftId);
       if (draft) {
-        try {
-          const parsed = JSON.parse(draft);
-          const meaningful = hasMeaningfulData(parsed);
-          setForm(parsed);
-          setIsDirty(meaningful);
-          if (meaningful) toast.info('Draft restored — you have unsaved order data.', { duration: 4000 });
-          else localStorage.removeItem(DRAFT_KEY); // stale empty draft, discard silently
-        } catch {
-          localStorage.removeItem(DRAFT_KEY);
-          setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
-          setIsDirty(false);
-        }
+        setForm({ ...emptyForm(), ...draft.form });
+        setIsDirty(true);
+        setActiveDraftId(draftId);
       } else {
-        setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
+        setForm({ ...emptyForm(), team_member_name: currentUser?.full_name || '' });
         setIsDirty(false);
+        setActiveDraftId(null);
       }
+    } else {
+      // Brand new order — blank form, no SSG number until confirmed
+      setForm({ ...emptyForm(), team_member_name: currentUser?.full_name || '' });
+      setIsDirty(false);
+      setActiveDraftId(null);
     }
-  }, [order, open, currentUser, allOrders]);
+  }, [order, draftId, open, currentUser]);
 
   const set = (field) => (e) => {
     const newForm = { ...form, [field]: e.target.value };
@@ -148,7 +142,6 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
     if (!order) setIsDirty(hasMeaningfulData(newForm));
   };
 
-  // Called when user tries to close the dialog (X button, backdrop, Cancel)
   const handleCloseAttempt = useCallback((requestedOpen) => {
     if (!requestedOpen && !order && isDirty && hasMeaningfulData(form)) {
       setShowDraftDialog(true);
@@ -158,18 +151,22 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   }, [order, isDirty, form, onOpenChange]);
 
   const handleDiscard = () => {
-    localStorage.removeItem(DRAFT_KEY);
+    if (activeDraftId) deleteDraft(activeDraftId);
     setIsDirty(false);
+    setActiveDraftId(null);
     setShowDraftDialog(false);
     onOpenChange(false);
+    onDraftSaved?.(); // refresh draft panel
     toast.success('Draft discarded');
   };
 
   const handleKeepDraft = () => {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+    const newId = saveDraft(form, activeDraftId);
+    setActiveDraftId(newId);
     setShowDraftDialog(false);
     onOpenChange(false);
-    toast.success('Draft saved — it will be restored when you create a new order');
+    onDraftSaved?.(); // refresh draft panel
+    toast.success('Draft saved — resume it anytime from the Orders page');
   };
 
   const handleCancelClose = () => {
@@ -179,11 +176,10 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   const handlePlatformChange = (value) => {
     const platform = PLATFORMS.find(p => p.value === value);
     setForm(f => ({ ...f, source_platform: value, fulfillment_type: platform?.type || 'china_hub' }));
-    // Platform change alone is not meaningful — don't mark dirty
   };
 
   const isDirectExpress = form.fulfillment_type === 'direct_express';
-  const statuses = isDirectExpress ? STATUSES_DIRECT : STATUSES_HUB;
+  const statuses = isDirectExpress ? ORDER_STATUSES_DIRECT : ORDER_STATUSES_HUB;
 
   const totalAmount = form.quantity && form.unit_price
     ? (Number(form.quantity) * Number(form.unit_price)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -204,6 +200,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
     e.preventDefault();
     if (!validate()) return;
     setSaving(true);
+
     const data = {
       ...form,
       quantity: form.quantity ? Number(form.quantity) : undefined,
@@ -213,204 +210,220 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
       cbm: form.cbm ? Number(form.cbm) : undefined,
       num_cartons: form.num_cartons ? Number(form.num_cartons) : undefined,
     };
+
     if (order) {
       await base44.entities.Order.update(order.id, data);
       toast.success('Order updated successfully');
     } else {
+      // Assign SSG order number only NOW when the order is confirmed/created
+      data.alibaba_order_ref = generateSSGOrderNumber();
       await base44.entities.Order.create(data);
-      localStorage.removeItem(DRAFT_KEY); // Clear draft on successful create
-      toast.success('Order created successfully');
+      // Remove draft if this was created from one
+      if (activeDraftId) deleteDraft(activeDraftId);
+      toast.success(`Order ${data.alibaba_order_ref} created successfully`);
     }
+
     setSaving(false);
     setIsDirty(false);
+    setActiveDraftId(null);
     onSaved();
+    onDraftSaved?.();
     onOpenChange(false);
   };
 
-  const selectedPlatform = PLATFORMS.find(p => p.value === form.source_platform);
+  const isDraftMode = !order && !!activeDraftId;
 
   return (
     <>
-    <UnsavedDraftDialog
-      open={showDraftDialog}
-      onDiscard={handleDiscard}
-      onKeep={handleKeepDraft}
-      onCancel={handleCancelClose}
-    />
-    <Dialog open={open} onOpenChange={handleCloseAttempt}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <DialogTitle className="text-lg font-bold">{order ? '✏️ Edit Order' : '+ New Order'}</DialogTitle>
-            <p className="text-xs text-slate-500">{isDirectExpress ? '⚡ Direct Express → Qatar' : '🏭 China Hub Consolidation → Qatar'}</p>
-          </div>
-          {form.alibaba_order_ref && <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{form.alibaba_order_ref}</span>}
-        </div>
-
-        {/* Draft banner — only show when form actually has meaningful user-entered data */}
-        {!order && isDirty && hasMeaningfulData(form) && (
-          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-1 text-xs text-amber-700">
-            <span>📝 Draft restored — finish filling in the details or discard below.</span>
-            <button onClick={handleDiscard} className="underline hover:text-amber-900 ml-2 font-semibold">Discard</button>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Product Section */}
-          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">📦 Product / Commodity</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label>Source Platform</Label>
-                <Select value={form.source_platform} onValueChange={handlePlatformChange}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Alibaba" disabled className="font-semibold text-xs text-slate-400">🏭 China Hub Consolidation</SelectItem>
-                    {PLATFORMS.filter(p => p.type === 'china_hub').map(p => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                    ))}
-                    <SelectItem value="eBay" disabled className="font-semibold text-xs text-slate-400">⚡ Direct to Qatar</SelectItem>
-                    {PLATFORMS.filter(p => p.type === 'direct_express').map(p => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Platform Order Ref #</Label>
-                <Input value={form.platform_order_ref} onChange={set('platform_order_ref')} placeholder="Platform ref..." className="h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Order Date</Label>
-                <Input type="date" value={form.order_date} onChange={set('order_date')} className="h-9" />
-              </div>
+      <UnsavedDraftDialog
+        open={showDraftDialog}
+        onDiscard={handleDiscard}
+        onKeep={handleKeepDraft}
+        onCancel={handleCancelClose}
+      />
+      <Dialog open={open} onOpenChange={handleCloseAttempt}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <DialogTitle className="text-lg font-bold">
+                {order ? '✏️ Edit Order' : isDraftMode ? '📝 Resume Draft' : '+ New Order'}
+              </DialogTitle>
+              <p className="text-xs text-slate-500">
+                {isDirectExpress ? '⚡ Direct Express → Qatar' : '🏭 China Hub Consolidation → Qatar'}
+              </p>
             </div>
-            <div className="space-y-1.5">
-              <Label>Product Name *</Label>
-              <Input value={form.product_name} onChange={set('product_name')} placeholder="e.g. Steel pipes 2 inch..." required className={errors.product_name ? 'border-red-400' : ''} />
-              {errors.product_name && <p className="text-xs text-red-500">{errors.product_name}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label>{isDirectExpress ? 'Seller / Store' : 'Supplier'}</Label>
-              <Input value={form.supplier_name} onChange={set('supplier_name')} placeholder="Supplier name" />
-            </div>
-            {!isDirectExpress && (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label>Sales Contact</Label>
-                  <Input value={form.supplier_salesperson} onChange={set('supplier_salesperson')} placeholder="Contact name" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>WeChat / Phone</Label>
-                  <Input value={form.supplier_wechat} onChange={set('supplier_wechat')} placeholder="WeChat ID" />
-                </div>
-              </div>
+            {/* SSG number only shown on edit of existing order */}
+            {order?.alibaba_order_ref && (
+              <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{order.alibaba_order_ref}</span>
+            )}
+            {!order && (
+              <span className="text-xs bg-amber-100 text-amber-700 border border-amber-200 px-2 py-1 rounded font-medium">
+                {isDraftMode ? '📝 Draft' : 'Order # assigned on confirm'}
+              </span>
             )}
           </div>
 
-          {/* Logistics & Financials */}
-          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Logistics & Financials</p>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label>KGS</Label>
-                <Input type="number" value={form.weight_kgs} onChange={set('weight_kgs')} placeholder="0" className="h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>CBM</Label>
-                <Input type="number" value={form.cbm} onChange={set('cbm')} placeholder="0" className="h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Cartons</Label>
-                <Input type="number" value={form.num_cartons} onChange={set('num_cartons')} placeholder="0" className="h-9" />
-              </div>
+          {/* Draft banner */}
+          {isDraftMode && (
+            <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-1 text-xs text-amber-700">
+              <span>📝 Resuming saved draft — confirm to create the real order.</span>
+              <button onClick={handleDiscard} className="underline hover:text-amber-900 ml-2 font-semibold">Discard Draft</button>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label>Quantity</Label>
-                <Input type="number" value={form.quantity} onChange={set('quantity')} placeholder="0" className="h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Unit Price {totalAmount && <span className="text-emerald-600 font-semibold">= {form.currency} {totalAmount}</span>}</Label>
-                <Input type="number" value={form.unit_price} onChange={set('unit_price')} placeholder="0.00" className="h-9" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Currency</Label>
-                <Select value={form.currency} onValueChange={v => { setForm(f => ({ ...f, currency: v })); }}>
+          )}
 
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Product Section */}
+            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">📦 Product / Commodity</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Source Platform</Label>
+                  <Select value={form.source_platform} onValueChange={handlePlatformChange}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Alibaba" disabled className="font-semibold text-xs text-slate-400">🏭 China Hub Consolidation</SelectItem>
+                      {PLATFORMS.filter(p => p.type === 'china_hub').map(p => (
+                        <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      ))}
+                      <SelectItem value="eBay" disabled className="font-semibold text-xs text-slate-400">⚡ Direct to Qatar</SelectItem>
+                      {PLATFORMS.filter(p => p.type === 'direct_express').map(p => (
+                        <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Platform Order Ref #</Label>
+                  <Input value={form.platform_order_ref} onChange={set('platform_order_ref')} placeholder="Platform ref..." className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Order Date</Label>
+                  <Input type="date" value={form.order_date} onChange={set('order_date')} className="h-9" />
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Tracking & Status */}
-          <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tracking & Status</p>
-            <div className="grid grid-cols-2 gap-3">
-              {isDirectExpress ? (
-                <>
+              <div className="space-y-1.5">
+                <Label>Product Name *</Label>
+                <Input value={form.product_name} onChange={set('product_name')} placeholder="e.g. Steel pipes 2 inch..." required className={errors.product_name ? 'border-red-400' : ''} />
+                {errors.product_name && <p className="text-xs text-red-500">{errors.product_name}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label>{isDirectExpress ? 'Seller / Store' : 'Supplier'}</Label>
+                <Input value={form.supplier_name} onChange={set('supplier_name')} placeholder="Supplier name" />
+              </div>
+              {!isDirectExpress && (
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label>Express Tracking #</Label>
-                    <Input value={form.express_tracking_number} onChange={set('express_tracking_number')} className="h-9" />
+                    <Label>Sales Contact</Label>
+                    <Input value={form.supplier_salesperson} onChange={set('supplier_salesperson')} placeholder="Contact name" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Estimated Delivery to Qatar</Label>
-                    <Input type="date" value={form.estimated_delivery_date} onChange={set('estimated_delivery_date')} className="h-9" />
+                    <Label>WeChat / Phone</Label>
+                    <Input value={form.supplier_wechat} onChange={set('supplier_wechat')} placeholder="WeChat ID" />
                   </div>
-                </>
-              ) : (
-                <div className="space-y-1.5 col-span-2">
-                  <Label>China Domestic Tracking #</Label>
-                  <Input value={form.domestic_tracking_number} onChange={set('domestic_tracking_number')} className="h-9" />
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Status</Label>
-                <Select value={form.status} onValueChange={v => { setForm(f => ({ ...f, status: v })); }}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>{statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
-                </Select>
+
+            {/* Logistics & Financials */}
+            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Logistics & Financials</p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label>KGS</Label>
+                  <Input type="number" value={form.weight_kgs} onChange={set('weight_kgs')} placeholder="0" className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>CBM</Label>
+                  <Input type="number" value={form.cbm} onChange={set('cbm')} placeholder="0" className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Cartons</Label>
+                  <Input type="number" value={form.num_cartons} onChange={set('num_cartons')} placeholder="0" className="h-9" />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <Label>Team Member</Label>
-                <Select value={form.team_member_name} onValueChange={v => { setForm(f => ({ ...f, team_member_name: v })); }}>
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
-                  <SelectContent>{TEAM_MEMBERS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
-                </Select>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Quantity</Label>
+                  <Input type="number" value={form.quantity} onChange={set('quantity')} placeholder="0" className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Unit Price {totalAmount && <span className="text-emerald-600 font-semibold">= {form.currency} {totalAmount}</span>}</Label>
+                  <Input type="number" value={form.unit_price} onChange={set('unit_price')} placeholder="0.00" className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Currency</Label>
+                  <Select value={form.currency} onValueChange={v => setForm(f => ({ ...f, currency: v }))}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
+
+            {/* Tracking & Status */}
+            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tracking & Status</p>
+              <div className="grid grid-cols-2 gap-3">
+                {isDirectExpress ? (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label>Express Tracking #</Label>
+                      <Input value={form.express_tracking_number} onChange={set('express_tracking_number')} className="h-9" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Estimated Delivery to Qatar</Label>
+                      <Input type="date" value={form.estimated_delivery_date} onChange={set('estimated_delivery_date')} className="h-9" />
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-1.5 col-span-2">
+                    <Label>China Domestic Tracking #</Label>
+                    <Input value={form.domestic_tracking_number} onChange={set('domestic_tracking_number')} className="h-9" />
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Status</Label>
+                  <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Team Member</Label>
+                  <Select value={form.team_member_name} onValueChange={v => setForm(f => ({ ...f, team_member_name: v }))}>
+                    <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
+                    <SelectContent>{TEAM_MEMBERS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Customer Name</Label>
+                <Input value={form.customer_name} onChange={set('customer_name')} placeholder="End customer" className="h-9" />
+              </div>
+            </div>
+
+            {/* Supplier Quotes */}
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <SupplierQuotesSection quotes={form.supplier_quotes || []} onChange={v => setForm(f => ({ ...f, supplier_quotes: v }))} />
+            </div>
+
+            {/* Notes */}
             <div className="space-y-1.5">
-              <Label>Customer Name</Label>
-              <Input value={form.customer_name} onChange={set('customer_name')} placeholder="End customer" className="h-9" />
+              <Label>Notes</Label>
+              <Textarea value={form.notes} onChange={set('notes')} rows={2} placeholder="Any additional notes..." />
             </div>
-          </div>
 
-          {/* Supplier Quotes */}
-          <div className="p-4 bg-slate-50 rounded-xl">
-            <SupplierQuotesSection quotes={form.supplier_quotes || []} onChange={v => setForm({ ...form, supplier_quotes: v })} />
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-1.5">
-            <Label>Notes</Label>
-            <Textarea value={form.notes} onChange={set('notes')} rows={2} placeholder="Any additional notes..." />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => handleCloseAttempt(false)}>Cancel</Button>
-            <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
-              {saving ? 'Saving...' : order ? 'Save Changes' : 'Create Order'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => handleCloseAttempt(false)}>Cancel</Button>
+              <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
+                {saving ? 'Saving...' : order ? 'Save Changes' : 'Confirm & Create Order'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

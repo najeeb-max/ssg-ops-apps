@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { Plus, Search, Pencil, Trash2, Zap, Package } from 'lucide-react';
+import OrderDraftsPanel from '../components/tradeflow/orders/OrderDraftsPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +39,8 @@ const platformLogos = {
 export default function TradeflowOrders() {
   const [showForm, setShowForm] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
+  const [resumingDraftId, setResumingDraftId] = useState(null);
+  const [draftRefresh, setDraftRefresh] = useState(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [platformFilter, setPlatformFilter] = useState('all');
@@ -115,7 +118,7 @@ export default function TradeflowOrders() {
             {isDirect ? <><Zap className="w-3 h-3" />Direct</> : <><Package className="w-3 h-3" />Hub</>}
           </span>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingOrder(order); setShowForm(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingOrder(order); setResumingDraftId(null); setShowForm(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
             {isAdmin && <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-300 hover:text-destructive" onClick={() => setDeleteOrder(order)}><Trash2 className="w-3.5 h-3.5" /></Button>}
           </div>
         </div>
@@ -181,7 +184,7 @@ export default function TradeflowOrders() {
                   <td className="py-2.5 px-4 text-xs text-slate-500 font-mono">{tracking || '—'}</td>
                   <td className="py-2.5 px-4">
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingOrder(order); setShowForm(true); }}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingOrder(order); setResumingDraftId(null); setShowForm(true); }}>
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
                       {isAdmin && (
@@ -218,10 +221,16 @@ export default function TradeflowOrders() {
             {orders.length} total · {hubOrders.length} via hub · {directOrders.length} direct
           </p>
         </div>
-        <Button onClick={() => { setEditingOrder(null); setShowForm(true); }} className="bg-indigo-600 hover:bg-indigo-700 gap-1.5">
+        <Button onClick={() => { setEditingOrder(null); setResumingDraftId(null); setShowForm(true); }} className="bg-indigo-600 hover:bg-indigo-700 gap-1.5">
           <Plus className="w-4 h-4" /> New Order
         </Button>
       </div>
+
+      {/* Drafts Panel */}
+      <OrderDraftsPanel
+        refreshTrigger={draftRefresh}
+        onResume={(id) => { setResumingDraftId(id); setEditingOrder(null); setShowForm(true); }}
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
@@ -266,9 +275,11 @@ export default function TradeflowOrders() {
 
       <OrderFormDialog
         open={showForm}
-        onOpenChange={setShowForm}
+        onOpenChange={(v) => { setShowForm(v); if (!v) setResumingDraftId(null); }}
         order={editingOrder}
+        draftId={resumingDraftId}
         onSaved={() => queryClient.invalidateQueries({ queryKey: ['orders'] })}
+        onDraftSaved={() => setDraftRefresh(n => n + 1)}
       />
 
       <AlertDialog open={!!deleteOrder} onOpenChange={() => setDeleteOrder(null)}>
