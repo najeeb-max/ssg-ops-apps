@@ -14,13 +14,27 @@ import UnsavedDraftDialog from './UnsavedDraftDialog';
 
 const DRAFT_KEY = 'tradeflow_order_draft';
 
-// Fields that count as "meaningful" user input (not auto-filled)
-const MEANINGFUL_FIELDS = ['product_name', 'supplier_name', 'supplier_salesperson', 'supplier_wechat',
-  'customer_name', 'platform_order_ref', 'quantity', 'unit_price', 'domestic_tracking_number',
-  'express_tracking_number', 'notes', 'weight_kgs', 'cbm', 'num_cartons'];
+// Only string fields that a user explicitly types count as meaningful.
+// Numbers stored as 0 or '' are NOT meaningful — only non-empty strings are.
+const MEANINGFUL_FIELDS = [
+  'product_name', 'supplier_name', 'supplier_salesperson', 'supplier_wechat',
+  'customer_name', 'platform_order_ref', 'domestic_tracking_number',
+  'express_tracking_number', 'notes',
+];
+
+// Numeric fields — only meaningful if > 0
+const MEANINGFUL_NUMERIC_FIELDS = ['quantity', 'unit_price', 'weight_kgs', 'cbm', 'num_cartons'];
 
 function hasMeaningfulData(formData) {
-  return MEANINGFUL_FIELDS.some(f => formData[f] !== '' && formData[f] !== undefined && formData[f] !== null);
+  const hasText = MEANINGFUL_FIELDS.some(f => {
+    const v = formData[f];
+    return typeof v === 'string' && v.trim() !== '';
+  });
+  const hasNumber = MEANINGFUL_NUMERIC_FIELDS.some(f => {
+    const v = Number(formData[f]);
+    return !isNaN(v) && v > 0;
+  });
+  return hasText || hasNumber;
 }
 
 const STATUSES_HUB = ORDER_STATUSES_HUB;
@@ -165,7 +179,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   const handlePlatformChange = (value) => {
     const platform = PLATFORMS.find(p => p.value === value);
     setForm(f => ({ ...f, source_platform: value, fulfillment_type: platform?.type || 'china_hub' }));
-    if (!order) setIsDirty(true);
+    // Platform change alone is not meaningful — don't mark dirty
   };
 
   const isDirectExpress = form.fulfillment_type === 'direct_express';
@@ -233,8 +247,8 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
           {form.alibaba_order_ref && <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{form.alibaba_order_ref}</span>}
         </div>
 
-        {/* Draft banner */}
-        {!order && isDirty && (
+        {/* Draft banner — only show when form actually has meaningful user-entered data */}
+        {!order && isDirty && hasMeaningfulData(form) && (
           <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-1 text-xs text-amber-700">
             <span>📝 Draft restored — finish filling in the details or discard below.</span>
             <button onClick={handleDiscard} className="underline hover:text-amber-900 ml-2 font-semibold">Discard</button>
@@ -324,7 +338,8 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
               </div>
               <div className="space-y-1.5">
                 <Label>Currency</Label>
-                <Select value={form.currency} onValueChange={v => { setForm(f => ({ ...f, currency: v })); if (!order) setIsDirty(true); }}>
+                <Select value={form.currency} onValueChange={v => { setForm(f => ({ ...f, currency: v })); }}>
+
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                 </Select>
@@ -357,14 +372,14 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Status</Label>
-                <Select value={form.status} onValueChange={v => { setForm(f => ({ ...f, status: v })); if (!order) setIsDirty(true); }}>
+                <Select value={form.status} onValueChange={v => { setForm(f => ({ ...f, status: v })); }}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>{statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>Team Member</Label>
-                <Select value={form.team_member_name} onValueChange={v => { setForm(f => ({ ...f, team_member_name: v })); if (!order) setIsDirty(true); }}>
+                <Select value={form.team_member_name} onValueChange={v => { setForm(f => ({ ...f, team_member_name: v })); }}>
                   <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>{TEAM_MEMBERS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                 </Select>
