@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,9 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import SupplierQuotesSection from './SupplierQuotesSection';
 import { CURRENCIES, TEAM_MEMBERS, PLATFORMS, ORDER_STATUSES_HUB, ORDER_STATUSES_DIRECT } from '@/lib/constants';
+import UnsavedDraftDialog from './UnsavedDraftDialog';
+
+const DRAFT_KEY = 'tradeflow_order_draft';
 
 const STATUSES_HUB = ORDER_STATUSES_HUB;
 const STATUSES_DIRECT = ORDER_STATUSES_DIRECT;
@@ -44,6 +47,8 @@ const emptyForm = () => ({
 export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me() });
   const { data: allOrders = [] } = useQuery({
@@ -62,6 +67,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   };
 
   useEffect(() => {
+    if (!open) return;
     if (order) {
       setForm({
         alibaba_order_ref: order.alibaba_order_ref || '',
@@ -89,16 +95,65 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
         notes: order.notes || '',
         supplier_quotes: order.supplier_quotes || [],
       });
+      setIsDirty(false);
     } else {
-      setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
+      // Check for a saved draft first
+      const draft = localStorage.getItem(DRAFT_KEY);
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          setForm(parsed);
+          setIsDirty(true);
+          toast.info('Draft restored — you have unsaved order data.', { duration: 4000 });
+        } catch {
+          localStorage.removeItem(DRAFT_KEY);
+          setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
+          setIsDirty(false);
+        }
+      } else {
+        setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
+        setIsDirty(false);
+      }
     }
   }, [order, open, currentUser, allOrders]);
 
-  const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+  const set = (field) => (e) => {
+    setForm(f => ({ ...f, [field]: e.target.value }));
+    if (!order) setIsDirty(true);
+  };
+
+  // Called when user tries to close the dialog (X button, backdrop, Cancel)
+  const handleCloseAttempt = useCallback((requestedOpen) => {
+    if (!requestedOpen && !order && isDirty) {
+      setShowDraftDialog(true);
+    } else {
+      onOpenChange(requestedOpen);
+    }
+  }, [order, isDirty, onOpenChange]);
+
+  const handleDiscard = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setIsDirty(false);
+    setShowDraftDialog(false);
+    onOpenChange(false);
+    toast.success('Draft discarded');
+  };
+
+  const handleKeepDraft = () => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+    setShowDraftDialog(false);
+    onOpenChange(false);
+    toast.success('Draft saved — it will be restored when you create a new order');
+  };
+
+  const handleCancelClose = () => {
+    setShowDraftDialog(false);
+  };
 
   const handlePlatformChange = (value) => {
     const platform = PLATFORMS.find(p => p.value === value);
     setForm(f => ({ ...f, source_platform: value, fulfillment_type: platform?.type || 'china_hub' }));
+    if (!order) setIsDirty(true);
   };
 
   const isDirectExpress = form.fulfillment_type === 'direct_express';
@@ -137,9 +192,11 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
       toast.success('Order updated successfully');
     } else {
       await base44.entities.Order.create(data);
+      localStorage.removeItem(DRAFT_KEY); // Clear draft on successful create
       toast.success('Order created successfully');
     }
     setSaving(false);
+    setIsDirty(false);
     onSaved();
     onOpenChange(false);
   };
@@ -147,7 +204,14 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   const selectedPlatform = PLATFORMS.find(p => p.value === form.source_platform);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+    <UnsavedDraftDialog
+      open={showDraftDialog}
+      onDiscard={handleDiscard}
+      onKeep={handleKeepDraft}
+      onCancel={handleCancelClose}
+    />
+    <Dialog open={open} onOpenChange={handleCloseAttempt}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -156,6 +220,14 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
           </div>
           {form.alibaba_order_ref && <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{form.alibaba_order_ref}</span>}
         </div>
+
+        {/* Draft banner */}
+        {!order && isDirty && localStorage.getItem(DRAFT_KEY) && (
+          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-1 text-xs text-amber-700">
+            <span>📝 Draft restored — finish filling in the details or discard below.</span>
+            <button onClick={handleDiscard} className="underline hover:text-amber-900 ml-2 font-semibold">Discard</button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Product Section */}
@@ -240,7 +312,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
               </div>
               <div className="space-y-1.5">
                 <Label>Currency</Label>
-                <Select value={form.currency} onValueChange={v => setForm({ ...form, currency: v })}>
+                <Select value={form.currency} onValueChange={v => { setForm(f => ({ ...f, currency: v })); if (!order) setIsDirty(true); }}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                 </Select>
@@ -273,14 +345,14 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Status</Label>
-                <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
+                <Select value={form.status} onValueChange={v => { setForm(f => ({ ...f, status: v })); if (!order) setIsDirty(true); }}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>{statuses.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>Team Member</Label>
-                <Select value={form.team_member_name} onValueChange={v => setForm({ ...form, team_member_name: v })}>
+                <Select value={form.team_member_name} onValueChange={v => { setForm(f => ({ ...f, team_member_name: v })); if (!order) setIsDirty(true); }}>
                   <SelectTrigger className="h-9"><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>{TEAM_MEMBERS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                 </Select>
@@ -304,7 +376,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => handleCloseAttempt(false)}>Cancel</Button>
             <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700">
               {saving ? 'Saving...' : order ? 'Save Changes' : 'Create Order'}
             </Button>
@@ -312,5 +384,6 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
