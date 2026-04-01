@@ -222,7 +222,7 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
         </div>
 
         {/* Draft banner */}
-        {!order && isDirty && localStorage.getItem(DRAFT_KEY) && (
+        {!order && isDirty && (
           <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-1 text-xs text-amber-700">
             <span>📝 Draft restored — finish filling in the details or discard below.</span>
             <button onClick={handleDiscard} className="underline hover:text-amber-900 ml-2 font-semibold">Discard</button>
