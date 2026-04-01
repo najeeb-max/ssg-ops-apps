@@ -14,6 +14,15 @@ import UnsavedDraftDialog from './UnsavedDraftDialog';
 
 const DRAFT_KEY = 'tradeflow_order_draft';
 
+// Fields that count as "meaningful" user input (not auto-filled)
+const MEANINGFUL_FIELDS = ['product_name', 'supplier_name', 'supplier_salesperson', 'supplier_wechat',
+  'customer_name', 'platform_order_ref', 'quantity', 'unit_price', 'domestic_tracking_number',
+  'express_tracking_number', 'notes', 'weight_kgs', 'cbm', 'num_cartons'];
+
+function hasMeaningfulData(formData) {
+  return MEANINGFUL_FIELDS.some(f => formData[f] !== '' && formData[f] !== undefined && formData[f] !== null);
+}
+
 const STATUSES_HUB = ORDER_STATUSES_HUB;
 const STATUSES_DIRECT = ORDER_STATUSES_DIRECT;
 
@@ -102,9 +111,11 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
       if (draft) {
         try {
           const parsed = JSON.parse(draft);
+          const meaningful = hasMeaningfulData(parsed);
           setForm(parsed);
-          setIsDirty(true);
-          toast.info('Draft restored — you have unsaved order data.', { duration: 4000 });
+          setIsDirty(meaningful);
+          if (meaningful) toast.info('Draft restored — you have unsaved order data.', { duration: 4000 });
+          else localStorage.removeItem(DRAFT_KEY); // stale empty draft, discard silently
         } catch {
           localStorage.removeItem(DRAFT_KEY);
           setForm({ ...emptyForm(), alibaba_order_ref: generateSSGOrderNumber(), team_member_name: currentUser?.full_name || '' });
@@ -118,18 +129,19 @@ export default function OrderFormDialog({ open, onOpenChange, order, onSaved }) 
   }, [order, open, currentUser, allOrders]);
 
   const set = (field) => (e) => {
-    setForm(f => ({ ...f, [field]: e.target.value }));
-    if (!order) setIsDirty(true);
+    const newForm = { ...form, [field]: e.target.value };
+    setForm(newForm);
+    if (!order) setIsDirty(hasMeaningfulData(newForm));
   };
 
   // Called when user tries to close the dialog (X button, backdrop, Cancel)
   const handleCloseAttempt = useCallback((requestedOpen) => {
-    if (!requestedOpen && !order && isDirty) {
+    if (!requestedOpen && !order && isDirty && hasMeaningfulData(form)) {
       setShowDraftDialog(true);
     } else {
       onOpenChange(requestedOpen);
     }
-  }, [order, isDirty, onOpenChange]);
+  }, [order, isDirty, form, onOpenChange]);
 
   const handleDiscard = () => {
     localStorage.removeItem(DRAFT_KEY);
