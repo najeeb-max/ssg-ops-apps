@@ -26,29 +26,47 @@ Deno.serve(async (req) => {
 
     // ── GET orders ───────────────────────────────────────────────────────────
     if (action === 'getOrders') {
-      const allOrders = await base44.asServiceRole.entities.Order.list('-created_date', 500);
+      const [allOrders, allShipments] = await Promise.all([
+        base44.asServiceRole.entities.Order.list('-created_date', 500),
+        base44.asServiceRole.entities.Shipment.list('-created_date', 200),
+      ]);
+
+      // Build a quick lookup: shipment_id → shipment
+      const shipmentMap = {};
+      for (const s of allShipments) {
+        shipmentMap[s.id] = s;
+      }
+
       // Only China Hub orders — strip financial & customer data
       const chinaHubOrders = allOrders
         .filter(o => o.fulfillment_type === 'china_hub')
-        .map(o => ({
-          id: o.id,
-          alibaba_order_ref: o.alibaba_order_ref,
-          platform_order_ref: o.platform_order_ref,
-          product_name: o.product_name,
-          quantity: o.quantity,
-          unit: o.unit,
-          supplier_name: o.supplier_name,
-          supplier_wechat: o.supplier_wechat,
-          supplier_salesperson: o.supplier_salesperson,
-          status: o.status,
-          domestic_tracking_number: o.domestic_tracking_number,
-          estimated_delivery_date: o.estimated_delivery_date,
-          order_date: o.order_date,
-          weight_kgs: o.weight_kgs,
-          num_cartons: o.num_cartons,
-          notes: o.notes,
-          // Intentionally excluded: customer_name, customer_id, unit_price, total_amount, team_member_name, express_tracking_number
-        }));
+        .map(o => {
+          const shipment = o.shipment_id ? shipmentMap[o.shipment_id] : null;
+          return {
+            id: o.id,
+            alibaba_order_ref: o.alibaba_order_ref,
+            platform_order_ref: o.platform_order_ref,
+            product_name: o.product_name,
+            quantity: o.quantity,
+            unit: o.unit,
+            supplier_name: o.supplier_name,
+            supplier_wechat: o.supplier_wechat,
+            supplier_salesperson: o.supplier_salesperson,
+            status: o.status,
+            domestic_tracking_number: o.domestic_tracking_number,
+            estimated_delivery_date: o.estimated_delivery_date,
+            order_date: o.order_date,
+            weight_kgs: o.weight_kgs,
+            num_cartons: o.num_cartons,
+            notes: o.notes,
+            shipment_id: o.shipment_id || null,
+            shipment_number: shipment?.shipment_number || null,
+            shipment_status: shipment?.status || null,
+            shipment_carrier: shipment?.carrier || null,
+            shipment_arrival_date: shipment?.arrival_date || null,
+            // Intentionally excluded: customer_name, customer_id, unit_price, total_amount, team_member_name, express_tracking_number
+          };
+        });
 
       return Response.json({ orders: chinaHubOrders });
     }

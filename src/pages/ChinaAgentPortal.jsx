@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw } from "lucide-react";
+import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -86,15 +86,56 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
   );
 }
 
+const shipmentStatusColors = {
+  preparing:  'bg-slate-100 text-slate-600',
+  booked:     'bg-blue-100 text-blue-700',
+  in_transit: 'bg-indigo-100 text-indigo-700',
+  customs:    'bg-amber-100 text-amber-700',
+  delivered:  'bg-emerald-100 text-emerald-700',
+  cancelled:  'bg-red-100 text-red-600',
+};
+
+function ShipmentTag({ order }) {
+  if (order.shipment_number) {
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-2.5 py-1 rounded-full">
+          <Ship className="w-3 h-3" /> {order.shipment_number}
+        </span>
+        {order.shipment_status && (
+          <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full capitalize ${shipmentStatusColors[order.shipment_status] || 'bg-slate-100 text-slate-600'}`}>
+            {order.shipment_status.replace(/_/g, ' ')}
+          </span>
+        )}
+        {order.shipment_carrier && (
+          <span className="text-xs text-slate-400">{order.shipment_carrier}</span>
+        )}
+        {order.shipment_arrival_date && (
+          <span className="text-xs text-slate-400">ETA: {order.shipment_arrival_date}</span>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-1.5">
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+        <AlertTriangle className="w-3 h-3" /> Not yet assigned to a shipment
+      </span>
+    </div>
+  );
+}
+
 function OrderCard({ order, onUpdate }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+    <div className={`bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow ${order.shipment_number ? 'border-slate-200' : 'border-amber-200'}`}>
       <div className="px-4 py-3 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Package className="w-4 h-4 text-indigo-600" />
+          <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 mt-0.5 ${order.shipment_number ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'}`}>
+            {order.shipment_number
+              ? <Ship className="w-4 h-4 text-emerald-600" />
+              : <Package className="w-4 h-4 text-amber-500" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2 mb-0.5">
@@ -107,6 +148,7 @@ function OrderCard({ order, onUpdate }) {
               {order.supplier_name ? ` · ${order.supplier_name}` : ''}
               {order.weight_kgs ? ` · ${order.weight_kgs} kg` : ''}
             </p>
+            <ShipmentTag order={order} />
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -205,9 +247,20 @@ export default function ChinaAgentPortal() {
     total: orders.length,
     atHub: orders.filter(o => o.status === 'received_at_hub').length,
     inTransit: orders.filter(o => o.status === 'in_transit').length,
-    pending: orders.filter(o => o.status === 'pending' || o.status === 'confirmed').length,
+    notBooked: orders.filter(o => !o.shipment_id && o.status !== 'delivered').length,
     delivered: orders.filter(o => o.status === 'delivered').length,
   };
+
+  // Sort: unbooked active orders first, then booked, then delivered
+  const sortedOrders = [...orders].sort((a, b) => {
+    const aBooked = !!a.shipment_id;
+    const bBooked = !!b.shipment_id;
+    const aDone = a.status === 'delivered';
+    const bDone = b.status === 'delivered';
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    if (aBooked !== bBooked) return aBooked ? 1 : -1;
+    return 0;
+  });
 
   // ── No token ─────────────────────────────────────────────────────────────
   if (!loading && error === 'no_token') {
@@ -282,6 +335,23 @@ export default function ChinaAgentPortal() {
               </div>
             ))}
           </div>
+          {/* Booking status summary bar */}
+          <div className="mt-3 flex items-center justify-between bg-white/10 rounded-xl px-3 py-2">
+            <div className="flex items-center gap-2">
+              <Ship className="w-4 h-4 text-emerald-300" />
+              <span className="text-sm font-semibold text-white">{orders.length - stats.notBooked} booked</span>
+              <span className="text-indigo-300 text-xs">into shipments</span>
+            </div>
+            {stats.notBooked > 0 && (
+              <div className="flex items-center gap-1.5 bg-amber-400/30 border border-amber-300/30 rounded-lg px-2.5 py-1">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+                <span className="text-sm font-bold text-amber-200">{stats.notBooked} unbooked</span>
+              </div>
+            )}
+            {stats.notBooked === 0 && (
+              <span className="text-xs text-emerald-300 font-medium">✓ All booked</span>
+            )}
+          </div>
 
           {lastRefresh && (
             <p className="text-indigo-300 text-[11px] mt-2 text-right">
@@ -293,17 +363,24 @@ export default function ChinaAgentPortal() {
 
       {/* Orders */}
       <div className="max-w-3xl mx-auto px-4 py-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-          {orders.length} China Hub Order{orders.length !== 1 ? 's' : ''} · Tap to expand · Use "Update" to change status
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            {orders.length} China Hub Order{orders.length !== 1 ? 's' : ''} · Tap to expand
+          </p>
+          {stats.notBooked > 0 && (
+            <span className="text-xs font-semibold text-amber-600 flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5" />{stats.notBooked} awaiting booking — shown first
+            </span>
+          )}
+        </div>
 
-        {orders.length === 0 ? (
+        {sortedOrders.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No China Hub orders at the moment.</p>
           </div>
         ) : (
-          orders.map(order => (
+          sortedOrders.map(order => (
             <OrderCard key={order.id} order={order} onUpdate={handleUpdate} />
           ))
         )}

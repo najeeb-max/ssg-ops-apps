@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { ShoppingCart, TrendingUp, Clock, Package, ArrowRight, Ship } from 'lucide-react';
+import { ShoppingCart, TrendingUp, Clock, Package, ArrowRight, Ship, AlertTriangle } from 'lucide-react';
 import StatCard from '../components/tradeflow/dashboard/StatCard';
 import { Link } from 'react-router-dom';
 
@@ -27,12 +27,19 @@ export default function TradeflowDashboard() {
     staleTime: 30_000,
   });
 
+  const shipmentMap = useMemo(() => {
+    const m = {};
+    shipments.forEach(s => { m[s.id] = s; });
+    return m;
+  }, [shipments]);
+
   const totalValue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
   const activeShipments = shipments.filter(s => !s.received_in_qatar && s.status !== 'cancelled').length;
   const hubOrders = orders.filter(o => o.fulfillment_type !== 'direct_express');
   const directOrders = orders.filter(o => o.fulfillment_type === 'direct_express');
   const unassignedOrders = hubOrders.filter(o => !o.shipment_id && ['pending', 'confirmed', 'received_at_hub'].includes(o.status)).length;
+  const activeOrders = orders.filter(o => ['pending', 'confirmed', 'received_at_hub', 'in_transit'].includes(o.status));
 
   if (ordersLoading) {
     return (
@@ -52,10 +59,22 @@ export default function TradeflowDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard title="Total Orders" value={orders.length} subtitle={`${pendingOrders} pending`} icon={ShoppingCart} color="indigo" />
-        <StatCard title="Active Shipments" value={activeShipments} subtitle={`${unassignedOrders} unassigned`} icon={Ship} color="amber" />
-        <StatCard title="Pending" value={pendingOrders} subtitle="Awaiting confirmation" icon={Clock} color="rose" />
+        <StatCard title="Active Shipments" value={activeShipments} subtitle={`${shipments.length} total`} icon={Ship} color="emerald" />
+        <StatCard title="Unbooked Hub Orders" value={unassignedOrders} subtitle="Need shipment assignment" icon={AlertTriangle} color="amber" />
         <StatCard title="Total Value" value={totalValue > 0 ? `$${totalValue.toLocaleString()}` : '—'} icon={TrendingUp} color="rose" />
       </div>
+
+      {/* Unbooked alert */}
+      {unassignedOrders > 0 && (
+        <Link to="/tradeflow/orders" className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 hover:bg-amber-100 transition-colors group">
+          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800">{unassignedOrders} China Hub order{unassignedOrders !== 1 ? 's' : ''} not yet assigned to a shipment</p>
+            <p className="text-xs text-amber-600">These orders need to be booked into a shipment before they can be consolidated.</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      )}
 
       {/* Quick Access */}
       <div className="grid grid-cols-3 gap-4">
@@ -82,18 +101,35 @@ export default function TradeflowDashboard() {
           </Link>
         </div>
         <div className="divide-y divide-slate-50">
-          {orders.filter(o => ['pending', 'confirmed', 'received_at_hub', 'in_transit'].includes(o.status)).slice(0, 8).map(order => (
-            <div key={order.id} className="px-4 py-2.5 flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-800 truncate">{order.product_name}</p>
-                <p className="text-xs text-slate-400">{[order.supplier_name, order.team_member_name].filter(Boolean).join(' · ')}</p>
+          {activeOrders.slice(0, 10).map(order => {
+            const shipment = order.shipment_id ? shipmentMap[order.shipment_id] : null;
+            const isDirect = order.fulfillment_type === 'direct_express';
+            return (
+              <div key={order.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-slate-800 truncate">{order.product_name}</p>
+                  <p className="text-xs text-slate-400">{[order.supplier_name, order.team_member_name].filter(Boolean).join(' · ')}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusStyles[order.status] || 'bg-slate-100 text-slate-500'}`}>
+                    {order.status?.replace(/_/g, ' ')}
+                  </span>
+                  {isDirect ? (
+                    <span className="text-xs text-slate-300 italic hidden sm:inline">Direct</span>
+                  ) : shipment ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                      <Ship className="w-3 h-3" />{shipment.shipment_number}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                      <AlertTriangle className="w-3 h-3" />Not Booked
+                    </span>
+                  )}
+                </div>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${statusStyles[order.status] || 'bg-slate-100 text-slate-500'}`}>
-                {order.status?.replace(/_/g, ' ')}
-              </span>
-            </div>
-          ))}
-          {orders.filter(o => ['pending', 'confirmed', 'received_at_hub', 'in_transit'].includes(o.status)).length === 0 && (
+            );
+          })}
+          {activeOrders.length === 0 && (
             <p className="text-sm text-slate-400 text-center py-8">No active orders.</p>
           )}
         </div>

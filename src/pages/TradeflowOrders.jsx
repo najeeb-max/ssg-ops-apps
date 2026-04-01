@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
-import { Plus, Search, Pencil, Trash2, Zap, Package } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Zap, Package, Ship, AlertTriangle } from 'lucide-react';
 import OrderDraftsPanel from '../components/tradeflow/orders/OrderDraftsPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,7 @@ export default function TradeflowOrders() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [platformFilter, setPlatformFilter] = useState('all');
+  const [bookingFilter, setBookingFilter] = useState('all'); // 'all' | 'booked' | 'unbooked'
   const [deleteOrder, setDeleteOrder] = useState(null);
   const queryClient = useQueryClient();
 
@@ -52,6 +53,19 @@ export default function TradeflowOrders() {
     queryFn: () => base44.entities.Order.list('-created_date', 200),
     staleTime: 30_000,
   });
+
+  const { data: shipments = [] } = useQuery({
+    queryKey: ['shipments'],
+    queryFn: () => base44.entities.Shipment.list('-created_date'),
+    staleTime: 30_000,
+  });
+
+  // Quick lookup map: shipment_id → shipment
+  const shipmentMap = useMemo(() => {
+    const m = {};
+    shipments.forEach(s => { m[s.id] = s; });
+    return m;
+  }, [shipments]);
 
   const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
   const isAdmin = currentUser?.role === 'admin';
@@ -81,7 +95,8 @@ export default function TradeflowOrders() {
       (statusFilter === 'all' || o.status === statusFilter) &&
       (platformFilter === 'all' || o.source_platform === platformFilter ||
         (platformFilter === 'direct' && o.fulfillment_type === 'direct_express') ||
-        (platformFilter === 'hub' && o.fulfillment_type !== 'direct_express'));
+        (platformFilter === 'hub' && o.fulfillment_type !== 'direct_express')) &&
+      (bookingFilter === 'all' || (bookingFilter === 'booked' && !!o.shipment_id) || (bookingFilter === 'unbooked' && !o.shipment_id));
 
     return {
       activeOrders: orders.filter(o => ACTIVE_STATUSES.includes(o.status) && filterOrder(o)),
@@ -105,6 +120,7 @@ export default function TradeflowOrders() {
   const OrderCard = ({ order }) => {
     const isDirect = order.fulfillment_type === 'direct_express';
     const tracking = isDirect ? order.express_tracking_number : order.domestic_tracking_number;
+    const shipment = order.shipment_id ? shipmentMap[order.shipment_id] : null;
     return (
       <div className="p-4 border-b border-slate-100 last:border-0">
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -113,10 +129,21 @@ export default function TradeflowOrders() {
         </div>
         <p className="text-xs text-slate-400">{order.customer_name || ''}{order.supplier_name ? ` · ${order.supplier_name}` : ''}</p>
         {tracking && <p className="text-xs text-slate-400 font-mono mt-1">{tracking}</p>}
-        <div className="flex items-center justify-between mt-2">
-          <span className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-0.5 ${isDirect ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
-            {isDirect ? <><Zap className="w-3 h-3" />Direct</> : <><Package className="w-3 h-3" />Hub</>}
-          </span>
+        <div className="flex items-center justify-between mt-2 flex-wrap gap-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-0.5 ${isDirect ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+              {isDirect ? <><Zap className="w-3 h-3" />Direct</> : <><Package className="w-3 h-3" />Hub</>}
+            </span>
+            {shipment ? (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-0.5 font-medium">
+                <Ship className="w-3 h-3" />{shipment.shipment_number}
+              </span>
+            ) : !isDirect && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 flex items-center gap-0.5">
+                <AlertTriangle className="w-3 h-3" />No Shipment
+              </span>
+            )}
+          </div>
           <div className="flex gap-1">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingOrder(order); setResumingDraftId(null); setShowForm(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
             {isAdmin && <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-300 hover:text-destructive" onClick={() => setDeleteOrder(order)}><Trash2 className="w-3.5 h-3.5" /></Button>}
@@ -138,6 +165,7 @@ export default function TradeflowOrders() {
               <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase">Supplier / Seller</th>
               <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase">Person</th>
               <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
+              <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase">Booking / Shipment</th>
               <th className="text-left py-2.5 px-4 text-xs font-semibold text-slate-500 uppercase">Tracking</th>
               <th className="w-20"></th>
             </tr>
@@ -147,6 +175,7 @@ export default function TradeflowOrders() {
               const isDirect = order.fulfillment_type === 'direct_express';
               const tracking = isDirect ? order.express_tracking_number : order.domestic_tracking_number;
               const logo = platformLogos[order.source_platform];
+              const shipment = order.shipment_id ? shipmentMap[order.shipment_id] : null;
               return (
                 <tr key={order.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-2.5 px-4">
@@ -181,6 +210,23 @@ export default function TradeflowOrders() {
                       <p className="text-xs text-slate-400 mt-0.5">ETA: {order.estimated_delivery_date}</p>
                     )}
                   </td>
+                  <td className="py-2.5 px-4">
+                    {isDirect ? (
+                      <span className="text-xs text-slate-300 italic">Direct Route</span>
+                    ) : shipment ? (
+                      <div>
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          <Ship className="w-3 h-3" />{shipment.shipment_number}
+                        </span>
+                        <p className="text-xs text-slate-400 mt-0.5 capitalize">{shipment.status?.replace(/_/g, ' ')}{shipment.carrier ? ` · ${shipment.carrier}` : ''}</p>
+                        {shipment.arrival_date && <p className="text-xs text-slate-400">ETA: {shipment.arrival_date}</p>}
+                      </div>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                        <AlertTriangle className="w-3 h-3" />Not Booked
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2.5 px-4 text-xs text-slate-500 font-mono">{tracking || '—'}</td>
                   <td className="py-2.5 px-4">
                     <div className="flex gap-1">
@@ -198,7 +244,7 @@ export default function TradeflowOrders() {
               );
             })}
             {list.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-10 text-slate-400 text-sm">No orders found.</td></tr>
+              <tr><td colSpan={8} className="text-center py-10 text-slate-400 text-sm">No orders found.</td></tr>
             )}
           </tbody>
         </table>
@@ -233,7 +279,7 @@ export default function TradeflowOrders() {
       />
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search orders..." className="pl-9 w-56" />
@@ -262,6 +308,22 @@ export default function TradeflowOrders() {
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
+        {/* Booking filter pill buttons */}
+        <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden divide-x divide-slate-200 text-xs font-medium h-9">
+          {[
+            { value: 'all', label: 'All' },
+            { value: 'booked', label: '✅ Booked' },
+            { value: 'unbooked', label: '⚠️ Not Booked' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setBookingFilter(opt.value)}
+              className={`px-3 h-full transition-colors ${bookingFilter === opt.value ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <Tabs defaultValue="active" className="bg-white rounded-xl border border-slate-200 overflow-hidden">
