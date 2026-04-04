@@ -6,6 +6,15 @@
       "type": "string",
       "description": "Shipment reference number"
     },
+    "shipment_type": {
+      "type": "string",
+      "enum": [
+        "china_hub",
+        "direct_express"
+      ],
+      "default": "china_hub",
+      "description": "China Hub consolidation or Direct Express"
+    },
     "description": {
       "type": "string"
     },

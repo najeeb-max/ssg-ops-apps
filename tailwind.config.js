@@ -85,5 +85,14 @@ module.exports = {
   		}
   	}
   },
+  safelist: [
+    // Shipment vivid colors
+    'bg-rose-500','bg-indigo-500','bg-emerald-500','bg-amber-500','bg-fuchsia-500','bg-cyan-500','bg-orange-500','bg-violet-500',
+    'bg-rose-50','bg-indigo-50','bg-emerald-50','bg-amber-50','bg-fuchsia-50','bg-cyan-50','bg-orange-50','bg-violet-50',
+    'border-rose-300','border-indigo-300','border-emerald-300','border-amber-300','border-fuchsia-300','border-cyan-300','border-orange-300','border-violet-300',
+    'text-rose-700','text-indigo-700','text-emerald-700','text-amber-700','text-fuchsia-700','text-cyan-700','text-orange-700','text-violet-700',
+    'border-rose-600','border-indigo-600','border-emerald-600','border-amber-600','border-fuchsia-600','border-cyan-600','border-orange-600','border-violet-600',
+    'border-t-rose-300','border-t-indigo-300','border-t-emerald-300','border-t-amber-300','border-t-fuchsia-300','border-t-cyan-300','border-t-orange-300','border-t-violet-300',
+  ],
   plugins: [require("tailwindcss-animate")],
 }

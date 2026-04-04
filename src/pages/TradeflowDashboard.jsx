@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { ShoppingCart, TrendingUp, Clock, Package, ArrowRight, Ship, AlertTriangle } from 'lucide-react';
 import StatCard from '../components/tradeflow/dashboard/StatCard';
 import { Link } from 'react-router-dom';
+import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 
 const statusStyles = {
   pending: 'bg-amber-50 text-amber-700',
@@ -32,6 +33,8 @@ export default function TradeflowDashboard() {
     shipments.forEach(s => { m[s.id] = s; });
     return m;
   }, [shipments]);
+
+  const shipmentColorMap = useMemo(() => buildShipmentColorMap(shipments), [shipments]);
 
   const totalValue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
@@ -116,11 +119,14 @@ export default function TradeflowDashboard() {
                   </span>
                   {isDirect ? (
                     <span className="text-xs text-slate-300 italic hidden sm:inline">Direct</span>
-                  ) : shipment ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                      <Ship className="w-3 h-3" />{shipment.shipment_number}
-                    </span>
-                  ) : (
+                  ) : shipment ? (() => {
+                    const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+                    return (
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${c.badge}`}>
+                        <Ship className="w-3 h-3" />{shipment.shipment_number}
+                      </span>
+                    );
+                  })() : (
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
                       <AlertTriangle className="w-3 h-3" />Not Booked
                     </span>

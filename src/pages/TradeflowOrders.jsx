@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { Plus, Search, Pencil, Trash2, Zap, Package, Ship, AlertTriangle } from 'lucide-react';
+import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 import OrderDraftsPanel from '../components/tradeflow/orders/OrderDraftsPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,6 +98,8 @@ export default function TradeflowOrders() {
     return m;
   }, [shipments]);
 
+  const shipmentColorMap = useMemo(() => buildShipmentColorMap(shipments), [shipments]);
+
   const { data: currentUser } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
   const isAdmin = currentUser?.role === 'admin';
 
@@ -163,11 +166,14 @@ export default function TradeflowOrders() {
             <span className={`text-xs px-1.5 py-0.5 rounded flex items-center gap-0.5 ${isDirect ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
               {isDirect ? <><Zap className="w-3 h-3" />Direct</> : <><Package className="w-3 h-3" />Hub</>}
             </span>
-            {shipment ? (
-              <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-0.5 font-medium">
-                <Ship className="w-3 h-3" />{shipment.shipment_number}
-              </span>
-            ) : !isDirect && (
+            {shipment ? (() => {
+              const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+              return (
+                <span className={`text-xs px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-bold border ${c.badge}`}>
+                  <Ship className="w-3 h-3" />{shipment.shipment_number}
+                </span>
+              );
+            })() : !isDirect && (
               <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 flex items-center gap-0.5">
                 <AlertTriangle className="w-3 h-3" />No Shipment
               </span>
@@ -245,15 +251,18 @@ export default function TradeflowOrders() {
                   <td className="py-2.5 px-4">
                     {isDirect ? (
                       <span className="text-xs text-slate-300 italic">Direct Route</span>
-                    ) : shipment ? (
-                      <div>
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                          <Ship className="w-3 h-3" />{shipment.shipment_number}
-                        </span>
-                        <p className="text-xs text-slate-400 mt-0.5 capitalize">{shipment.status?.replace(/_/g, ' ')}{shipment.carrier ? ` · ${shipment.carrier}` : ''}</p>
-                        {shipment.arrival_date && <p className="text-xs text-slate-400">ETA: {shipment.arrival_date}</p>}
-                      </div>
-                    ) : (
+                    ) : shipment ? (() => {
+                      const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+                      return (
+                        <div>
+                          <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${c.badge}`}>
+                            <Ship className="w-3 h-3" />{shipment.shipment_number}
+                          </span>
+                          <p className="text-xs text-slate-400 mt-0.5 capitalize">{shipment.status?.replace(/_/g, ' ')}{shipment.carrier ? ` · ${shipment.carrier}` : ''}</p>
+                          {shipment.arrival_date && <p className="text-xs text-slate-400">ETA: {shipment.arrival_date}</p>}
+                        </div>
+                      );
+                    })() : (
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
                         <AlertTriangle className="w-3 h-3" />Not Booked
                       </span>

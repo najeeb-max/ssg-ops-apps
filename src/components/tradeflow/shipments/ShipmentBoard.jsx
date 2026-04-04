@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, ChevronDown, ChevronUp, X, MapPin } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, ChevronUp, MapPin, Zap } from 'lucide-react';
 import { format } from 'date-fns';
+import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 
 const statusStyles = {
   preparing: 'bg-slate-100 text-slate-600 border-slate-300',
@@ -27,6 +28,8 @@ export default function ShipmentBoard({ shipments, orders, onEdit, onDelete, onU
   const active = shipments.filter(s => !s.received_in_qatar && s.status !== 'cancelled');
   const dispatched = shipments.filter(s => !s.received_in_qatar && (s.status === 'in_transit' || s.status === 'customs' || s.status === 'booked'));
 
+  const colorMap = useMemo(() => buildShipmentColorMap(shipments), [shipments]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -39,7 +42,7 @@ export default function ShipmentBoard({ shipments, orders, onEdit, onDelete, onU
         ) : (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {active.map(s => (
-              <ShipmentCard key={s.id} shipment={s} orders={orders} onEdit={onEdit} onDelete={onDelete} onUnassign={onUnassign} onMarkQatarReceived={onMarkQatarReceived} />
+              <ShipmentCard key={s.id} shipment={s} orders={orders} color={colorMap[s.id] || NEUTRAL_COLOR} onEdit={onEdit} onDelete={onDelete} onUnassign={onUnassign} onMarkQatarReceived={onMarkQatarReceived} />
             ))}
           </div>
         )}
@@ -50,7 +53,7 @@ export default function ShipmentBoard({ shipments, orders, onEdit, onDelete, onU
           <h2 className="text-base font-semibold text-slate-700 mb-3">Dispatched / In Transit</h2>
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {dispatched.filter(s => s.status !== 'preparing').map(s => (
-              <ShipmentCard key={s.id} shipment={s} orders={orders} onEdit={onEdit} onDelete={onDelete} onUnassign={onUnassign} onMarkQatarReceived={onMarkQatarReceived} dimmed />
+              <ShipmentCard key={s.id} shipment={s} orders={orders} color={colorMap[s.id] || NEUTRAL_COLOR} onEdit={onEdit} onDelete={onDelete} onUnassign={onUnassign} onMarkQatarReceived={onMarkQatarReceived} dimmed />
             ))}
           </div>
         </div>
@@ -59,32 +62,44 @@ export default function ShipmentBoard({ shipments, orders, onEdit, onDelete, onU
   );
 }
 
-function ShipmentCard({ shipment, orders, onEdit, onDelete, onUnassign, onMarkQatarReceived, dimmed }) {
+function ShipmentCard({ shipment, orders, color, onEdit, onDelete, onUnassign, onMarkQatarReceived, dimmed }) {
   const [expanded, setExpanded] = useState(false);
   const included = orders.filter(o => o.shipment_id === shipment.id);
   const totalKgs = included.reduce((s, o) => s + (o.weight_kgs || 0), 0);
   const totalCbm = included.reduce((s, o) => s + (o.cbm || 0), 0);
   const totalCtns = included.reduce((s, o) => s + (o.num_cartons || 0), 0);
+  const isDirect = shipment.shipment_type === 'direct_express';
 
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 overflow-hidden ${dimmed ? 'opacity-70' : ''}`}>
+    <div className={`bg-white rounded-xl border-2 overflow-hidden ${color.border} ${dimmed ? 'opacity-70' : ''}`}>
+      {/* Vivid color header strip */}
+      <div className={`${color.bg} px-4 py-2 flex items-center justify-between`}>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-white text-sm tracking-wide">{shipment.shipment_number}</span>
+          {isDirect && (
+            <span className="inline-flex items-center gap-0.5 bg-white/20 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
+              <Zap className="w-2.5 h-2.5" />Direct
+            </span>
+          )}
+        </div>
+        <div className="flex gap-0.5">
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/20" onClick={() => onEdit(shipment)} title="Edit"><Pencil className="w-3 h-3" /></Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/20" onClick={() => onMarkQatarReceived(shipment)} title="Mark Received in Qatar">
+            <span className="text-xs">✅</span>
+          </Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/20" onClick={() => onDelete(shipment)} title="Delete"><Trash2 className="w-3 h-3" /></Button>
+        </div>
+      </div>
+
       <div className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <p className="font-semibold text-slate-900">{shipment.shipment_number}</p>
-            <Badge className={`text-xs mt-1 border ${statusStyles[shipment.status] || 'bg-slate-100 text-slate-600'}`}>
-              {shipment.status?.replace(/_/g, ' ')}
-            </Badge>
-          </div>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(shipment)} title="Edit"><Pencil className="w-3.5 h-3.5" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" onClick={() => onMarkQatarReceived(shipment)} title="Mark Received in Qatar">✅</Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-300 hover:text-destructive" onClick={() => onDelete(shipment)} title="Delete"><Trash2 className="w-3.5 h-3.5" /></Button>
-          </div>
+        <div className="mb-2">
+          <Badge className={`text-xs border ${statusStyles[shipment.status] || 'bg-slate-100 text-slate-600'}`}>
+            {shipment.status?.replace(/_/g, ' ')}
+          </Badge>
         </div>
 
         <div className="space-y-1 text-xs text-slate-500">
-          {shipment.transport_mode && (
+          {shipment.transport_mode && !isDirect && (
             <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${modeColors[shipment.transport_mode] || 'bg-slate-100 text-slate-600'}`}>
               {modeIcon[shipment.transport_mode]} {shipment.transport_mode}
             </span>
@@ -94,7 +109,7 @@ function ShipmentCard({ shipment, orders, onEdit, onDelete, onUnassign, onMarkQa
           )}
           {shipment.carrier && <p>{shipment.carrier}{shipment.tracking_number && ` · ${shipment.tracking_number}`}</p>}
           {shipment.arrival_date && (
-            <p className="text-indigo-600 font-medium">ETA: {format(new Date(shipment.arrival_date), 'MMM d, yyyy')}</p>
+            <p className={`font-medium ${color.text}`}>ETA: {format(new Date(shipment.arrival_date), 'MMM d, yyyy')}</p>
           )}
         </div>
 
@@ -108,7 +123,7 @@ function ShipmentCard({ shipment, orders, onEdit, onDelete, onUnassign, onMarkQa
       </div>
 
       <button
-        className="w-full flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 hover:bg-slate-100 transition-colors"
+        className={`w-full flex items-center justify-between px-4 py-2 border-t text-xs text-slate-500 hover:opacity-80 transition-colors ${color.light} ${color.border.replace('border-', 'border-t-')}`}
         onClick={() => setExpanded(!expanded)}
       >
         <span>{included.length} order{included.length !== 1 ? 's' : ''}</span>
