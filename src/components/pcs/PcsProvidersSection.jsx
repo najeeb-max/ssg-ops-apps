@@ -26,19 +26,22 @@ function ProviderForm({ pcsId, providerCount, onClose }) {
   });
 
   const handleCurrencyChange = async (currency) => {
-    setForm((f) => ({ ...f, currency }));
+    setForm((f) => ({ ...f, currency, exchange_rate: currency === "QAR" ? 1 : "" }));
     if (currency !== "QAR") {
-      const rate = await fetchRate(currency);
-      if (rate) setForm((f) => ({ ...f, currency, exchange_rate: rate }));
-    } else {
-      setForm((f) => ({ ...f, currency: "QAR", exchange_rate: 1 }));
+      const rate = await fetchRate(currency); // use cache on auto-change (refresh button forces)
+      if (rate) setForm((f) => ({ ...f, exchange_rate: rate }));
     }
   };
 
   const handleRefreshRate = async () => {
     if (form.currency === "QAR") return;
-    const rate = await fetchRate(form.currency);
-    if (rate) setForm((f) => ({ ...f, exchange_rate: rate }));
+    const rate = await fetchRate(form.currency, true); // force = bypass cache
+    if (rate) {
+      setForm((f) => ({ ...f, exchange_rate: rate }));
+      toast.success(`Rate updated: 1 ${form.currency} = ${rate.toFixed(4)} QAR`);
+    } else {
+      toast.error("Could not fetch live rate. Check your connection.");
+    }
   };
 
   const createMutation = useMutation({
@@ -204,7 +207,7 @@ function ProviderRow({ p, canEdit, pcsId }) {
                   onChange={(e) => setForm({ ...form, exchange_rate: e.target.value })}
                   className="h-7 text-xs w-20"
                 />
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => fetchRate(form.currency).then(r => r && setForm(f => ({ ...f, exchange_rate: r })))} disabled={fxLoading}>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => fetchRate(form.currency, true).then(r => r && setForm(f => ({ ...f, exchange_rate: r })))} disabled={fxLoading}>
                   {fxLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                 </Button>
               </div>
