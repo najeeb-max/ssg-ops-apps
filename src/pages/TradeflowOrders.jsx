@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
@@ -46,13 +46,29 @@ export default function TradeflowOrders() {
   const [platformFilter, setPlatformFilter] = useState('all');
   const [bookingFilter, setBookingFilter] = useState('all'); // 'all' | 'booked' | 'unbooked'
   const [deleteOrder, setDeleteOrder] = useState(null);
+  const [activeTab, setActiveTab] = useState('active');
+  const [closedLoaded, setClosedLoaded] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['orders'],
-    queryFn: () => base44.entities.Order.list('-created_date', 200),
+  // Active orders only — small bounded set, always needed
+  const { data: activeOrdersRaw = [], isLoading } = useQuery({
+    queryKey: ['orders', 'active'],
+    queryFn: () => base44.entities.Order.filter({ status: { $in: ['pending', 'confirmed', 'received_at_hub', 'in_transit'] } }, '-created_date', 500),
     staleTime: 30_000,
   });
+
+  // Closed orders — lazy loaded only when user opens the Closed tab
+  const { data: closedOrdersRaw = [], isFetching: closedFetching } = useQuery({
+    queryKey: ['orders', 'closed'],
+    queryFn: () => base44.entities.Order.filter({ status: { $in: ['delivered', 'cancelled'] } }, '-created_date', 200),
+    staleTime: 60_000,
+    enabled: closedLoaded,
+  });
+
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    if (tab === 'closed') setClosedLoaded(true);
+  }, []);
 
   const { data: shipments = [] } = useQuery({
     queryKey: ['shipments'],
@@ -71,14 +87,13 @@ export default function TradeflowOrders() {
   const isAdmin = currentUser?.role === 'admin';
 
   const handleDelete = async () => {
-    // Soft-delete: mark as archived instead of hard delete (Point 15)
     await base44.entities.Order.update(deleteOrder.id, { status: 'cancelled' });
     setDeleteOrder(null);
-    queryClient.invalidateQueries({ queryKey: ['orders'] });
+    queryClient.invalidateQueries({ queryKey: ['orders', 'active'] });
+    queryClient.invalidateQueries({ queryKey: ['orders', 'closed'] });
     toast.success(`"${deleteOrder.product_name}" moved to Cancelled.`);
   };
 
-  // Memoized filtering (Point 4)
   const { activeOrders, closedOrders, hubOrders, directOrders } = useMemo(() => {
     const q = search.toLowerCase();
     const matchesSearch = (o) => !q ||
@@ -99,12 +114,12 @@ export default function TradeflowOrders() {
       (bookingFilter === 'all' || (bookingFilter === 'booked' && !!o.shipment_id) || (bookingFilter === 'unbooked' && !o.shipment_id));
 
     return {
-      activeOrders: orders.filter(o => ACTIVE_STATUSES.includes(o.status) && filterOrder(o)),
-      closedOrders: orders.filter(o => CLOSED_STATUSES.includes(o.status) && filterOrder(o)),
-      hubOrders: orders.filter(o => o.fulfillment_type !== 'direct_express'),
-      directOrders: orders.filter(o => o.fulfillment_type === 'direct_express'),
+      activeOrders: activeOrdersRaw.filter(filterOrder),
+      closedOrders: closedOrdersRaw.filter(filterOrder),
+      hubOrders: activeOrdersRaw.filter(o => o.fulfillment_type !== 'direct_express'),
+      directOrders: activeOrdersRaw.filter(o => o.fulfillment_type === 'direct_express'),
     };
-  }, [orders, search, statusFilter, platformFilter]);
+  }, [activeOrdersRaw, closedOrdersRaw, search, statusFilter, platformFilter, bookingFilter]);
 
   if (isLoading) {
     return (
@@ -264,7 +279,7 @@ export default function TradeflowOrders() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            {orders.length} total · {hubOrders.length} via hub · {directOrders.length} direct
+            {activeOrdersRaw.length} active · {hubOrders.length} via hub · {directOrders.length} direct
           </p>
         </div>
         <Button onClick={() => { setEditingOrder(null); setResumingDraftId(null); setShowForm(true); }} className="bg-indigo-600 hover:bg-indigo-700 gap-1.5">
@@ -326,13 +341,22 @@ export default function TradeflowOrders() {
         </div>
       </div>
 
-      <Tabs defaultValue="active" className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <TabsList className="bg-slate-50 border-b border-slate-100 rounded-none w-full justify-start px-4 py-0 h-11">
           <TabsTrigger value="active" className="text-sm">Active Orders <span className="ml-1.5 bg-indigo-100 text-indigo-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{activeOrders.length}</span></TabsTrigger>
-          <TabsTrigger value="closed" className="text-sm">Completed / Closed <span className="ml-1.5 bg-slate-100 text-slate-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">{closedOrders.length}</span></TabsTrigger>
+          <TabsTrigger value="closed" className="text-sm">Completed / Closed {closedLoaded && <span className="ml-1.5 bg-slate-100 text-slate-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">{closedOrders.length}</span>}</TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="m-0"><OrderTable list={activeOrders} /></TabsContent>
-        <TabsContent value="closed" className="m-0"><OrderTable list={closedOrders} /></TabsContent>
+        <TabsContent value="closed" className="m-0">
+          {closedFetching ? (
+            <div className="p-8 text-center text-slate-400 text-sm">
+              <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin mx-auto mb-2" />
+              Loading closed orders...
+            </div>
+          ) : (
+            <OrderTable list={closedOrders} />
+          )}
+        </TabsContent>
       </Tabs>
 
       <OrderFormDialog
@@ -340,7 +364,7 @@ export default function TradeflowOrders() {
         onOpenChange={(v) => { setShowForm(v); if (!v) setResumingDraftId(null); }}
         order={editingOrder}
         draftId={resumingDraftId}
-        onSaved={() => queryClient.invalidateQueries({ queryKey: ['orders'] })}
+        onSaved={() => { queryClient.invalidateQueries({ queryKey: ['orders', 'active'] }); queryClient.invalidateQueries({ queryKey: ['orders', 'closed'] }); }}
         onDraftSaved={() => setDraftRefresh(n => n + 1)}
       />
 
