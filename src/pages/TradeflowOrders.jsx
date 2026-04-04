@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
@@ -48,7 +48,21 @@ export default function TradeflowOrders() {
   const [deleteOrder, setDeleteOrder] = useState(null);
   const [activeTab, setActiveTab] = useState('active');
   const [closedLoaded, setClosedLoaded] = useState(false);
+  const [activeVisible, setActiveVisible] = useState(50);
+  const [closedVisible, setClosedVisible] = useState(50);
   const queryClient = useQueryClient();
+
+  // Real-time subscriptions — invalidate cache on any Order or Shipment change
+  useEffect(() => {
+    const unsubOrder = base44.entities.Order.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ['orders', 'active'] });
+      queryClient.invalidateQueries({ queryKey: ['orders', 'closed'] });
+    });
+    const unsubShipment = base44.entities.Shipment.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+    });
+    return () => { unsubOrder(); unsubShipment(); };
+  }, [queryClient]);
 
   // Active orders only — small bounded set, always needed
   const { data: activeOrdersRaw = [], isLoading } = useQuery({
@@ -168,7 +182,10 @@ export default function TradeflowOrders() {
     );
   };
 
-  const OrderTable = ({ list }) => (
+  const OrderTable = ({ list, visible, onLoadMore }) => {
+    const slice = list.slice(0, visible);
+    const hasMore = list.length > visible;
+    return (
     <>
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto">
@@ -186,7 +203,7 @@ export default function TradeflowOrders() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {list.map((order) => {
+            {slice.map((order) => {
               const isDirect = order.fulfillment_type === 'direct_express';
               const tracking = isDirect ? order.express_tracking_number : order.domestic_tracking_number;
               const logo = platformLogos[order.source_platform];
@@ -258,20 +275,35 @@ export default function TradeflowOrders() {
                 </tr>
               );
             })}
-            {list.length === 0 && (
+            {slice.length === 0 && (
               <tr><td colSpan={8} className="text-center py-10 text-slate-400 text-sm">No orders found.</td></tr>
             )}
           </tbody>
         </table>
+        {hasMore && (
+          <div className="flex items-center justify-center py-4 border-t border-slate-100">
+            <Button variant="outline" size="sm" onClick={onLoadMore} className="text-xs gap-1.5">
+              Load more <span className="text-slate-400">({list.length - visible} remaining)</span>
+            </Button>
+          </div>
+        )}
       </div>
       {/* Mobile cards */}
       <div className="md:hidden">
-        {list.length === 0
+        {slice.length === 0
           ? <p className="text-center py-10 text-slate-400 text-sm">No orders found.</p>
-          : list.map(order => <OrderCard key={order.id} order={order} />)}
+          : slice.map(order => <OrderCard key={order.id} order={order} />)}
+        {hasMore && (
+          <div className="flex justify-center py-4 border-t border-slate-100">
+            <Button variant="outline" size="sm" onClick={onLoadMore} className="text-xs">
+              Load more ({list.length - visible} remaining)
+            </Button>
+          </div>
+        )}
       </div>
     </>
-  );
+    );
+  };
 
   return (
     <div className="p-6">
@@ -346,7 +378,9 @@ export default function TradeflowOrders() {
           <TabsTrigger value="active" className="text-sm">Active Orders <span className="ml-1.5 bg-indigo-100 text-indigo-700 text-xs font-semibold px-1.5 py-0.5 rounded-full">{activeOrders.length}</span></TabsTrigger>
           <TabsTrigger value="closed" className="text-sm">Completed / Closed {closedLoaded && <span className="ml-1.5 bg-slate-100 text-slate-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">{closedOrders.length}</span>}</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="m-0"><OrderTable list={activeOrders} /></TabsContent>
+        <TabsContent value="active" className="m-0">
+          <OrderTable list={activeOrders} visible={activeVisible} onLoadMore={() => setActiveVisible(v => v + 50)} />
+        </TabsContent>
         <TabsContent value="closed" className="m-0">
           {closedFetching ? (
             <div className="p-8 text-center text-slate-400 text-sm">
@@ -354,7 +388,7 @@ export default function TradeflowOrders() {
               Loading closed orders...
             </div>
           ) : (
-            <OrderTable list={closedOrders} />
+            <OrderTable list={closedOrders} visible={closedVisible} onLoadMore={() => setClosedVisible(v => v + 50)} />
           )}
         </TabsContent>
       </Tabs>
