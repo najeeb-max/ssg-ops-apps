@@ -31,7 +31,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function StatusDropdown({ orderId, current, onUpdate, disabled }) {
+function StatusDropdown({ orderId, current, onUpdate }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
@@ -43,17 +43,20 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
 
   async function handleSelect(newStatus) {
     if (newStatus === current) { setOpen(false); return; }
-    setLoading(true);
     setOpen(false);
-    await onUpdate(orderId, newStatus);
-    setLoading(false);
+    setLoading(true);
+    try {
+      await onUpdate(orderId, newStatus);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleOpen() {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
       setMenuPos({
-        top: rect.bottom + window.scrollY + 4,
+        top: rect.bottom + 4,
         right: window.innerWidth - rect.right,
       });
     }
@@ -69,65 +72,58 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
     );
   }
 
-  const menu = open ? ReactDOM.createPortal(
-    <>
-      <div
-        style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
-        onClick={() => setOpen(false)}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: menuPos.top,
-          right: menuPos.right,
-          zIndex: 9999,
-          width: 256,
-        }}
-        className="bg-white border border-slate-200 rounded-xl shadow-xl py-2 overflow-hidden"
-      >
-        <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
-        {agentStatuses.map(s => {
-          const Icon = s.icon;
-          const isActive = s.value === current;
-          return (
-            <button
-              key={s.value}
-              onClick={() => handleSelect(s.value)}
-              className={`w-full flex items-start gap-2.5 px-3 py-2 text-xs hover:bg-orange-50 transition-colors text-left ${isActive ? 'bg-orange-50' : ''}`}
-            >
-              <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${s.color}`}>
-                <Icon className="w-2.5 h-2.5" />
-              </span>
-              <div>
-                <p className={`font-semibold ${isActive ? 'text-orange-700' : 'text-slate-700'}`}>{s.label}</p>
-                <p className="text-slate-400 text-[10px] leading-snug">{
-                  s.value === 'dispatched_to_hub' ? 'Supplier sent it — on the way to hub' :
-                  s.value === 'received_at_hub'   ? 'Goods arrived & checked in at hub' : ''
-                }</p>
-              </div>
-              {isActive && <span className="ml-auto text-orange-400 text-[10px] font-bold flex-shrink-0">✓ current</span>}
-            </button>
-          );
-        })}
-      </div>
-    </>,
-    document.body
-  ) : null;
-
   return (
     <div className="relative">
       <button
         ref={btnRef}
         onClick={handleOpen}
-        disabled={disabled || loading}
+        disabled={loading}
         className="flex items-center gap-1.5 text-xs font-semibold bg-white border border-orange-300 hover:border-orange-400 text-orange-700 rounded-lg px-3 py-1.5 transition-colors shadow-sm disabled:opacity-50"
       >
-        {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <>
-          <span>Update</span>
-          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </>}
+        {loading
+          ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+          : <><span>Update</span><ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} /></>
+        }
       </button>
-      {menu}
+
+      {open && ReactDOM.createPortal(
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+            onClick={() => setOpen(false)}
+          />
+          <div
+            style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999, width: 256 }}
+            className="bg-white border border-slate-200 rounded-xl shadow-xl py-2"
+          >
+            <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
+            {agentStatuses.map(s => {
+              const Icon = s.icon;
+              const isActive = s.value === current;
+              return (
+                <button
+                  key={s.value}
+                  onClick={() => handleSelect(s.value)}
+                  className={`w-full flex items-start gap-2.5 px-3 py-2 text-xs hover:bg-orange-50 transition-colors text-left ${isActive ? 'bg-orange-50' : ''}`}
+                >
+                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${s.color}`}>
+                    <Icon className="w-2.5 h-2.5" />
+                  </span>
+                  <div>
+                    <p className={`font-semibold ${isActive ? 'text-orange-700' : 'text-slate-700'}`}>{s.label}</p>
+                    <p className="text-slate-400 text-[10px] leading-snug">
+                      {s.value === 'dispatched_to_hub' ? 'Supplier sent it — on the way to hub' :
+                       s.value === 'received_at_hub'   ? 'Goods arrived & checked in at hub' : ''}
+                    </p>
+                  </div>
+                  {isActive && <span className="ml-auto text-orange-400 text-[10px] font-bold flex-shrink-0">✓ current</span>}
+                </button>
+              );
+            })}
+          </div>
+        </>,
+        document.body
+      )}
     </div>
   );
 }
