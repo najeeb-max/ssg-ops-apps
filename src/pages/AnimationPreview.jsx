@@ -20,7 +20,7 @@ const MOCK_SHEETS = [
 
 // ── Pipeline Config ──────────────────────────────────────────────────────────
 const PIPELINE = [
-  { key: "in_progress",      label: "Quoting",           color: "bg-blue-500",    light: "bg-blue-50 border-blue-200",   text: "text-blue-700",   icon: FileText,    desc: "Gathering supplier quotes" },
+  { key: "in_progress",      label: "Gathering Quotes",           color: "bg-blue-500",    light: "bg-blue-50 border-blue-200",   text: "text-blue-700",   icon: FileText,    desc: "Gathering supplier quotes" },
   { key: "pending_approval", label: "Awaiting Approval", color: "bg-amber-500",   light: "bg-amber-50 border-amber-200", text: "text-amber-700",  icon: Clock,       desc: "Submitted, pending sign-off" },
   { key: "approved",         label: "Approved",          color: "bg-emerald-500", light: "bg-emerald-50 border-emerald-200", text: "text-emerald-700", icon: CheckCircle2, desc: "Approved — select a winner" },
   { key: "awarded",          label: "Awarded",           color: "bg-violet-500",  light: "bg-violet-50 border-violet-200",  text: "text-violet-700", icon: Award,       desc: "Supplier selected — create PO" },
