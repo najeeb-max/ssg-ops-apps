@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Search, Package, CheckCircle2, Clock, ArrowRight, Send, Truck, FileText, Award, AlertTriangle, ChevronRight, TrendingUp, ShoppingCart, Zap, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import { ArrowLeft, Plus, CheckCircle2, Clock, Send, Truck, FileText, Award, AlertTriangle, ChevronRight, TrendingUp, Zap, X, Lock, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
@@ -119,7 +120,7 @@ function SendToTradeflowModal({ sheet, onConfirm, onClose }) {
 }
 
 // ── PCS Card ─────────────────────────────────────────────────────────────────
-function PcsCard({ sheet, onSendToTradeflow }) {
+function PcsCard({ sheet, onSendToTradeflow, isAdmin }) {
   const stage = getStage(sheet.status);
   const Icon = stage.icon;
   const canSendToTradeflow = sheet.status === "awarded";
@@ -170,19 +171,25 @@ function PcsCard({ sheet, onSendToTradeflow }) {
       )}
 
       {canSendToTradeflow && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onSendToTradeflow(sheet); }}
-          className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg py-1.5 transition-colors"
-        >
-          <Send className="w-3 h-3" /> Send to Tradeflow →
-        </button>
+        isAdmin ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); onSendToTradeflow(sheet); }}
+            className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg py-1.5 transition-colors"
+          >
+            <Send className="w-3 h-3" /> Send to Tradeflow →
+          </button>
+        ) : (
+          <div className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-xs font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-lg py-1.5 cursor-not-allowed" title="Admin only">
+            <Lock className="w-3 h-3" /> Admin only
+          </div>
+        )
       )}
     </motion.div>
   );
 }
 
 // ── Kanban Column ─────────────────────────────────────────────────────────────
-function KanbanColumn({ stage, sheets, onSendToTradeflow }) {
+function KanbanColumn({ stage, sheets, onSendToTradeflow, isAdmin }) {
   const Icon = stage.icon;
   return (
     <div className="flex-shrink-0 w-64">
@@ -204,7 +211,7 @@ function KanbanColumn({ stage, sheets, onSendToTradeflow }) {
       <div className="space-y-2.5 min-h-[120px]">
         <AnimatePresence>
           {sheets.map(sheet => (
-            <PcsCard key={sheet.id} sheet={sheet} onSendToTradeflow={onSendToTradeflow} />
+            <PcsCard key={sheet.id} sheet={sheet} onSendToTradeflow={onSendToTradeflow} isAdmin={isAdmin} />
           ))}
         </AnimatePresence>
         {sheets.length === 0 && (
@@ -222,6 +229,9 @@ export default function AnimationPreview() {
   const [sheets, setSheets] = useState(MOCK_SHEETS);
   const [sendModal, setSendModal] = useState(null); // sheet to send
   const [toast, setToast] = useState(null);
+
+  const { data: currentUser } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me(), staleTime: 60_000 });
+  const isAdmin = currentUser?.role === 'admin';
 
   const showToast = (msg) => {
     setToast(msg);
@@ -266,8 +276,12 @@ export default function AnimationPreview() {
             <h1 className="text-xl font-bold">New PCS Pipeline Dashboard</h1>
             <p className="text-indigo-200 text-sm mt-0.5">Kanban view · Full procurement lifecycle · Tradeflow integration</p>
           </div>
-          <div className="hidden md:flex items-center gap-2 text-xs text-indigo-200">
+          <div className="hidden md:flex flex-col items-end gap-2 text-xs text-indigo-200">
             <span className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5">Mock data — click "Send to Tradeflow" on awarded cards</span>
+            {isAdmin
+              ? <span className="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 rounded-lg px-3 py-1.5"><Shield className="w-3 h-3" /> You are Admin — Send to Tradeflow enabled</span>
+              : <span className="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/30 text-amber-200 rounded-lg px-3 py-1.5"><Lock className="w-3 h-3" /> Non-admin — Send to Tradeflow is locked</span>
+            }
           </div>
         </div>
 
@@ -328,6 +342,7 @@ export default function AnimationPreview() {
                 stage={stage}
                 sheets={sheets.filter(s => s.status === stage.key)}
                 onSendToTradeflow={handleSendToTradeflow}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
