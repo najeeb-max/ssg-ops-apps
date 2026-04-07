@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box } from "lucide-react";
+import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -301,11 +301,13 @@ export default function ChinaAgentPortal() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [adminBypass, setAdminBypass] = useState(false);
 
-  async function fetchOrders() {
+  async function fetchOrders(bypassToken) {
     setLoading(true);
     setError(null);
-    const res = await base44.functions.invoke('chinaAgentPortal', { action: 'getOrders', token });
+    const useToken = bypassToken || token;
+    const res = await base44.functions.invoke('chinaAgentPortal', { action: 'getOrders', token: useToken });
     if (res.data.error) throw new Error(res.data.error);
     setOrders(res.data.orders || []);
     setLastRefresh(new Date());
@@ -313,15 +315,41 @@ export default function ChinaAgentPortal() {
   }
 
   useEffect(() => {
-    if (!token) { setLoading(false); setError('no_token'); return; }
-    fetchOrders().catch(err => {
-      setError(err.message || 'Access denied');
+    if (token) {
+      fetchOrders().catch(err => {
+        setError(err.message || 'Access denied');
+        setLoading(false);
+      });
+      return;
+    }
+    // No token — check if admin user is logged in (preview/dev access)
+    base44.auth.me().then(user => {
+      if (user?.role === 'admin') {
+        // Admin: fetch their own saved tokens and use the first one
+        const savedTokens = user?.data?.china_agent_tokens || [];
+        if (savedTokens.length > 0) {
+          setAdminBypass(true);
+          fetchOrders(savedTokens[0]).catch(err => {
+            setError(err.message || 'Failed to load');
+            setLoading(false);
+          });
+        } else {
+          setLoading(false);
+          setError('no_token');
+        }
+      } else {
+        setLoading(false);
+        setError('no_token');
+      }
+    }).catch(() => {
       setLoading(false);
+      setError('no_token');
     });
   }, [token]);
 
   async function handleUpdate(orderId, newStatus) {
-    const res = await base44.functions.invoke('chinaAgentPortal', { action: 'updateStatus', token, orderId, status: newStatus });
+    const useToken = token || (await base44.auth.me().then(u => u?.data?.china_agent_tokens?.[0]).catch(() => null));
+    const res = await base44.functions.invoke('chinaAgentPortal', { action: 'updateStatus', token: useToken, orderId, status: newStatus });
     if (res.data.error) {
       toast.error('Update failed: ' + res.data.error);
       return;
@@ -425,7 +453,7 @@ export default function ChinaAgentPortal() {
               </div>
             </div>
             <button
-              onClick={() => fetchOrders().catch(err => toast.error(err.message))}
+              onClick={() => fetchOrders(token || undefined).catch(err => toast.error(err.message))}
               className="flex items-center gap-1.5 text-xs text-indigo-200 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Refresh
@@ -464,6 +492,12 @@ export default function ChinaAgentPortal() {
             )}
           </div>
 
+          {adminBypass && (
+            <div className="mt-3 flex items-center gap-2 bg-yellow-400/20 border border-yellow-300/30 rounded-lg px-3 py-2 text-xs text-yellow-200">
+              <Shield className="w-3.5 h-3.5 flex-shrink-0" />
+              <span><strong>Admin Preview:</strong> You're viewing this as an admin using your first saved agent token. Agents access this via their secret link.</span>
+            </div>
+          )}
           {lastRefresh && (
             <p className="text-indigo-300 text-[11px] mt-2 text-right">
               Last updated: {lastRefresh.toLocaleTimeString()}
