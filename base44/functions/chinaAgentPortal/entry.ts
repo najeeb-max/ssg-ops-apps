@@ -78,9 +78,12 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'Missing orderId or status' }, { status: 400 });
       }
 
-      const ALLOWED_STATUSES = ['pending', 'confirmed', 'received_at_hub', 'in_transit', 'delivered'];
-      if (!ALLOWED_STATUSES.includes(status)) {
-        return Response.json({ error: 'Invalid status' }, { status: 400 });
+      // Agents may only move orders forward through THEIR steps
+      // SSG controls: pending, confirmed, in_transit, delivered
+      // Agent controls: dispatched_to_hub, received_at_hub
+      const AGENT_ALLOWED_STATUSES = ['dispatched_to_hub', 'received_at_hub'];
+      if (!AGENT_ALLOWED_STATUSES.includes(status)) {
+        return Response.json({ error: `Agents can only set status to: ${AGENT_ALLOWED_STATUSES.join(', ')}` }, { status: 403 });
       }
 
       // Verify this order is a china_hub order before allowing update

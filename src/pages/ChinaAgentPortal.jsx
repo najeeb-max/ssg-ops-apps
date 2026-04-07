@@ -5,12 +5,15 @@ import { getTransportIcon } from "@/lib/transportIcons";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
+// Agent-owned statuses (can be changed by agent via portal)
+// SSG-owned statuses (read-only for agent: pending, confirmed, in_transit, delivered)
 const STATUSES = [
-  { value: "pending",          label: "Pending",          color: "bg-amber-100 text-amber-700",   icon: Clock },
-  { value: "confirmed",        label: "Confirmed",         color: "bg-blue-100 text-blue-700",     icon: CheckCircle2 },
-  { value: "received_at_hub",  label: "Received at Hub",   color: "bg-teal-100 text-teal-700",     icon: Package },
-  { value: "in_transit",       label: "In Transit",        color: "bg-indigo-100 text-indigo-700", icon: Truck },
-  { value: "delivered",        label: "Delivered",         color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
+  { value: "pending",           label: "Pending",              color: "bg-amber-100 text-amber-700",    icon: Clock,         agentOwned: false },
+  { value: "confirmed",         label: "Confirmed",            color: "bg-blue-100 text-blue-700",      icon: CheckCircle2,  agentOwned: false },
+  { value: "dispatched_to_hub", label: "Dispatched to Hub",   color: "bg-orange-100 text-orange-700",  icon: Truck,         agentOwned: true  },
+  { value: "received_at_hub",   label: "Received at Hub",     color: "bg-teal-100 text-teal-700",      icon: Package,       agentOwned: true  },
+  { value: "in_transit",        label: "In Transit to Qatar", color: "bg-indigo-100 text-indigo-700",  icon: Ship,          agentOwned: false },
+  { value: "delivered",         label: "Delivered",            color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2, agentOwned: false },
 ];
 
 function getStatusMeta(value) {
@@ -31,6 +34,11 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const currentStatus = STATUSES.find(s => s.value === current);
+  const isAgentOwned = currentStatus?.agentOwned ?? false;
+  // Agent can only pick their two statuses
+  const agentStatuses = STATUSES.filter(s => s.agentOwned);
+
   async function handleSelect(newStatus) {
     if (newStatus === current) { setOpen(false); return; }
     setLoading(true);
@@ -39,16 +47,26 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
     setLoading(false);
   }
 
+  // If current status is SSG-owned, show a locked badge instead of a dropdown
+  if (!isAgentOwned && !open) {
+    return (
+      <div className="flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5">
+        <Lock className="w-3 h-3" />
+        <span>SSG</span>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <button
         onClick={() => setOpen(v => !v)}
         disabled={disabled || loading}
-        className="flex items-center gap-1.5 text-xs font-semibold bg-white border border-slate-200 hover:border-indigo-400 rounded-lg px-3 py-1.5 transition-colors shadow-sm disabled:opacity-50"
+        className="flex items-center gap-1.5 text-xs font-semibold bg-white border border-orange-300 hover:border-orange-400 text-orange-700 rounded-lg px-3 py-1.5 transition-colors shadow-sm disabled:opacity-50"
       >
-        {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" /> : <>
-          <span className="text-slate-600">Update</span>
-          <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <>
+          <span>Update</span>
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
         </>}
       </button>
       <AnimatePresence>
@@ -60,22 +78,29 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.12 }}
-              className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 w-52 py-1 overflow-hidden"
+              className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 w-64 py-2 overflow-hidden"
             >
-              {STATUSES.map(s => {
+              <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
+              {agentStatuses.map(s => {
                 const Icon = s.icon;
                 const isActive = s.value === current;
                 return (
                   <button
                     key={s.value}
                     onClick={() => handleSelect(s.value)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-slate-50 transition-colors text-left ${isActive ? 'bg-indigo-50' : ''}`}
+                    className={`w-full flex items-start gap-2.5 px-3 py-2 text-xs hover:bg-orange-50 transition-colors text-left ${isActive ? 'bg-orange-50' : ''}`}
                   >
-                    <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${s.color}`}>
+                    <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${s.color}`}>
                       <Icon className="w-2.5 h-2.5" />
                     </span>
-                    <span className={`font-medium ${isActive ? 'text-indigo-700' : 'text-slate-700'}`}>{s.label}</span>
-                    {isActive && <span className="ml-auto text-indigo-400 text-[10px]">current</span>}
+                    <div>
+                      <p className={`font-semibold ${isActive ? 'text-orange-700' : 'text-slate-700'}`}>{s.label}</p>
+                      <p className="text-slate-400 text-[10px] leading-snug">{
+                        s.value === 'dispatched_to_hub' ? 'Supplier sent it — on the way to hub' :
+                        s.value === 'received_at_hub'   ? 'Goods arrived & checked in at hub' : ''
+                      }</p>
+                    </div>
+                    {isActive && <span className="ml-auto text-orange-400 text-[10px] font-bold flex-shrink-0">✓ current</span>}
                   </button>
                 );
               })}
@@ -363,6 +388,7 @@ export default function ChinaAgentPortal() {
 
   const stats = {
     total: orders.length,
+    dispatched: orders.filter(o => o.status === 'dispatched_to_hub').length,
     atHub: orders.filter(o => o.status === 'received_at_hub').length,
     inTransit: orders.filter(o => o.status === 'in_transit').length,
     notBooked: orders.filter(o => !o.shipment_id && o.status !== 'delivered').length,
@@ -467,8 +493,8 @@ export default function ChinaAgentPortal() {
           <div className="grid grid-cols-4 gap-2">
             {[
               { label: "Total", value: stats.total, bg: "bg-white/10" },
-              { label: "At Hub", value: stats.atHub, bg: "bg-amber-400/20" },
-              { label: "In Transit", value: stats.inTransit, bg: "bg-blue-400/20" },
+              { label: "Dispatched", value: stats.dispatched, bg: "bg-orange-400/20" },
+              { label: "At Hub", value: stats.atHub, bg: "bg-teal-400/20" },
               { label: "Delivered", value: stats.delivered, bg: "bg-emerald-400/20" },
             ].map(s => (
               <div key={s.label} className={`${s.bg} rounded-xl px-3 py-2 text-center`}>

@@ -73,6 +73,7 @@
       "enum": [
         "pending",
         "confirmed",
+        "dispatched_to_hub",
         "received_at_hub",
         "in_transit",
         "delivered",

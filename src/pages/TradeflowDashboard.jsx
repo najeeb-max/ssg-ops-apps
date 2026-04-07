@@ -8,12 +8,13 @@ import { Link } from 'react-router-dom';
 import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 
 const statusStyles = {
-  pending: 'bg-amber-50 text-amber-700',
-  confirmed: 'bg-blue-50 text-blue-700',
-  received_at_hub: 'bg-teal-50 text-teal-700',
-  in_transit: 'bg-purple-50 text-purple-700',
-  delivered: 'bg-emerald-50 text-emerald-700',
-  cancelled: 'bg-slate-100 text-slate-500',
+  pending:           'bg-amber-50 text-amber-700',
+  confirmed:         'bg-blue-50 text-blue-700',
+  dispatched_to_hub: 'bg-orange-50 text-orange-700',
+  received_at_hub:   'bg-teal-50 text-teal-700',
+  in_transit:        'bg-purple-50 text-purple-700',
+  delivered:         'bg-emerald-50 text-emerald-700',
+  cancelled:         'bg-slate-100 text-slate-500',
 };
 
 export default function TradeflowDashboard() {
@@ -42,8 +43,8 @@ export default function TradeflowDashboard() {
   const activeShipments = shipments.filter(s => !s.received_in_qatar && s.status !== 'cancelled').length;
   const hubOrders = orders.filter(o => o.fulfillment_type !== 'direct_express');
   const directOrders = orders.filter(o => o.fulfillment_type === 'direct_express');
-  const unassignedOrders = hubOrders.filter(o => !o.shipment_id && ['pending', 'confirmed', 'received_at_hub'].includes(o.status)).length;
-  const activeOrders = orders.filter(o => ['pending', 'confirmed', 'received_at_hub', 'in_transit'].includes(o.status));
+  const unassignedOrders = hubOrders.filter(o => !o.shipment_id && ['pending', 'confirmed', 'dispatched_to_hub', 'received_at_hub'].includes(o.status)).length;
+  const activeOrders = orders.filter(o => ['pending', 'confirmed', 'dispatched_to_hub', 'received_at_hub', 'in_transit'].includes(o.status));
 
   if (ordersLoading) {
     return (

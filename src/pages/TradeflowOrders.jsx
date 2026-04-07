@@ -17,16 +17,17 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const ACTIVE_STATUSES = ['pending', 'confirmed', 'received_at_hub', 'in_transit'];
+const ACTIVE_STATUSES = ['pending', 'confirmed', 'dispatched_to_hub', 'received_at_hub', 'in_transit'];
 const CLOSED_STATUSES = ['delivered', 'cancelled'];
 
 const statusStyles = {
-  pending: 'bg-amber-50 text-amber-700 border-amber-200',
-  confirmed: 'bg-blue-50 text-blue-700 border-blue-200',
-  received_at_hub: 'bg-teal-50 text-teal-700 border-teal-200',
-  in_transit: 'bg-purple-50 text-purple-700 border-purple-200',
-  delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  cancelled: 'bg-slate-100 text-slate-500 border-slate-200',
+  pending:           'bg-amber-50 text-amber-700 border-amber-200',
+  confirmed:         'bg-blue-50 text-blue-700 border-blue-200',
+  dispatched_to_hub: 'bg-orange-50 text-orange-700 border-orange-200',
+  received_at_hub:   'bg-teal-50 text-teal-700 border-teal-200',
+  in_transit:        'bg-purple-50 text-purple-700 border-purple-200',
+  delivered:         'bg-emerald-50 text-emerald-700 border-emerald-200',
+  cancelled:         'bg-slate-100 text-slate-500 border-slate-200',
 };
 
 const platformLogos = {
@@ -69,7 +70,7 @@ export default function TradeflowOrders() {
   // Active orders only — small bounded set, always needed
   const { data: activeOrdersRaw = [], isLoading } = useQuery({
     queryKey: ['orders', 'active'],
-    queryFn: () => base44.entities.Order.filter({ status: { $in: ['pending', 'confirmed', 'received_at_hub', 'in_transit'] } }, '-created_date', 500),
+    queryFn: () => base44.entities.Order.filter({ status: { $in: ['pending', 'confirmed', 'dispatched_to_hub', 'received_at_hub', 'in_transit'] } }, '-created_date', 500),
     staleTime: 30_000,
   });
 
@@ -361,8 +362,9 @@ export default function TradeflowOrders() {
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="dispatched_to_hub">Dispatched to Hub</SelectItem>
             <SelectItem value="received_at_hub">Received at Hub</SelectItem>
-            <SelectItem value="in_transit">In Transit</SelectItem>
+            <SelectItem value="in_transit">In Transit to Qatar</SelectItem>
             <SelectItem value="delivered">Delivered</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
