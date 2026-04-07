@@ -140,6 +140,7 @@ function ProviderRow({ p, canEdit, pcsId }) {
   const { fetchRate, loading: fxLoading } = useFxRate();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
+    name: p.name || "",
     currency: p.currency || "QAR",
     exchange_rate: p.exchange_rate ?? 1,
     freight_charges: p.freight_charges ?? 0,
@@ -189,7 +190,9 @@ function ProviderRow({ p, canEdit, pcsId }) {
     return (
       <tr className="bg-blue-50/40 border-y border-blue-100">
         <td className="py-2 px-3 text-slate-400 font-mono text-xs">{p.provider_number}</td>
-        <td className="py-2 px-3 font-medium text-slate-800">{p.name}</td>
+        <td className="py-2 px-3">
+          <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-7 text-xs w-36 font-medium" placeholder="Company name" />
+        </td>
         <td className="py-2 px-3">
           <Input value={form.contact_person} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} className="h-7 text-xs w-28" />
         </td>
@@ -228,7 +231,7 @@ function ProviderRow({ p, canEdit, pcsId }) {
         </td>
         <td className="py-2 px-3">
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-600 hover:bg-emerald-50" onClick={() => updateMutation.mutate({ ...form, exchange_rate: parseFloat(form.exchange_rate) || 1, freight_charges: parseFloat(form.freight_charges) || 0 })} disabled={updateMutation.isPending}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-600 hover:bg-emerald-50" onClick={() => { if (!form.name.trim()) { toast.error("Company name is required"); return; } updateMutation.mutate({ ...form, exchange_rate: parseFloat(form.exchange_rate) || 1, freight_charges: parseFloat(form.freight_charges) || 0 }); }} disabled={updateMutation.isPending}>
               <Check className="w-3 h-3" />
             </Button>
             <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:bg-slate-100" onClick={() => setEditing(false)}>
