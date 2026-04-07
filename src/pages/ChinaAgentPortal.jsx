@@ -53,7 +53,7 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
       setMenuPos({
-        top: rect.bottom + 4,
+        top: rect.bottom + window.scrollY + 4,
         right: window.innerWidth - rect.right,
       });
     }
@@ -69,6 +69,51 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
     );
   }
 
+  const menu = open ? ReactDOM.createPortal(
+    <>
+      <div
+        style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+        onClick={() => setOpen(false)}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: menuPos.top,
+          right: menuPos.right,
+          zIndex: 9999,
+          width: 256,
+        }}
+        className="bg-white border border-slate-200 rounded-xl shadow-xl py-2 overflow-hidden"
+      >
+        <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
+        {agentStatuses.map(s => {
+          const Icon = s.icon;
+          const isActive = s.value === current;
+          return (
+            <button
+              key={s.value}
+              onClick={() => handleSelect(s.value)}
+              className={`w-full flex items-start gap-2.5 px-3 py-2 text-xs hover:bg-orange-50 transition-colors text-left ${isActive ? 'bg-orange-50' : ''}`}
+            >
+              <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${s.color}`}>
+                <Icon className="w-2.5 h-2.5" />
+              </span>
+              <div>
+                <p className={`font-semibold ${isActive ? 'text-orange-700' : 'text-slate-700'}`}>{s.label}</p>
+                <p className="text-slate-400 text-[10px] leading-snug">{
+                  s.value === 'dispatched_to_hub' ? 'Supplier sent it — on the way to hub' :
+                  s.value === 'received_at_hub'   ? 'Goods arrived & checked in at hub' : ''
+                }</p>
+              </div>
+              {isActive && <span className="ml-auto text-orange-400 text-[10px] font-bold flex-shrink-0">✓ current</span>}
+            </button>
+          );
+        })}
+      </div>
+    </>,
+    document.body
+  ) : null;
+
   return (
     <div className="relative">
       <button
@@ -82,47 +127,7 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
         </>}
       </button>
-      <AnimatePresence>
-        {open && typeof document !== 'undefined' && ReactDOM.createPortal(
-          <>
-            <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.12 }}
-              style={{ top: menuPos.top, right: menuPos.right }}
-              className="fixed bg-white border border-slate-200 rounded-xl shadow-xl z-[9999] w-64 py-2 overflow-hidden"
-            >
-              <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
-              {agentStatuses.map(s => {
-                const Icon = s.icon;
-                const isActive = s.value === current;
-                return (
-                  <button
-                    key={s.value}
-                    onClick={() => handleSelect(s.value)}
-                    className={`w-full flex items-start gap-2.5 px-3 py-2 text-xs hover:bg-orange-50 transition-colors text-left ${isActive ? 'bg-orange-50' : ''}`}
-                  >
-                    <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${s.color}`}>
-                      <Icon className="w-2.5 h-2.5" />
-                    </span>
-                    <div>
-                      <p className={`font-semibold ${isActive ? 'text-orange-700' : 'text-slate-700'}`}>{s.label}</p>
-                      <p className="text-slate-400 text-[10px] leading-snug">{
-                        s.value === 'dispatched_to_hub' ? 'Supplier sent it — on the way to hub' :
-                        s.value === 'received_at_hub'   ? 'Goods arrived & checked in at hub' : ''
-                      }</p>
-                    </div>
-                    {isActive && <span className="ml-auto text-orange-400 text-[10px] font-bold flex-shrink-0">✓ current</span>}
-                  </button>
-                );
-              })}
-            </motion.div>
-          </>,
-          document.body
-        )}
-      </AnimatePresence>
+      {menu}
     </div>
   );
 }
