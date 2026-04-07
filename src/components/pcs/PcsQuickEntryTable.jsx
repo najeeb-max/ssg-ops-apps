@@ -38,11 +38,12 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
 
   // For a given item, find the lowest QAR total among providers
   const getLowestQAR = (lineItemId) => {
+    const item = sortedItems.find((i) => i.id === lineItemId);
     const totalsQAR = sortedProviders
       .map((p) => {
         const q = getQuote(lineItemId, p.id);
-        if (!q?.total_price) return null;
-        return q.total_price * (p.exchange_rate || 1);
+        if (q?.unit_price == null) return null;
+        return q.unit_price * (item?.quantity || 1) * (p.exchange_rate || 1);
       })
       .filter((v) => v != null && v > 0);
     return totalsQAR.length ? Math.min(...totalsQAR) : null;
@@ -70,12 +71,24 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
               <th className="text-left py-2.5 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide w-8">#</th>
               <th className="text-left py-2.5 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide min-w-[200px]">Description</th>
               <th className="text-right py-2.5 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide w-16">Qty</th>
-              {sortedProviders.map((p) => (
-                <th key={p.id} className="text-center py-2.5 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide min-w-[160px]">
-                  <div>{p.name}</div>
-                  <Badge variant="outline" className="text-xs font-normal mt-0.5">{p.currency || "QAR"}</Badge>
-                </th>
-              ))}
+              {sortedProviders.map((p) => {
+                const currency = p.currency || "QAR";
+                const rateOk = currency === "QAR" || (p.exchange_rate && p.exchange_rate !== 1);
+                return (
+                  <th key={p.id} className="text-center py-2.5 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide min-w-[160px]">
+                    <div>{p.name}</div>
+                    <div className="flex items-center justify-center gap-1 mt-0.5">
+                      <Badge variant="outline" className="text-xs font-normal">{currency}</Badge>
+                      {!rateOk && (
+                        <span title="Exchange rate may be incorrect (set to 1)" className="text-amber-500 text-[10px] font-bold cursor-help">⚠️ rate=1</span>
+                      )}
+                    </div>
+                    {currency !== "QAR" && p.exchange_rate && (
+                      <div className="text-[10px] text-slate-400 font-normal">1 {currency} = {Number(p.exchange_rate).toFixed(4)} QAR</div>
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -89,9 +102,12 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                   {sortedProviders.map((p) => {
                     const q = getQuote(item.id, p.id);
                     const rate = p.exchange_rate || 1;
-                    const totalQAR = q?.total_price ? q.total_price * rate : null;
-                    const isLowest = totalQAR != null && lowestQAR != null && Math.abs(totalQAR - lowestQAR) < 0.001;
                     const currency = p.currency || "QAR";
+                    // total_price is stored in provider currency; multiply by exchange_rate to get QAR
+                    const totalInProviderCurrency = q?.unit_price != null ? q.unit_price * (item.quantity || 1) : null;
+                    const totalQAR = totalInProviderCurrency != null ? totalInProviderCurrency * rate : null;
+                    const lowestQARVal = getLowestQAR(item.id);
+                    const isLowest = totalQAR != null && lowestQARVal != null && Math.abs(totalQAR - lowestQARVal) < 0.001;
 
                     return (
                       <td key={p.id} className={`py-1.5 px-2 text-center ${isLowest ? "bg-emerald-50" : ""}`}>
@@ -105,15 +121,15 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
                               className={`text-xs h-7 text-center w-28 tabular-nums ${isLowest ? "border-emerald-300 bg-emerald-50" : ""}`}
                             />
                           ) : (
-                            <span className="text-xs tabular-nums">{q?.unit_price ? `${currency} ${fmt(q.unit_price)}` : "-"}</span>
+                            <span className="text-xs tabular-nums">{q?.unit_price != null ? `${currency} ${fmt(q.unit_price)}` : "-"}</span>
                           )}
-                          {q?.total_price != null && (
-                            <div className="text-xs text-slate-400 tabular-nums">
-                              {currency !== "QAR" && <span>{currency} {fmt(q.total_price)}</span>}
-                              <span className={`ml-1 ${isLowest ? "text-emerald-700 font-semibold" : ""}`}>
+                          {totalInProviderCurrency != null && (
+                            <div className="text-xs text-slate-400 tabular-nums leading-tight">
+                              {currency !== "QAR" && <div>{currency} {fmt(totalInProviderCurrency)}</div>}
+                              <div className={isLowest ? "text-emerald-700 font-semibold" : ""}>
                                 {isLowest && <Star className="w-2.5 h-2.5 inline mr-0.5 text-emerald-500" />}
-                                QAR {fmt(totalQAR)}
-                              </span>
+                                @ QAR {fmt(totalQAR)}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -129,7 +145,12 @@ export default function PcsQuickEntryTable({ pcsId, lineItems, providers, quotes
               <td colSpan={3} className="py-3 px-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wide">Total (QAR)</td>
               {sortedProviders.map((p) => {
                 const rate = p.exchange_rate || 1;
-                const total = (quotes || []).filter((q) => q.provider_id === p.id).reduce((sum, q) => sum + (q.total_price || 0) * rate, 0);
+                // Recalculate from unit_price * qty to avoid stale total_price values
+                const total = sortedItems.reduce((sum, item) => {
+                  const q = getQuote(item.id, p.id);
+                  if (q?.unit_price == null) return sum;
+                  return sum + q.unit_price * (item.quantity || 1) * rate;
+                }, 0);
                 const freight = (p.freight_charges || 0) * rate;
                 return (
                   <td key={p.id} className="py-3 px-3 text-center">

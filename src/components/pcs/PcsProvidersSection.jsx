@@ -141,13 +141,22 @@ function ProviderRow({ p, canEdit, pcsId }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     currency: p.currency || "QAR",
-    exchange_rate: p.exchange_rate || 1,
-    freight_charges: p.freight_charges || 0,
+    exchange_rate: p.exchange_rate ?? 1,
+    freight_charges: p.freight_charges ?? 0,
     delivery_period: p.delivery_period || "",
     payment_terms: p.payment_terms || "",
     delivery_terms: p.delivery_terms || "",
     contact_person: p.contact_person || "",
   });
+
+  // When opening edit mode, auto-fetch rate if currency is non-QAR and rate looks wrong (= 1 default)
+  const handleStartEditing = async () => {
+    setEditing(true);
+    if (form.currency !== "QAR" && (!p.exchange_rate || p.exchange_rate === 1)) {
+      const rate = await fetchRate(form.currency);
+      if (rate) setForm((f) => ({ ...f, exchange_rate: rate }));
+    }
+  };
 
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.Provider.update(p.id, data),
@@ -250,7 +259,7 @@ function ProviderRow({ p, canEdit, pcsId }) {
       <td className="py-2 px-3">
         {canEdit && (
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-blue-600 hover:bg-blue-50" onClick={() => setEditing(true)}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-blue-600 hover:bg-blue-50" onClick={handleStartEditing}>
               <Pencil className="w-3 h-3" />
             </Button>
             <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-300 hover:text-destructive hover:bg-red-50" onClick={() => deleteMutation.mutate()}>
