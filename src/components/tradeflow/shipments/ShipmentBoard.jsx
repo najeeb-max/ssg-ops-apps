@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, ChevronDown, ChevronUp, MapPin, Zap } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, ChevronUp, MapPin, Zap, Ship, Plane, Truck, Train } from 'lucide-react';
+import { getTransportIcon } from '@/lib/transportIcons';
 import { format } from 'date-fns';
 import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 
@@ -69,16 +70,18 @@ function ShipmentCard({ shipment, orders, color, onEdit, onDelete, onUnassign, o
   const totalCbm = included.reduce((s, o) => s + (o.cbm || 0), 0);
   const totalCtns = included.reduce((s, o) => s + (o.num_cartons || 0), 0);
   const isDirect = shipment.shipment_type === 'direct_express';
+  const TransportIcon = getTransportIcon(isDirect ? 'express' : shipment.transport_mode);
 
   return (
     <div className={`bg-white rounded-xl border-2 overflow-hidden ${color.border} ${dimmed ? 'opacity-70' : ''}`}>
       {/* Vivid color header strip */}
       <div className={`${color.bg} px-4 py-2 flex items-center justify-between`}>
         <div className="flex items-center gap-2">
+          <TransportIcon className="w-4 h-4 text-white/80" />
           <span className="font-bold text-white text-sm tracking-wide">{shipment.shipment_number}</span>
           {isDirect && (
             <span className="inline-flex items-center gap-0.5 bg-white/20 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
-              <Zap className="w-2.5 h-2.5" />Direct
+              Direct
             </span>
           )}
         </div>

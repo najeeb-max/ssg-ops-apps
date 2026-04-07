@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { ShoppingCart, TrendingUp, Clock, Package, ArrowRight, Ship, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, TrendingUp, Package, ArrowRight, Ship, AlertTriangle, Plane, Truck, Train, Zap } from 'lucide-react';
+import { getTransportIcon } from '@/lib/transportIcons';
 import StatCard from '../components/tradeflow/dashboard/StatCard';
 import { Link } from 'react-router-dom';
 import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
@@ -121,9 +122,10 @@ export default function TradeflowDashboard() {
                     <span className="text-xs text-slate-300 italic hidden sm:inline">Direct</span>
                   ) : shipment ? (() => {
                     const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+                    const TransportIcon = getTransportIcon(shipment.transport_mode);
                     return (
                       <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${c.badge}`}>
-                        <Ship className="w-3 h-3" />{shipment.shipment_number}
+                        <TransportIcon className="w-3 h-3" />{shipment.shipment_number}
                       </span>
                     );
                   })() : (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box, Shield } from "lucide-react";
+import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box, Shield, Plane, Train, Zap } from "lucide-react";
+import { getTransportIcon } from "@/lib/transportIcons";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -151,6 +152,7 @@ function ShipmentGroup({ group, onUpdate }) {
   const color = getGroupColor(group.shipmentId);
   const totalKg = group.orders.reduce((s, o) => s + (o.weight_kgs || 0), 0);
   const totalCartons = group.orders.reduce((s, o) => s + (o.num_cartons || 0), 0);
+  const TransportIcon = getTransportIcon(group.transportMode);
 
   return (
     <div className={`rounded-xl border-2 overflow-hidden ${color.border}`}>
@@ -160,7 +162,7 @@ function ShipmentGroup({ group, onUpdate }) {
         onClick={() => setCollapsed(v => !v)}
       >
         <div className="flex items-center gap-3">
-          <Ship className="w-5 h-5 text-white/80 flex-shrink-0" />
+          <TransportIcon className="w-5 h-5 text-white/80 flex-shrink-0" />
           <div className="text-left">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-base">{group.shipmentNumber}</span>
@@ -390,6 +392,7 @@ export default function ChinaAgentPortal() {
         shipmentStatus: first.shipment_status,
         shipmentCarrier: first.shipment_carrier,
         shipmentArrivalDate: first.shipment_arrival_date,
+        transportMode: first.shipment_transport_mode,
         orders: shipmentOrders,
         isDone: first.shipment_status === 'delivered' || first.shipment_status === 'cancelled',
       };

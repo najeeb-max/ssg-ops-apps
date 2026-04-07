@@ -64,6 +64,7 @@ Deno.serve(async (req) => {
             shipment_status: shipment?.status || null,
             shipment_carrier: shipment?.carrier || null,
             shipment_arrival_date: shipment?.arrival_date || null,
+            shipment_transport_mode: shipment?.transport_mode || null,
             // Intentionally excluded: customer_name, customer_id, unit_price, total_amount, team_member_name, express_tracking_number
           };
         });

@@ -2,7 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
-import { Plus, Search, Pencil, Trash2, Zap, Package, Ship, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, Zap, Package, Ship, AlertTriangle, Plane, Truck, Train } from 'lucide-react';
+import { getTransportIcon } from '@/lib/transportIcons';
 import { buildShipmentColorMap, NEUTRAL_COLOR } from '@/lib/shipmentColors';
 import OrderDraftsPanel from '../components/tradeflow/orders/OrderDraftsPanel';
 import { Button } from '@/components/ui/button';
@@ -168,9 +169,10 @@ export default function TradeflowOrders() {
             </span>
             {shipment ? (() => {
               const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+              const TransportIcon = getTransportIcon(shipment.transport_mode);
               return (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full flex items-center gap-0.5 font-bold border ${c.badge}`}>
-                  <Ship className="w-3 h-3" />{shipment.shipment_number}
+                  <TransportIcon className="w-3 h-3" />{shipment.shipment_number}
                 </span>
               );
             })() : !isDirect && (
@@ -253,10 +255,11 @@ export default function TradeflowOrders() {
                       <span className="text-xs text-slate-300 italic">Direct Route</span>
                     ) : shipment ? (() => {
                       const c = shipmentColorMap[shipment.id] || NEUTRAL_COLOR;
+                      const TransportIcon = getTransportIcon(shipment.transport_mode);
                       return (
                         <div>
                           <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${c.badge}`}>
-                            <Ship className="w-3 h-3" />{shipment.shipment_number}
+                            <TransportIcon className="w-3 h-3" />{shipment.shipment_number}
                           </span>
                           <p className="text-xs text-slate-400 mt-0.5 capitalize">{shipment.status?.replace(/_/g, ' ')}{shipment.carrier ? ` · ${shipment.carrier}` : ''}</p>
                           {shipment.arrival_date && <p className="text-xs text-slate-400">ETA: {shipment.arrival_date}</p>}
