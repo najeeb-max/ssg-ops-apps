@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
+import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -125,18 +125,106 @@ function ShipmentTag({ order }) {
   );
 }
 
-function OrderCard({ order, onUpdate }) {
-  const [expanded, setExpanded] = useState(false);
+const shipmentGroupColors = [
+  { header: 'bg-indigo-600', border: 'border-indigo-200', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  { header: 'bg-emerald-600', border: 'border-emerald-200', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { header: 'bg-rose-600', border: 'border-rose-200', badge: 'bg-rose-50 text-rose-700 border-rose-200' },
+  { header: 'bg-amber-600', border: 'border-amber-200', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { header: 'bg-fuchsia-600', border: 'border-fuchsia-200', badge: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200' },
+  { header: 'bg-cyan-600', border: 'border-cyan-200', badge: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  { header: 'bg-orange-600', border: 'border-orange-200', badge: 'bg-orange-50 text-orange-700 border-orange-200' },
+  { header: 'bg-violet-600', border: 'border-violet-200', badge: 'bg-violet-50 text-violet-700 border-violet-200' },
+];
+
+let _colorIndex = 0;
+const _shipmentColorAssigned = {};
+function getGroupColor(shipmentId) {
+  if (!_shipmentColorAssigned[shipmentId]) {
+    _shipmentColorAssigned[shipmentId] = shipmentGroupColors[_colorIndex % shipmentGroupColors.length];
+    _colorIndex++;
+  }
+  return _shipmentColorAssigned[shipmentId];
+}
+
+function ShipmentGroup({ group, onUpdate }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const color = getGroupColor(group.shipmentId);
+  const totalKg = group.orders.reduce((s, o) => s + (o.weight_kgs || 0), 0);
+  const totalCartons = group.orders.reduce((s, o) => s + (o.num_cartons || 0), 0);
 
   return (
-    <div className={`bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow ${order.shipment_number ? 'border-slate-200' : 'border-amber-200'}`}>
+    <div className={`rounded-xl border-2 overflow-hidden ${color.border}`}>
+      {/* Shipment header */}
+      <button
+        className={`w-full flex items-center justify-between px-4 py-3 text-white ${color.header} hover:opacity-95 transition-opacity`}
+        onClick={() => setCollapsed(v => !v)}
+      >
+        <div className="flex items-center gap-3">
+          <Ship className="w-5 h-5 text-white/80 flex-shrink-0" />
+          <div className="text-left">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-base">{group.shipmentNumber}</span>
+              {group.shipmentStatus && (
+                <span className="text-xs font-semibold bg-white/20 px-2 py-0.5 rounded-full capitalize">
+                  {group.shipmentStatus.replace(/_/g, ' ')}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3 mt-0.5 text-white/70 text-xs flex-wrap">
+              {group.shipmentCarrier && <span>{group.shipmentCarrier}</span>}
+              {group.shipmentArrivalDate && <span>ETA: {group.shipmentArrivalDate}</span>}
+              <span className="flex items-center gap-1"><Box className="w-3 h-3" />{group.orders.length} order{group.orders.length !== 1 ? 's' : ''}</span>
+              {totalKg > 0 && <span>{totalKg.toFixed(1)} kg</span>}
+              {totalCartons > 0 && <span>{totalCartons} ctn</span>}
+            </div>
+          </div>
+        </div>
+        <ChevronDown className={`w-5 h-5 text-white/70 transition-transform flex-shrink-0 ${collapsed ? '-rotate-90' : ''}`} />
+      </button>
+
+      {/* Orders inside shipment */}
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="divide-y divide-slate-100 bg-white">
+              {group.orders.map((order, idx) => (
+                <OrderCard key={order.id} order={order} onUpdate={onUpdate} hideShipmentTag insideGroup groupColor={color} orderIndex={idx + 1} totalInGroup={group.orders.length} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function OrderCard({ order, onUpdate, hideShipmentTag, insideGroup, groupColor, orderIndex, totalInGroup }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const cardBorder = insideGroup ? 'border-0' : (order.shipment_number ? 'border border-slate-200 rounded-xl' : 'border border-amber-200 rounded-xl');
+
+  return (
+    <div className={`bg-white overflow-hidden hover:bg-slate-50/60 transition-colors ${cardBorder}`}>
       <div className="px-4 py-3 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 mt-0.5 ${order.shipment_number ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'}`}>
-            {order.shipment_number
-              ? <Ship className="w-4 h-4 text-emerald-600" />
-              : <Package className="w-4 h-4 text-amber-500" />}
-          </div>
+          {insideGroup ? (
+            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold text-white/90"
+              style={{ background: 'rgba(0,0,0,0.12)' }}>
+              {orderIndex}
+            </div>
+          ) : (
+            <div className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 mt-0.5 ${order.shipment_number ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'}`}>
+              {order.shipment_number
+                ? <Ship className="w-4 h-4 text-emerald-600" />
+                : <Package className="w-4 h-4 text-amber-500" />}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2 mb-0.5">
               <span className="font-bold text-slate-900 text-sm">{order.alibaba_order_ref || order.id.slice(-6)}</span>
@@ -148,7 +236,7 @@ function OrderCard({ order, onUpdate }) {
               {order.supplier_name ? ` · ${order.supplier_name}` : ''}
               {order.weight_kgs ? ` · ${order.weight_kgs} kg` : ''}
             </p>
-            <ShipmentTag order={order} />
+            {!hideShipmentTag && <ShipmentTag order={order} />}
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -251,16 +339,39 @@ export default function ChinaAgentPortal() {
     delivered: orders.filter(o => o.status === 'delivered').length,
   };
 
-  // Sort: unbooked active orders first, then booked, then delivered
-  const sortedOrders = [...orders].sort((a, b) => {
-    const aBooked = !!a.shipment_id;
-    const bBooked = !!b.shipment_id;
-    const aDone = a.status === 'delivered';
-    const bDone = b.status === 'delivered';
-    if (aDone !== bDone) return aDone ? 1 : -1;
-    if (aBooked !== bBooked) return aBooked ? 1 : -1;
-    return 0;
-  });
+  // Group orders by shipment
+  const groupedByShipment = orders.reduce((acc, order) => {
+    if (!order.shipment_id) {
+      acc.__unbooked = acc.__unbooked || [];
+      acc.__unbooked.push(order);
+    } else {
+      acc[order.shipment_id] = acc[order.shipment_id] || [];
+      acc[order.shipment_id].push(order);
+    }
+    return acc;
+  }, {});
+
+  // Build shipment groups sorted: active shipments first, then delivered/cancelled, unbooked last
+  const shipmentGroups = Object.entries(groupedByShipment)
+    .filter(([key]) => key !== '__unbooked')
+    .map(([shipmentId, shipmentOrders]) => {
+      const first = shipmentOrders[0];
+      return {
+        shipmentId,
+        shipmentNumber: first.shipment_number,
+        shipmentStatus: first.shipment_status,
+        shipmentCarrier: first.shipment_carrier,
+        shipmentArrivalDate: first.shipment_arrival_date,
+        orders: shipmentOrders,
+        isDone: first.shipment_status === 'delivered' || first.shipment_status === 'cancelled',
+      };
+    })
+    .sort((a, b) => {
+      if (a.isDone !== b.isDone) return a.isDone ? 1 : -1;
+      return (a.shipmentNumber || '').localeCompare(b.shipmentNumber || '');
+    });
+
+  const unbookedOrders = groupedByShipment.__unbooked || [];
 
   // ── No token ─────────────────────────────────────────────────────────────
   if (!loading && error === 'no_token') {
@@ -361,28 +472,38 @@ export default function ChinaAgentPortal() {
         </div>
       </div>
 
-      {/* Orders */}
-      <div className="max-w-3xl mx-auto px-4 py-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-            {orders.length} China Hub Order{orders.length !== 1 ? 's' : ''} · Tap to expand
-          </p>
-          {stats.notBooked > 0 && (
-            <span className="text-xs font-semibold text-amber-600 flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5" />{stats.notBooked} awaiting booking — shown first
-            </span>
-          )}
-        </div>
+      {/* Orders grouped by shipment */}
+      <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
 
-        {sortedOrders.length === 0 ? (
+        {orders.length === 0 && (
           <div className="text-center py-16 text-slate-400">
             <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No China Hub orders at the moment.</p>
           </div>
-        ) : (
-          sortedOrders.map(order => (
-            <OrderCard key={order.id} order={order} onUpdate={handleUpdate} />
-          ))
+        )}
+
+        {/* Active shipment groups */}
+        {shipmentGroups.map(group => (
+          <ShipmentGroup key={group.shipmentId} group={group} onUpdate={handleUpdate} />
+        ))}
+
+        {/* Unbooked orders */}
+        {unbookedOrders.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <div className="flex items-center gap-1.5 bg-amber-100 border border-amber-200 rounded-lg px-3 py-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <span className="text-sm font-bold text-amber-700">Awaiting Shipment Booking</span>
+                <span className="bg-amber-200 text-amber-800 text-xs font-bold px-1.5 py-0.5 rounded-full ml-1">{unbookedOrders.length}</span>
+              </div>
+              <p className="text-xs text-slate-400">Not yet assigned to any shipment</p>
+            </div>
+            <div className="border-2 border-dashed border-amber-200 rounded-xl p-1 space-y-1.5 bg-amber-50/40">
+              {unbookedOrders.map(order => (
+                <OrderCard key={order.id} order={order} onUpdate={handleUpdate} />
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
