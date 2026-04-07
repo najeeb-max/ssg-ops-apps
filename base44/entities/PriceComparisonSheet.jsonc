@@ -48,7 +48,9 @@
         "pending_approval",
         "approved",
         "rejected",
-        "awarded"
+        "awarded",
+        "ordered",
+        "completed"
       ],
       "default": "draft",
       "description": "Workflow status"
@@ -68,6 +70,14 @@
     "total_selling_value": {
       "type": "number",
       "default": 0
+    },
+    "tradeflow_order_ref": {
+      "type": "string",
+      "description": "Linked Tradeflow Order reference (e.g. SSG-0042)"
+    },
+    "tradeflow_order_id": {
+      "type": "string",
+      "description": "Linked Tradeflow Order entity ID"
     }
   },
   "required": [

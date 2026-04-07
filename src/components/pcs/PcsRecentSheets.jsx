@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Building2, Hash, Calendar } from "lucide-react";
+import { ArrowRight, Building2, Hash, Calendar, Truck } from "lucide-react";
 
 const statusStyles = {
   draft: "bg-slate-100 text-slate-600 border-slate-200",
   in_progress: "bg-amber-50 text-amber-700 border-amber-200",
-  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  pending_approval: "bg-blue-50 text-blue-700 border-blue-200",
+  approved: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  rejected: "bg-red-50 text-red-700 border-red-200",
   awarded: "bg-violet-50 text-violet-700 border-violet-200",
+  ordered: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
 function SheetTile({ sheet, providers, lineItems, quotes }) {
@@ -43,7 +47,12 @@ function SheetTile({ sheet, providers, lineItems, quotes }) {
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-bold text-slate-900">{sheet.pcs_number}</span>
             <Badge className={statusStyles[sheet.status]}>{sheet.status?.replace("_", " ")}</Badge>
-            {awardedVendors.length > 1 && <Badge className="bg-blue-50 text-blue-600 border-blue-200 text-xs">split order</Badge>}
+                  {awardedVendors.length > 1 && <Badge className="bg-blue-50 text-blue-600 border-blue-200 text-xs">split order</Badge>}
+            {sheet.tradeflow_order_ref && (
+              <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs flex items-center gap-1">
+                <Truck className="w-2.5 h-2.5" />{sheet.tradeflow_order_ref}
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-slate-600 flex items-center gap-1 mb-1">
             <Building2 className="w-3.5 h-3.5" />{sheet.client_name}
@@ -90,7 +99,7 @@ export default function PcsRecentSheets({ sheets, searchActive, allProviders = [
   const sorted = [...sheets].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
   const recent = searchActive
     ? sorted
-    : sorted.filter((s) => s.status !== "completed" && s.status !== "awarded");
+    : sorted.filter((s) => s.status !== "completed");
 
   if (recent.length === 0) {
     return (

@@ -46,7 +46,7 @@ export default function PcsDashboard() {
       s.rfq_number?.toLowerCase().includes(q) ||
       s.remarks?.toLowerCase().includes(q)
     );
-    const matchesStat = !statFilter || statFilter === "total" || s.status === statFilter;
+    const matchesStat = !statFilter || statFilter === "total" || s.status === statFilter || (statFilter === "in_progress" && s.status === "pending_approval");
     return matchesSearch && matchesStat;
   });
 
