@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { base44 } from "@/api/base44Client";
 import { Package, Ship, Clock, CheckCircle2, Truck, ChevronDown, Lock, AlertCircle, RefreshCw, AlertTriangle, Box, Shield, Plane, Train, Zap } from "lucide-react";
 import { getTransportIcon } from "@/lib/transportIcons";
@@ -33,10 +34,11 @@ function StatusBadge({ status }) {
 function StatusDropdown({ orderId, current, onUpdate, disabled }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const btnRef = useRef(null);
 
   const currentStatus = STATUSES.find(s => s.value === current);
   const isAgentOwned = currentStatus?.agentOwned ?? false;
-  // Agent can only pick their two statuses
   const agentStatuses = STATUSES.filter(s => s.agentOwned);
 
   async function handleSelect(newStatus) {
@@ -47,8 +49,18 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
     setLoading(false);
   }
 
-  // If current status is SSG-owned, show a locked badge instead of a dropdown
-  if (!isAgentOwned && !open) {
+  function handleOpen() {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setMenuPos({
+        top: rect.bottom + window.scrollY + 4,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setOpen(v => !v);
+  }
+
+  if (!isAgentOwned) {
     return (
       <div className="flex items-center gap-1 text-xs font-medium text-slate-400 bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1.5">
         <Lock className="w-3 h-3" />
@@ -60,7 +72,8 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(v => !v)}
+        ref={btnRef}
+        onClick={handleOpen}
         disabled={disabled || loading}
         className="flex items-center gap-1.5 text-xs font-semibold bg-white border border-orange-300 hover:border-orange-400 text-orange-700 rounded-lg px-3 py-1.5 transition-colors shadow-sm disabled:opacity-50"
       >
@@ -70,15 +83,16 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
         </>}
       </button>
       <AnimatePresence>
-        {open && (
+        {open && typeof document !== 'undefined' && ReactDOM.createPortal(
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.12 }}
-              className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 w-64 py-2 overflow-hidden"
+              style={{ top: menuPos.top, right: menuPos.right }}
+              className="fixed bg-white border border-slate-200 rounded-xl shadow-xl z-[9999] w-64 py-2 overflow-hidden"
             >
               <p className="text-[10px] font-bold text-slate-400 uppercase px-3 pb-1.5">Your Actions</p>
               {agentStatuses.map(s => {
@@ -105,7 +119,8 @@ function StatusDropdown({ orderId, current, onUpdate, disabled }) {
                 );
               })}
             </motion.div>
-          </>
+          </>,
+          document.body
         )}
       </AnimatePresence>
     </div>
