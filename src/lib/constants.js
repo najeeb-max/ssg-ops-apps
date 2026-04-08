@@ -58,26 +58,42 @@ export const PLATFORMS = [
   { value: 'Other Direct', label: 'Other (Direct)', type: 'direct_express', logo: 'https://media.base44.com/images/public/69b6a3cfbeec26cd3fa13483/efc049276_image.png' },
 ];
 
+// ── Unified status labels (single source of truth) ───────────────────────────
+// These labels are used everywhere: forms, badges, filters, portals.
+export const STATUS_LABELS = {
+  pending:           'Pending',
+  confirmed:         'Order Placed - Awaiting Supplier To Ship',
+  dispatched_to_hub: 'Dispatched to Hub',
+  received_at_hub:   'Received at Hub',
+  in_transit:        'In Transit to Qatar',
+  delivered:         'Delivered',
+  cancelled:         'Cancelled',
+};
+
+// Helper: get display label for any status value
+export const getStatusLabel = (value) => STATUS_LABELS[value] || (value?.replace(/_/g, ' ') ?? '');
+
 // China Hub order status flow:
 // SSG:   pending → confirmed
 // Agent: confirmed → dispatched_to_hub → received_at_hub
 // SSG:   received_at_hub → in_transit → delivered
 export const ORDER_STATUSES_HUB = [
-  { value: 'pending',           label: 'Pending',              owner: 'ssg',   description: 'Order placed, awaiting supplier confirmation' },
-  { value: 'confirmed',         label: 'Confirmed',            owner: 'ssg',   description: 'Supplier confirmed, goods being prepared' },
-  { value: 'dispatched_to_hub', label: 'Dispatched to Hub',   owner: 'agent', description: 'Supplier shipped goods — moving to hub within China' },
-  { value: 'received_at_hub',   label: 'Received at Hub',     owner: 'agent', description: 'Goods arrived and checked in at the hub' },
-  { value: 'in_transit',        label: 'In Transit to Qatar', owner: 'ssg',   description: 'Loaded on shipment, en route to Qatar' },
-  { value: 'delivered',         label: 'Delivered',            owner: 'ssg',   description: 'Arrived in Qatar' },
-  { value: 'cancelled',         label: 'Cancelled',            owner: 'ssg',   description: '' },
+  { value: 'pending',           label: STATUS_LABELS.pending,           owner: 'ssg',   description: 'Order placed, awaiting supplier confirmation' },
+  { value: 'confirmed',         label: STATUS_LABELS.confirmed,         owner: 'ssg',   description: 'Supplier confirmed, goods being prepared' },
+  { value: 'dispatched_to_hub', label: STATUS_LABELS.dispatched_to_hub, owner: 'agent', description: 'Supplier shipped goods — moving to hub within China' },
+  { value: 'received_at_hub',   label: STATUS_LABELS.received_at_hub,   owner: 'agent', description: 'Goods arrived and checked in at the hub' },
+  { value: 'in_transit',        label: STATUS_LABELS.in_transit,        owner: 'ssg',   description: 'Loaded on shipment, en route to Qatar' },
+  { value: 'delivered',         label: STATUS_LABELS.delivered,         owner: 'ssg',   description: 'Arrived in Qatar' },
+  { value: 'cancelled',         label: STATUS_LABELS.cancelled,         owner: 'ssg',   description: '' },
 ];
 
+// Direct Express uses the same full status set (minus hub-specific steps)
 export const ORDER_STATUSES_DIRECT = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'confirmed', label: 'Ordered / Confirmed' },
-  { value: 'in_transit', label: 'Shipped / In Transit' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'pending',    label: STATUS_LABELS.pending },
+  { value: 'confirmed',  label: STATUS_LABELS.confirmed },
+  { value: 'in_transit', label: STATUS_LABELS.in_transit },
+  { value: 'delivered',  label: STATUS_LABELS.delivered },
+  { value: 'cancelled',  label: STATUS_LABELS.cancelled },
 ];
 
 export const STATUS_STYLES = {

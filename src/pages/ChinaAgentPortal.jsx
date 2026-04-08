@@ -10,7 +10,7 @@ import { toast } from "sonner";
 // SSG-owned statuses (read-only for agent: pending, confirmed, in_transit, delivered)
 const STATUSES = [
   { value: "pending",           label: "Pending",              color: "bg-amber-100 text-amber-700",    icon: Clock,         agentOwned: false },
-  { value: "confirmed",         label: "Order Placed - Awaiting Supplier To Ship", color: "bg-blue-100 text-blue-700", icon: CheckCircle2,  agentOwned: false },
+  { value: "confirmed",         label: "Order Placed - Awaiting Supplier To Ship",  color: "bg-blue-100 text-blue-700",      icon: CheckCircle2,  agentOwned: false },
   { value: "dispatched_to_hub", label: "Dispatched to Hub",   color: "bg-orange-100 text-orange-700",  icon: Truck,         agentOwned: true  },
   { value: "received_at_hub",   label: "Received at Hub",     color: "bg-teal-100 text-teal-700",      icon: Package,       agentOwned: true  },
   { value: "in_transit",        label: "In Transit to Qatar", color: "bg-indigo-100 text-indigo-700",  icon: Ship,          agentOwned: false },

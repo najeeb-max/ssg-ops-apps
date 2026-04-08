@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ShoppingCart, TrendingUp, Package, ArrowRight, Ship, AlertTriangle, Plane, Truck, Train, Zap } from 'lucide-react';
+import { getStatusLabel } from '@/lib/constants';
 import { getTransportIcon } from '@/lib/transportIcons';
 import StatCard from '../components/tradeflow/dashboard/StatCard';
 import { Link } from 'react-router-dom';
@@ -117,7 +118,7 @@ export default function TradeflowDashboard() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusStyles[order.status] || 'bg-slate-100 text-slate-500'}`}>
-                    {order.status === 'confirmed' ? 'Order Placed - Awaiting Supplier To Ship' : order.status?.replace(/_/g, ' ')}
+                    {getStatusLabel(order.status)}
                   </span>
                   {isDirect ? (
                     <span className="text-xs text-slate-300 italic hidden sm:inline">Direct</span>
