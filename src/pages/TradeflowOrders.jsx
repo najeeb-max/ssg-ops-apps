@@ -159,7 +159,7 @@ export default function TradeflowOrders() {
       <div className="p-4 border-b border-slate-100 last:border-0">
         <div className="flex items-start justify-between gap-2 mb-1">
           <p className="font-medium text-slate-800 text-sm">{order.product_name}</p>
-          <Badge className={`text-xs border shrink-0 ${statusStyles[order.status] || ''}`}>{order.status?.replace(/_/g, ' ')}</Badge>
+          <Badge className={`text-xs border shrink-0 ${statusStyles[order.status] || ''}`}>{order.status === 'confirmed' ? 'Order Placed - Awaiting Supplier To Ship' : order.status?.replace(/_/g, ' ')}</Badge>
         </div>
         <p className="text-xs text-slate-400">{order.customer_name || ''}{order.supplier_name ? ` · ${order.supplier_name}` : ''}</p>
         {tracking && <p className="text-xs text-slate-400 font-mono mt-1">{tracking}</p>}
@@ -245,7 +245,7 @@ export default function TradeflowOrders() {
                   <td className="py-2.5 px-4 text-slate-600 text-sm">{order.team_member_name || '—'}</td>
                   <td className="py-2.5 px-4">
                     <Badge className={`text-xs border ${statusStyles[order.status] || ''}`}>
-                      {order.status?.replace(/_/g, ' ')}
+                      {order.status === 'confirmed' ? 'Order Placed - Awaiting Supplier To Ship' : order.status?.replace(/_/g, ' ')}
                     </Badge>
                     {isDirect && order.estimated_delivery_date && (
                       <p className="text-xs text-slate-400 mt-0.5">ETA: {order.estimated_delivery_date}</p>
@@ -361,7 +361,7 @@ export default function TradeflowOrders() {
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="confirmed">Order Placed - Awaiting Supplier To Ship</SelectItem>
             <SelectItem value="dispatched_to_hub">Dispatched to Hub</SelectItem>
             <SelectItem value="received_at_hub">Received at Hub</SelectItem>
             <SelectItem value="in_transit">In Transit to Qatar</SelectItem>

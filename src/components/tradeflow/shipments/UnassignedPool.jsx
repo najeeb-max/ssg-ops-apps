@@ -37,7 +37,7 @@ export default function UnassignedPool({ orders, shipments, onAssign }) {
             <div className="flex items-start justify-between gap-2 mb-1">
               <p className="text-sm font-medium text-slate-800 truncate">{order.product_name}</p>
               <Badge className={`text-xs border shrink-0 ${statusStyles[order.status] || ''}`}>
-                {order.status?.replace(/_/g, ' ')}
+                {order.status === 'confirmed' ? 'Order Placed - Awaiting Supplier To Ship' : order.status?.replace(/_/g, ' ')}
               </Badge>
             </div>
             <p className="text-xs text-slate-400">
