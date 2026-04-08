@@ -92,7 +92,7 @@ export default function TradeflowShipments() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Shipments</h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            Group received orders into shipments · {orders.filter(o => !o.shipment_id).length} orders unassigned
+            Group received orders into shipments · {orders.filter(o => !o.shipment_id && o.fulfillment_type !== 'direct_express').length} orders unassigned
           </p>
         </div>
         <Button onClick={() => { setEditing(null); setShowForm(true); }} className="bg-indigo-600 hover:bg-indigo-700 gap-1.5">

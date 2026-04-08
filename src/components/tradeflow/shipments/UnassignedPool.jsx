@@ -13,7 +13,8 @@ const statusStyles = {
 };
 
 export default function UnassignedPool({ orders, shipments, onAssign }) {
-  const unassigned = orders.filter(o => !o.shipment_id);
+  // Direct Express orders ship directly — they don't need shipment assignment
+  const unassigned = orders.filter(o => !o.shipment_id && o.fulfillment_type !== 'direct_express');
 
   if (unassigned.length === 0) {
     return (
